@@ -1,0 +1,3 @@
+language: scala
+script:
+  - sbt +test +publishLocal plugin/test plugin/scripted
