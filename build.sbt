@@ -40,7 +40,6 @@ lazy val plugin = project
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % PlayVersion),
     resourceGenerators in Compile <+= generateVersionFile,
     scriptedLaunchOpts ++= Seq("-Dplay-ebean.version=" + version.value),
-    scriptedBufferLog := false,
     scriptedDependencies := {
       val () = publishLocal.value
       val () = (publishLocal in core).value
