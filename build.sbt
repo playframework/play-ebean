@@ -1,6 +1,6 @@
 import sbt.inc.Analysis
 
-val PlayVersion = "2.4-SNAPSHOT"
+val PlayVersion = "2.4-2014-11-04-10ce984-SNAPSHOT"
 
 lazy val root = project
   .in(file("."))
