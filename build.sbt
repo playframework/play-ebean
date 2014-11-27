@@ -55,7 +55,8 @@ def common: Seq[Setting[_]] = Seq(
   scalaVersion := sys.props.get("scala.version").getOrElse("2.10.4"),
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
   (javacOptions in compile) := Seq("-source", "1.7", "-target", "1.7"),
-  (javacOptions in doc) := Seq("-source", "1.7")
+  (javacOptions in doc) := Seq("-source", "1.7"),
+  resolvers ++= DefaultOptions.resolvers(snapshot = true)
 )
 
 def crossScala: Seq[Setting[_]] = Seq(
