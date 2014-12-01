@@ -25,15 +25,20 @@ object SbtEbean extends AutoPlugin {
 
   override def trigger = allRequirements
 
-  override def projectSettings = inConfig(Compile)(Seq(
+  override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
+
+
+  def scopedSettings = Seq(
     models <<= configuredEbeanModels,
     compile <<= ebeanEnhance
-  )) ++ Seq(
+  )
+
+  def unscopedSettings = Seq(
     playEbeanVersion := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
     libraryDependencies += "com.typesafe.play" %% "play-ebean" % playEbeanVersion.value
   )
 
-  private def ebeanEnhance = Def.task {
+  def ebeanEnhance = Def.task {
 
     val deps = dependencyClasspath.value
     val classes = classDirectory.value
@@ -50,14 +55,14 @@ object SbtEbean extends AutoPlugin {
       import com.avaje.ebean.enhance.agent._
       import com.avaje.ebean.enhance.ant._
 
-      val cl = ClassLoader.getSystemClassLoader
+      val classloader = ClassLoader.getSystemClassLoader
 
-      val t = new Transformer(classpath, "debug=-1")
+      val transformer = new Transformer(classpath, "debug=-1")
 
-      val ft = new OfflineFileTransform(t, cl, classes.getAbsolutePath, classes.getAbsolutePath)
+      val fileTransform = new OfflineFileTransform(transformer, classloader, classes.getAbsolutePath, classes.getAbsolutePath)
 
       try {
-        ft.process(models.value.mkString(","))
+        fileTransform.process(models.value.mkString(","))
       } catch {
         case NonFatal(_) =>
       }
