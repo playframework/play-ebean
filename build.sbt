@@ -43,14 +43,14 @@ lazy val plugin = project
     scriptedDependencies := {
       val () = publishLocal.value
       val () = (publishLocal in core).value
-    }
+    },
+    scriptedTask := scripted.toTask("").value
   )
 
 // Shared settings
 
-def common: Seq[Setting[_]] = Seq(
+def common: Seq[Setting[_]] = releaseCommonSettings ++ Seq(
   organization := "com.typesafe.play",
-  version := "1.0-SNAPSHOT",
   scalaVersion := sys.props.get("scala.version").getOrElse("2.10.4"),
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
   (javacOptions in compile) := Seq("-source", "1.7", "-target", "1.7"),
@@ -58,6 +58,45 @@ def common: Seq[Setting[_]] = Seq(
   resolvers ++= DefaultOptions.resolvers(snapshot = true),
   resolvers += Resolver.typesafeRepo("releases")
 )
+
+// Release settings
+
+lazy val scriptedTask = TaskKey[Unit]("scripted-task")
+
+def releaseCommonSettings = releaseSettings ++ {
+  import sbtrelease._
+  import ReleaseStateTransformations._
+  import ReleaseKeys._
+
+  def runScriptedTest = ReleaseStep(
+    action = releaseTask(scriptedTask in plugin)
+  )
+  def publishPlugin = ReleaseStep(
+    action = releaseTask(PgpKeys.publishSigned in plugin)
+  )
+
+  Seq(
+    crossBuild := true,
+    publishArtifactsAction := PgpKeys.publishSigned.value,
+    tagName := (version in ThisBuild).value,
+
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,
+      runClean,
+      runTest,
+      runScriptedTest,
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      publishArtifacts,
+      publishPlugin,
+      setNextVersion,
+      commitNextVersion,
+      pushChanges
+    )
+  )
+}
 
 def crossScala: Seq[Setting[_]] = Seq(
   crossScalaVersions := Seq("2.10.4", "2.11.1")
