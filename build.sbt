@@ -1,6 +1,6 @@
 import sbt.inc.Analysis
 
-val PlayVersion = "2.4.0-M2"
+val PlayVersion = sys.props.getOrElse("play.version", "2.4.0-M2")
 
 lazy val root = project
   .in(file("."))
