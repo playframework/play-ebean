@@ -1,6 +1,6 @@
 import sbt.inc.Analysis
 
-val PlayVersion = "2.4.0-M2"
+val PlayVersion = sys.props.getOrElse("play.version", "2.4.0-M2")
 
 lazy val root = project
   .in(file("."))
@@ -11,14 +11,15 @@ lazy val root = project
 
 lazy val core = project
   .in(file("play-ebean"))
+  .enablePlugins(Playdoc, Omnidoc)
   .settings(common: _*)
   .settings(crossScala: _*)
   .settings(publishMaven: _*)
-  .settings(playdocSettings: _*)
   .settings(
     name := "play-ebean",
-    projectID := withSourceUrl.value,
     libraryDependencies ++= playEbeanDeps,
+    OmnidocKeys.githubRepo := "playframework/play-ebean",
+    OmnidocKeys.tagPrefix := "",
     compile in Compile := enhanceEbeanClasses(
       (dependencyClasspath in Compile).value,
       (compile in Compile).value,
@@ -153,30 +154,6 @@ def sbtPlayEbeanDeps = Seq(
 )
 
 def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "4.1.10"
-
-// Aggregated documentation
-
-def withSourceUrl = Def.setting {
-  val baseUrl = "https://github.com/playframework/play-ebean"
-  val sourceTree = if (isSnapshot.value) "master" else "v" + version.value
-  val sourceDirectory = IO.relativize((baseDirectory in ThisBuild).value, baseDirectory.value).getOrElse("")
-  val sourceUrl = s"$baseUrl/tree/$sourceTree/$sourceDirectory"
-  projectID.value.extra("info.sourceUrl" -> sourceUrl)
-}
-
-val packagePlaydoc = TaskKey[File]("package-playdoc", "Package play documentation")
-
-def playdocSettings: Seq[Setting[_]] =
-  Defaults.packageTaskSettings(packagePlaydoc, mappings in packagePlaydoc) ++
-  Seq(
-    mappings in packagePlaydoc := {
-      val base = (baseDirectory in ThisBuild).value / "docs"
-      (base / "manual").***.get pair relativeTo(base)
-    },
-    artifactClassifier in packagePlaydoc := Some("playdoc"),
-    artifact in packagePlaydoc ~= { _.copy(configurations = Seq(Docs)) }
-  ) ++
-  addArtifact(artifact in packagePlaydoc, packagePlaydoc)
 
 // Ebean enhancement
 
