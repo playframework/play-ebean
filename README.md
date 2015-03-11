@@ -2,4 +2,4 @@
 
 This module provides Ebean support for Play Framework.
 
-![Travis build status](https://travis-ci.org/playframework/play-ebean.svg?branch=master)
+[![Build Status](https://travis-ci.org/playframework/play-ebean.svg?branch=master)](https://travis-ci.org/playframework/play-ebean)
