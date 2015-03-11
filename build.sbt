@@ -54,8 +54,8 @@ def common: Seq[Setting[_]] = releaseCommonSettings ++ Seq(
   organization := "com.typesafe.play",
   scalaVersion := sys.props.get("scala.version").getOrElse("2.10.4"),
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
-  (javacOptions in compile) := Seq("-source", "1.7", "-target", "1.7"),
-  (javacOptions in doc) := Seq("-source", "1.7"),
+  (javacOptions in compile) := Seq("-source", "1.8", "-target", "1.8"),
+  (javacOptions in doc) := Seq("-source", "1.8"),
   resolvers ++= DefaultOptions.resolvers(snapshot = true),
   resolvers += Resolver.typesafeRepo("releases")
 )
@@ -150,7 +150,7 @@ def playEbeanDeps = Seq(
 
 def sbtPlayEbeanDeps = Seq(
   avajeEbeanormAgent,
-  "com.typesafe" % "config" % "1.2.1"
+  "com.typesafe" % "config" % "1.3.0-M1"
 )
 
 def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "4.1.10"
