@@ -3,15 +3,14 @@ package play.ebean.sbt
 import play.PlayJava
 import sbt.Keys._
 import sbt._
-import sbt.compiler.AggressiveCompile
 import sbt.inc._
 
 import scala.util.control.NonFatal
 
 object Import {
   object EbeanKeys {
-    val models = TaskKey[Seq[String]]("ebean-models", "The packages that should be searched for ebean models to enhance.")
-    val playEbeanVersion = SettingKey[String]("play-ebean-version", "The version of Play ebean that should be added to the library dependencies.")
+    val models = TaskKey[Seq[String]]("ebeanModels", "The packages that should be searched for ebean models to enhance.")
+    val playEbeanVersion = SettingKey[String]("playEbeanVersion", "The version of Play ebean that should be added to the library dependencies.")
   }
 }
 
@@ -27,10 +26,9 @@ object SbtEbean extends AutoPlugin {
 
   override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
-
   def scopedSettings = Seq(
     models <<= configuredEbeanModels,
-    compile <<= ebeanEnhance
+    manipulateBytecode <<= ebeanEnhance
   )
 
   def unscopedSettings = Seq(
@@ -38,11 +36,12 @@ object SbtEbean extends AutoPlugin {
     libraryDependencies += "com.typesafe.play" %% "play-ebean" % playEbeanVersion.value
   )
 
-  def ebeanEnhance = Def.task {
+  def ebeanEnhance: Def.Initialize[Task[Compiler.CompileResult]] = Def.task {
 
     val deps = dependencyClasspath.value
     val classes = classDirectory.value
-    val analysis = compile.value
+    val result = manipulateBytecode.value
+    val analysis = result.analysis
 
     val originalContextClassLoader = Thread.currentThread.getContextClassLoader
 
@@ -95,20 +94,7 @@ object SbtEbean extends AutoPlugin {
       stamps.markProduct(classFile, updateStampForClassFile(classFile, existingStamp))
     })
 
-    // Need to persist the updated analysis.
-    val agg = new AggressiveCompile((compileInputs in compile).value.incSetup.cacheFile)
-    // Load the old one. We do this so that we can get a copy of CompileSetup, which is the cache compiler
-    // configuration used to determine when everything should be invalidated. We could calculate it ourselves, but
-    // that would by a heck of a lot of fragile code due to the vast number of things we would have to depend on.
-    // Reading it out of the existing file is good enough.
-    val existing: Option[(Analysis, CompileSetup)] = agg.store.get()
-    // Since we've just done a compile before this task, this should never return None, so don't worry about what to
-    // do when it returns None.
-    existing.foreach {
-      case (_, compileSetup) => agg.store.set(updatedAnalysis, compileSetup)
-    }
-
-    updatedAnalysis
+    result.copy(analysis = updatedAnalysis)
   }
 
 
