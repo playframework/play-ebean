@@ -16,17 +16,35 @@ import play.mvc.Result;
 public class TransactionalAction extends Action<Transactional> {
     
     public F.Promise<Result> call(final Context ctx) throws Throwable {
-        return Ebean.execute(new TxCallable<F.Promise<Result>>() {
-            public F.Promise<Result> call() {
-                try {
-                    return delegate.call(ctx);
-                } catch (RuntimeException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    throw new RuntimeException(t);
-                }
+        Action<Transactional> action = new Action<Transactional>() {
+            @Override
+            public F.Promise<Result> call(Context context) throws Throwable {
+                return Ebean.execute(new TxCallable<F.Promise<Result>>() {
+                    public F.Promise<Result> call() {
+                        try {
+                            return delegate.call(ctx);
+                        } catch (RuntimeException e) {
+                            throw e;
+                        } catch (Throwable t) {
+                            throw new RuntimeException(t);
+                        }
+                    }
+                });
             }
-        });
+        };
+
+        Action<?> previousDelegate = this;
+        Action<?> lastDelegate = delegate;
+
+        while (lastDelegate.delegate != null) {
+            previousDelegate = lastDelegate;
+            lastDelegate = lastDelegate.delegate;
+        }
+
+        action.delegate = lastDelegate;
+        previousDelegate.delegate = action;
+
+        return delegate.call(ctx);
     }
     
 }
