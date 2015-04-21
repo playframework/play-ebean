@@ -71,9 +71,7 @@ object SbtEbean extends AutoPlugin {
       Thread.currentThread.setContextClassLoader(originalContextClassLoader)
     }
 
-    val javaClasses = (javaSource.value ** "*.java").get flatMap { sourceFile =>
-      analysis.relations.products(sourceFile)
-    }
+    val allProducts = analysis.relations.allProducts
 
     /**
      * Updates stamp of product (class file) by preserving the type of a passed stamp.
@@ -88,7 +86,7 @@ object SbtEbean extends AutoPlugin {
     // Since we may have modified some of the products of the incremental compiler, that is, the compiled template
     // classes and compiled Java sources, we need to update their timestamps in the incremental compiler, otherwise
     // the incremental compiler will see that they've changed since it last compiled them, and recompile them.
-    val updatedAnalysis = analysis.copy(stamps = javaClasses.foldLeft(analysis.stamps) { (stamps, classFile) =>
+    val updatedAnalysis = analysis.copy(stamps = allProducts.foldLeft(analysis.stamps) { (stamps, classFile) =>
       val existingStamp = stamps.product(classFile)
       if (existingStamp == Stamp.notPresent) {
         throw new java.io.IOException("Tried to update a stamp for class file that is not recorded as "
