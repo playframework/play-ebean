@@ -1,6 +1,7 @@
 import sbt.inc.Analysis
+import bintray.Keys._
 
-val PlayVersion = sys.props.getOrElse("play.version", "2.4.0-M3")
+val PlayVersion = sys.props.getOrElse("play.version", "2.4.0-RC1")
 
 lazy val root = project
   .in(file("."))
@@ -25,7 +26,9 @@ lazy val core = project
       (compile in Compile).value,
       (classDirectory in Compile).value,
       "play/db/ebean/**"
-    )
+    ),
+    (javacOptions in compile) := Seq("-source", "1.8", "-target", "1.8"),
+    (javacOptions in doc) := Seq("-source", "1.8")
   )
 
 lazy val plugin = project
@@ -38,6 +41,8 @@ lazy val plugin = project
     organization := "com.typesafe.sbt",
     sbtPlugin := true,
     libraryDependencies ++= sbtPlayEbeanDeps,
+    (javacOptions in compile) := Seq("-source", "1.7", "-target", "1.7"),
+    (javacOptions in doc) := Seq("-source", "1.7"),
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % PlayVersion),
     resourceGenerators in Compile <+= generateVersionFile,
     scriptedLaunchOpts ++= Seq("-Dplay-ebean.version=" + version.value),
@@ -54,10 +59,10 @@ def common: Seq[Setting[_]] = releaseCommonSettings ++ Seq(
   organization := "com.typesafe.play",
   scalaVersion := sys.props.get("scala.version").getOrElse("2.10.4"),
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
-  (javacOptions in compile) := Seq("-source", "1.8", "-target", "1.8"),
-  (javacOptions in doc) := Seq("-source", "1.8"),
   resolvers ++= DefaultOptions.resolvers(snapshot = true),
-  resolvers += Resolver.typesafeRepo("releases")
+  resolvers += Resolver.typesafeRepo("releases"),
+  homepage := Some(url("https://github.com/playframework/play-ebean")),
+  licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
 )
 
 // Release settings
@@ -108,8 +113,6 @@ def publishMaven: Seq[Setting[_]] = Seq(
     if (isSnapshot.value) Some(Opts.resolver.sonatypeSnapshots)
     else Some(Opts.resolver.sonatypeStaging)
   },
-  homepage := Some(url("https://github.com/playframework/play-ebean")),
-  licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   pomExtra := {
     <scm>
       <url>https://github.com/playframework/play-ebean</url>
@@ -126,12 +129,10 @@ def publishMaven: Seq[Setting[_]] = Seq(
   pomIncludeRepository := { _ => false }
 )
 
-def publishSbtPlugin: Seq[Setting[_]] = Seq(
+def publishSbtPlugin: Seq[Setting[_]] = bintrayPublishSettings ++ Seq(
   publishMavenStyle := false,
-  publishTo := {
-    if (isSnapshot.value) Some(Classpaths.sbtPluginSnapshots)
-    else Some(Classpaths.sbtPluginReleases)
-  }
+  bintrayOrganization in bintray := Some("playframework"),
+  repository in bintray := "sbt-plugin-releases"
 )
 
 def noPublish: Seq[Setting[_]] = Seq(

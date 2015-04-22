@@ -1,7 +1,6 @@
 package javaguide.ebean;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.TxRunnable;
 import org.junit.*;
 import play.db.ebean.Transactional;
 import play.mvc.Controller;
@@ -16,7 +15,7 @@ import static play.test.Helpers.*;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
-public class JavaEbean extends WithApplication {
+public class JavaEbeanTest extends WithApplication {
 
     @Override
     protected FakeApplication provideFakeApplication() {
@@ -52,6 +51,7 @@ public class JavaEbean extends WithApplication {
         assertThat(tasks.get(0).name, equalTo("coco"));
         assertThat(anyTask.name, equalTo("coco"));
         assertThat(cocoTasks.size(), equalTo(0));
+        assertThat(Task.find.all().size(), equalTo(0));
     }
 
     @Test
@@ -61,13 +61,13 @@ public class JavaEbean extends WithApplication {
         //#transaction
         // Created implicit transaction
         Task task = Task.find.byId(34L);
-        // Transaction commited or rollbacked
+        // Transaction committed or rolled back
 
         task.done = true;
 
         // Created implicit transaction
         task.save();
-        // Transaction commited or rollbacked
+        // Transaction committed or rolled back
         //#transaction
 
         assertThat(Task.find.byId(34L).done, is(true));
@@ -75,7 +75,6 @@ public class JavaEbean extends WithApplication {
 
     @Test
     public void txRunnable() {
-
         createTask();
 
         //#txrunnable
@@ -83,18 +82,15 @@ public class JavaEbean extends WithApplication {
 
         //###insert: ...
 
-        Ebean.execute(new TxRunnable() {
-            public void run() {
+        Ebean.execute(() -> {
+            // code running in "REQUIRED" transactional scope
+            // ... as "REQUIRED" is the default TxType
+            System.out.println(Ebean.currentTransaction());
 
-                // code running in "REQUIRED" transactional scope
-                // ... as "REQUIRED" is the default TxType
-                System.out.println(Ebean.currentTransaction());
+            Task task = Task.find.byId(34L);
+            task.done = true;
 
-                Task task = Task.find.byId(34L);
-                task.done = true;
-
-                task.save();
-            }
+            task.save();
         });
         //#txrunnable
 

@@ -1,6 +1,6 @@
 lazy val root = project
   .in(file("."))
-  .enablePlugins(PlayJava)
+  .enablePlugins(PlayJava, SbtEbean)
 
 sourceDirectory in Test := baseDirectory.value / "tests"
 

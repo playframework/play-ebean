@@ -9,17 +9,24 @@ Play comes with the [Ebean](http://www.avaje.org/) ORM. To enable it, add the Pl
 addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "1.0.0")
 ```
 
+And then modify your `build.sbt` to enable the Play ebean plugin:
+
+```scala
+lazy val myProject = (project in file("."))
+  .enablePlugins(PlayJava, SbtEbean)
+```
+
 then add the following line to `conf/application.conf`:
 
 ```properties
-ebean.default="models.*"
+ebean.default = ["models.*"]
 ```
 
 This defines a `default` Ebean server, using the `default` data source, which must be properly configured. You can also override the name of the default Ebean server by configuring `ebeanconfig.datasource.default` property. This might be useful if you want to use separate databases for testing and development. You can actually create as many Ebean servers you need, and explicitly define the mapped class for each server.
 
 ```properties
-ebean.orders="models.Order,models.OrderItem"
-ebean.customers="models.Customer,models.Address"
+ebean.orders = ["models.Order", "models.OrderItem"]
+ebean.customers =  ["models.Customer", ["models.Address"]
 ```
 
 In this example, we have access to two Ebean servers - each using its own database.
@@ -52,26 +59,22 @@ Ebean defines a convenient superclass for your Ebean model classes, `com.avaje.e
 
 As you can see, we've added a `find` static field, defining a `Finder` for an entity of type `Task` with a `Long` identifier. This helper field is then used to simplify querying our model:
 
-@[operations](code/javaguide/ebean/JavaEbean.java)
+@[operations](code/javaguide/ebean/JavaEbeanTest.java)
 
 ## Transactional actions
 
 By default Ebean will use transactions. However this transactions will be created before and commited or rollbacked after every single query, update, create or delete, as you can see here:
 
-@[transaction](code/javaguide/ebean/JavaEbean.java)
+@[transaction](code/javaguide/ebean/JavaEbeanTest.java)
 
 So, if you want to do more than one action in the same transaction you can use TxRunnable and TxCallable:
 
-Java
-: @[txrunnable](code/javaguide/ebean/JavaEbean.java)
-
-Java 8
-: @[txrunnable](java8code/javaguide/ebean/Java8Ebean.java)
+@[txrunnable](code/javaguide/ebean/JavaEbeanTest.java)
 
 If your class is an action, you can annotate your action method with `@play.db.ebean.Transactional` to compose your action method with an `Action` that will automatically manage a transaction:
 
-@[annotation](code/javaguide/ebean/JavaEbean.java)
+@[annotation](code/javaguide/ebean/JavaEbeanTest.java)
 
 Or if you want a more traditional approach you can begin, commit and rollback transactions explicitly:
 
-@[traditional](code/javaguide/ebean/JavaEbean.java)
+@[traditional](code/javaguide/ebean/JavaEbeanTest.java)

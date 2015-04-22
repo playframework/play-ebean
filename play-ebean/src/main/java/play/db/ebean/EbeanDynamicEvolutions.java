@@ -11,6 +11,8 @@ import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;
 import play.api.libs.Files;
+import play.inject.ApplicationLifecycle;
+import play.libs.F;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,10 +32,14 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
     private final Map<String, EbeanServer> servers = new HashMap<String, EbeanServer>();
 
     @Inject
-    public EbeanDynamicEvolutions(EbeanConfig config, Environment environment) {
+    public EbeanDynamicEvolutions(EbeanConfig config, Environment environment, ApplicationLifecycle lifecycle) {
         this.config = config;
         this.environment = environment;
         start();
+        lifecycle.addStopHook(() -> {
+            servers.forEach((database, server) -> server.shutdown(false, false));
+            return F.Promise.<Void>pure(null);
+        });
     }
 
     /**
