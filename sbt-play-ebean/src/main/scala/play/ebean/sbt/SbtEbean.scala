@@ -1,6 +1,6 @@
 package play.ebean.sbt
 
-import play.PlayJava
+import com.typesafe.play.sbt.enhancer.PlayEnhancer
 import sbt.Keys._
 import sbt._
 import sbt.inc._
@@ -19,10 +19,10 @@ object SbtEbean extends AutoPlugin {
 
   val autoImport = Import
 
-  // We require PlayJava first in order to ensure that the play enhancer runs before play ebean enhancer
-  override def requires = PlayJava
+  // Must require PlayEnhancer to make sure it runs before we do
+  override def requires = PlayEnhancer
 
-  override def trigger = allRequirements
+  override def trigger = noTrigger
 
   override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
