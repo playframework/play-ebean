@@ -132,7 +132,9 @@ def publishMaven: Seq[Setting[_]] = Seq(
 def publishSbtPlugin: Seq[Setting[_]] = bintrayPublishSettings ++ Seq(
   publishMavenStyle := false,
   bintrayOrganization in bintray := Some("playframework"),
-  repository in bintray := "sbt-plugin-releases"
+  repository in bintray := {
+    if (isSnapshot.value) "sbt-plugin-snapshots" else "sbt-plugin-releases"
+  }
 )
 
 def noPublish: Seq[Setting[_]] = Seq(
