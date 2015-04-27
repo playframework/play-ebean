@@ -1,6 +1,10 @@
 language: scala
+sudo: false
 jdk:
   - oraclejdk8
 script:
   - sbt +test +publishLocal plugin/test plugin/scripted
   - cd docs && sbt test validateDocs
+cache:
+  directories:
+    - $HOME/.ivy2
