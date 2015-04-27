@@ -3,7 +3,7 @@
 
 ## Configuring Ebean
 
-Play comes with the [Ebean](http://www.avaje.org/) ORM. To enable it, add the Play Ebean plugin to your SBT plugins in `project/plugins.sbt`:
+Play comes with the [Ebean](https://ebean-orm.github.io/) ORM. To enable it, add the Play Ebean plugin to your SBT plugins in `project/plugins.sbt`:
 
 ```scala
 addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "1.0.0")
@@ -41,7 +41,7 @@ As an example, the fairly common problem of reducing the sequence batch size in 
 
 Note that Ebean will also make use of a `conf/orm.xml` file (if present), to configure `<entity-mappings>`.
 
-> For more information about Ebean, see the [Ebean documentation](http://www.avaje.org/ebean/documentation.html).
+> For more information about Ebean, see the [Ebean documentation](https://ebean-orm.github.io/docs).
 
 ## Using Model superclass
 
