@@ -145,16 +145,16 @@ def noPublish: Seq[Setting[_]] = Seq(
 
 def playEbeanDeps = Seq(
   "com.typesafe.play" %% "play-java-jdbc" % PlayVersion,
-  "org.avaje.ebeanorm" % "avaje-ebeanorm" % "4.5.5",
+  "org.avaje.ebeanorm" % "avaje-ebeanorm" % "4.5.6",
   avajeEbeanormAgent
 )
 
 def sbtPlayEbeanDeps = Seq(
   avajeEbeanormAgent,
-  "com.typesafe" % "config" % "1.3.0-M1"
+  "com.typesafe" % "config" % "1.3.0-M3"
 )
 
-def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "4.5.2"
+def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "4.5.3"
 
 // Ebean enhancement
 
