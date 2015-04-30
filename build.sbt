@@ -1,5 +1,4 @@
 import sbt.inc.Analysis
-import bintray.Keys._
 
 val PlayVersion = sys.props.getOrElse("play.version", "2.4.0-RC1")
 
@@ -9,10 +8,14 @@ lazy val root = project
   .settings(common: _*)
   .settings(crossScala: _*)
   .settings(noPublish: _*)
+  .settings(
+    sonatypeReleaseTask := SonatypeKeys.sonatypeRelease.toTask("").value
+  )
 
 lazy val core = project
   .in(file("play-ebean"))
   .enablePlugins(Playdoc, Omnidoc)
+  .disablePlugins(BintrayPlugin)
   .settings(common: _*)
   .settings(crossScala: _*)
   .settings(publishMaven: _*)
@@ -62,12 +65,20 @@ def common: Seq[Setting[_]] = releaseCommonSettings ++ Seq(
   resolvers ++= DefaultOptions.resolvers(snapshot = true),
   resolvers += Resolver.typesafeRepo("releases"),
   homepage := Some(url("https://github.com/playframework/play-ebean")),
-  licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
+  licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+  bintrayOrganization := Some("playframework"),
+  bintrayRepository := "sbt-plugin-releases",
+  bintrayPackage := "sbt-play-ebean",
+  bintrayReleaseOnPublish := false,
+  SonatypeKeys.profileName := "com.typesafe",
+  aggregate in sonatypeReleaseTask := false,
+  aggregate in bintrayRelease := false
 )
 
 // Release settings
 
-lazy val scriptedTask = TaskKey[Unit]("scripted-task")
+lazy val scriptedTask = taskKey[Unit]("Scripted as a task")
+lazy val sonatypeReleaseTask = taskKey[Unit]("Sonatype release as a task")
 
 def releaseCommonSettings = releaseSettings ++ {
   import sbtrelease._
@@ -79,6 +90,12 @@ def releaseCommonSettings = releaseSettings ++ {
   )
   def publishPlugin = ReleaseStep(
     action = releaseTask(PgpKeys.publishSigned in plugin)
+  )
+  def promoteBintray = ReleaseStep(
+    action = releaseTask(bintrayRelease)
+  )
+  def promoteSonatype = ReleaseStep(
+    action = releaseTask(sonatypeReleaseTask)
   )
 
   Seq(
@@ -99,6 +116,8 @@ def releaseCommonSettings = releaseSettings ++ {
       publishPlugin,
       setNextVersion,
       commitNextVersion,
+      promoteSonatype,
+      promoteBintray,
       pushChanges
     )
   )
@@ -108,11 +127,7 @@ def crossScala: Seq[Setting[_]] = Seq(
   crossScalaVersions := Seq("2.10.4", "2.11.1")
 )
 
-def publishMaven: Seq[Setting[_]] = Seq(
-  publishTo := {
-    if (isSnapshot.value) Some(Opts.resolver.sonatypeSnapshots)
-    else Some(Opts.resolver.sonatypeStaging)
-  },
+def publishMaven: Seq[Setting[_]] = sonatypeSettings ++ Seq(
   pomExtra := {
     <scm>
       <url>https://github.com/playframework/play-ebean</url>
@@ -129,13 +144,18 @@ def publishMaven: Seq[Setting[_]] = Seq(
   pomIncludeRepository := { _ => false }
 )
 
-def publishSbtPlugin: Seq[Setting[_]] = bintrayPublishSettings ++ Seq(
-  publishMavenStyle := false,
-  bintrayOrganization in bintray := Some("playframework"),
-  repository in bintray := "sbt-plugin-releases"
+def publishSbtPlugin: Seq[Setting[_]] = Seq(
+  publishTo := {
+    if (isSnapshot.value) {
+      Some(Opts.resolver.sonatypeSnapshots)
+    } else {
+      publishTo.value
+    }
+  },
+  publishMavenStyle := false
 )
 
-def noPublish: Seq[Setting[_]] = Seq(
+def noPublish: Seq[Setting[_]] = sonatypeSettings ++ Seq(
   publish := {},
   publishLocal := {},
   publishTo := Some(Resolver.file("no-publish", crossTarget.value / "no-publish"))
