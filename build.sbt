@@ -152,7 +152,7 @@ def publishSbtPlugin: Seq[Setting[_]] = Seq(
       publishTo.value
     }
   },
-  publishMavenStyle := false
+  publishMavenStyle := isSnapshot.value
 )
 
 def noPublish: Seq[Setting[_]] = sonatypeSettings ++ Seq(
