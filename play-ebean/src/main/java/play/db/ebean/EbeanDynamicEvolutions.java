@@ -10,13 +10,14 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;
-import play.api.libs.Files;
 import play.inject.ApplicationLifecycle;
 import play.libs.F;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,9 +66,22 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                 String evolutionScript = generateEvolutionScript(servers.get(key), serverConfig);
                 if (evolutionScript != null) {
                     File evolutions = environment.getFile("conf/evolutions/" + key + "/1.sql");
-                    if (!evolutions.exists() || Files.readFile(evolutions).startsWith("# --- Created by Ebean DDL")) {
-                        Files.createDirectory(environment.getFile("conf/evolutions/" + key));
-                        Files.writeFileIfChanged(evolutions, evolutionScript);
+                    try {
+                        String content;
+                        if (!evolutions.exists()) {
+                            content = "";
+                        } else {
+                            content = new String(Files.readAllBytes(evolutions.toPath()), "utf-8");
+                        }
+
+                        if (content.isEmpty() || content.startsWith("# --- Created by Ebean DDL")) {
+                            environment.getFile("conf/evolutions/" + key).mkdirs();
+                            if (!content.equals(evolutionScript)) {
+                                Files.write(evolutions.toPath(), evolutionScript.getBytes("utf-8"));
+                            }
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
