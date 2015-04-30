@@ -1,5 +1,7 @@
 package play.ebean.sbt
 
+import java.net.URLClassLoader
+
 import com.typesafe.play.sbt.enhancer.PlayEnhancer
 import sbt.Keys._
 import sbt._
@@ -99,24 +101,30 @@ object SbtEbean extends AutoPlugin {
 
 
   private def configuredEbeanModels = Def.task {
-    import com.typesafe.config._
     import collection.JavaConverters._
+    import java.util.{ Map => JMap, List => JList }
 
-    val configFile = sys.props.get("config.file").map(new File(_)).orElse {
-      val configResource = sys.props.get("config.resource").getOrElse("application.conf")
-      unmanagedResources.value.filter(r => r.exists && !r.isDirectory)
-        .pair(relativeTo(unmanagedResourceDirectories.value))
-        .collectFirst {
-          case (file, name) if name == configResource => file
-        }
+    // Creates a classloader with all the dependencies and all the resources, from there we can use the play ebean
+    // code to load the config as it would be loaded in production
+    def withClassLoader[T](block: ClassLoader => T): T = {
+      val classpath = unmanagedResourceDirectories.value.map(_.toURI.toURL) ++ dependencyClasspath.value.map(_.data.toURI.toURL)
+      val classLoader = new URLClassLoader(classpath.toArray, null)
+      try {
+        block(classLoader)
+      } finally {
+        classLoader.close()
+      }
     }
 
-    configFile.fold(Seq("models.*")) { file =>
-      val config = ConfigFactory.parseFileAnySyntax(file)
-      try {
-        config.getConfig("ebean").entrySet.asScala.map(_.getValue.unwrapped.toString).toSeq.distinct
-      } catch {
-        case e: ConfigException.Missing => Seq("models.*")
+    withClassLoader { classLoader =>
+      val configLoader = classLoader.loadClass("play.db.ebean.ModelsConfigLoader").
+        asSubclass(classOf[java.util.function.Function[ClassLoader, JMap[String, JList[String]]]])
+      val config = configLoader.newInstance().apply(classLoader)
+
+      if (config.isEmpty) {
+        Seq("models.*")
+      } else {
+        config.asScala.flatMap(_._2.asScala).toSeq.distinct
       }
     }
   }

@@ -146,7 +146,8 @@ def noPublish: Seq[Setting[_]] = Seq(
 def playEbeanDeps = Seq(
   "com.typesafe.play" %% "play-java-jdbc" % PlayVersion,
   "org.avaje.ebeanorm" % "avaje-ebeanorm" % "4.5.6",
-  avajeEbeanormAgent
+  avajeEbeanormAgent,
+  "com.typesafe.play" %% "play-test" % PlayVersion % Test
 )
 
 def sbtPlayEbeanDeps = Seq(

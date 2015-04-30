@@ -4,9 +4,6 @@
 package play.db.ebean;
 
 import com.avaje.ebean.config.ServerConfig;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigValue;
-import com.typesafe.config.ConfigValueType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Configuration;
@@ -68,71 +65,55 @@ public class DefaultEbeanConfig implements EbeanConfig {
          */
         public EbeanConfig parse() {
 
-            Config config = configuration.underlying();
-            Config playEbeanConfig = config.getConfig("play.ebean");
-            String defaultServer = playEbeanConfig.getString("defaultDatasource");
-            String ebeanConfigKey = playEbeanConfig.getString("config");
+            EbeanParsedConfig config = EbeanParsedConfig.parseFromConfig(configuration);
 
             Map<String, ServerConfig> serverConfigs = new HashMap<String, ServerConfig>();
 
-            if (config.hasPath(ebeanConfigKey)) {
-                Config ebeanConfig = config.getConfig(ebeanConfigKey);
-                Configuration conf = new Configuration(ebeanConfig);
+            for (Map.Entry<String, List<String>> entry: config.getDatasourceModels().entrySet()) {
+                String key = entry.getKey();
 
-                for (String key: ebeanConfig.root().keySet()) {
+                ServerConfig serverConfig = new ServerConfig();
+                serverConfig.setName(key);
+                serverConfig.loadFromProperties();
+                try {
+                    serverConfig.setDataSource(new WrappingDatasource(dbApi.getDatabase(key).getDataSource()));
+                } catch(Exception e) {
+                    throw configuration.reportError(
+                        "ebean." + key,
+                        e.getMessage(),
+                        e
+                    );
+                }
 
-                    ServerConfig serverConfig = new ServerConfig();
-                    serverConfig.setName(key);
-                    serverConfig.loadFromProperties();
+                if (config.getDefaultDatasource().equals(key)) {
+                    serverConfig.setDefaultServer(true);
+                }
+
+                Set<String> classes = new HashSet<String>();
+                for (String load: entry.getValue()) {
+                    load = load.trim();
+                    if (load.endsWith(".*")) {
+                        classes.addAll(play.libs.Classpath.getTypes(environment, load.substring(0, load.length()-2)));
+                    } else {
+                        classes.add(load);
+                    }
+                }
+                for (String clazz: classes) {
                     try {
-                        serverConfig.setDataSource(new WrappingDatasource(dbApi.getDatabase(key).getDataSource()));
-                    } catch(Exception e) {
-                        throw conf.reportError(
-                            key,
-                            e.getMessage(),
+                        serverConfig.addClass(Class.forName(clazz, true, environment.classLoader()));
+                    } catch (Throwable e) {
+                        throw configuration.reportError(
+                            "ebean." + key,
+                            "Cannot register class [" + clazz + "] in Ebean server",
                             e
                         );
                     }
-
-                    if (defaultServer.equals(key)) {
-                        serverConfig.setDefaultServer(true);
-                    }
-
-                    ConfigValue raw = ebeanConfig.getValue(key);
-                    List<String> toLoad;
-                    if (raw.valueType() == ConfigValueType.STRING) {
-                        // Support legacy comma separated string
-                        toLoad = Arrays.asList(((String) raw.unwrapped()).split(","));
-                    } else {
-                        toLoad = ebeanConfig.getStringList(key);
-                    }
-
-                    Set<String> classes = new HashSet<String>();
-                    for (String load: toLoad) {
-                        load = load.trim();
-                        if (load.endsWith(".*")) {
-                            classes.addAll(play.libs.Classpath.getTypes(environment, load.substring(0, load.length()-2)));
-                        } else {
-                            classes.add(load);
-                        }
-                    }
-                    for (String clazz: classes) {
-                        try {
-                            serverConfig.addClass(Class.forName(clazz, true, environment.classLoader()));
-                        } catch (Throwable e) {
-                            throw conf.reportError(
-                                key,
-                                "Cannot register class [" + clazz + "] in Ebean server",
-                                e
-                            );
-                        }
-                    }
-
-                    serverConfigs.put(key, serverConfig);
                 }
+
+                serverConfigs.put(key, serverConfig);
             }
 
-            return new DefaultEbeanConfig(defaultServer, serverConfigs);
+            return new DefaultEbeanConfig(config.getDefaultDatasource(), serverConfigs);
         }
 
         /**
