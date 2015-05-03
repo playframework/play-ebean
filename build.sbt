@@ -60,7 +60,7 @@ lazy val plugin = project
 
 def common: Seq[Setting[_]] = releaseCommonSettings ++ Seq(
   organization := "com.typesafe.play",
-  scalaVersion := sys.props.get("scala.version").getOrElse("2.10.4"),
+  scalaVersion := sys.props.get("scala.version").getOrElse("2.10.5"),
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
   resolvers ++= DefaultOptions.resolvers(snapshot = true),
   resolvers += Resolver.typesafeRepo("releases"),
@@ -124,7 +124,7 @@ def releaseCommonSettings = releaseSettings ++ {
 }
 
 def crossScala: Seq[Setting[_]] = Seq(
-  crossScalaVersions := Seq("2.10.4", "2.11.1")
+  crossScalaVersions := Seq("2.10.5", "2.11.6")
 )
 
 def publishMaven: Seq[Setting[_]] = sonatypeSettings ++ Seq(
