@@ -44,6 +44,7 @@ lazy val plugin = project
     organization := "com.typesafe.sbt",
     sbtPlugin := true,
     libraryDependencies ++= sbtPlayEbeanDeps,
+    addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % "1.1.0-RC2"),
     (javacOptions in compile) := Seq("-source", "1.7", "-target", "1.7"),
     (javacOptions in doc) := Seq("-source", "1.7"),
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % PlayVersion),
