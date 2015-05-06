@@ -8,3 +8,9 @@ script:
 cache:
   directories:
     - $HOME/.ivy2
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/d2c8a242a2615f659595
+    on_success: always
+    on_failure: always
