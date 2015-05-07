@@ -118,10 +118,11 @@ def releaseCommonSettings: Seq[Setting[_]] = releaseSettings ++ {
       commitReleaseVersion,
       tagRelease,
       publishArtifacts,
-      setNextVersion,
-      commitNextVersion,
+      taskStep(PgpKeys.publishSigned in plugin),
       taskStep(bintrayRelease in plugin),
       inputTaskStep(SonatypeKeys.sonatypeRelease in core, ""),
+      setNextVersion,
+      commitNextVersion,
       pushChanges
     )
   )
