@@ -107,6 +107,7 @@ def releaseCommonSettings: Seq[Setting[_]] = releaseSettings ++ {
   Seq(
     publishArtifactsAction := PgpKeys.publishSigned.value,
     tagName := (version in ThisBuild).value,
+    crossBuild := true,
 
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
