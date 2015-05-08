@@ -7,7 +7,13 @@ script:
   - cd docs && sbt test validateDocs
 cache:
   directories:
-    - $HOME/.ivy2
+    - $HOME/.ivy2/cache
+before_cache:
+  # Ensure changes to the cache aren't persisted
+  - rm -rf $HOME/.ivy2/cache/com.typesafe.play/play-ebean*
+  - rm -rf $HOME/.ivy2/cache/scala_*/sbt_*/com.typesafe.sbt/sbt-play-ebean
+  # Delete all ivydata files since ivy touches them on each build
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" | xargs rm
 notifications:
   webhooks:
     urls:
