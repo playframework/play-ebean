@@ -1,6 +1,6 @@
 import sbt.inc.Analysis
 
-val PlayVersion = sys.props.getOrElse("play.version", "2.4.0-RC2")
+val PlayVersion = sys.props.getOrElse("play.version", "2.4.0-2015-05-10-ed330de-SNAPSHOT")
 
 lazy val root = project
   .in(file("."))
@@ -160,6 +160,7 @@ def noPublish: Seq[Setting[_]] = Seq(
 
 def playEbeanDeps = Seq(
   "com.typesafe.play" %% "play-java-jdbc" % PlayVersion,
+  "com.typesafe.play" %% "play-jdbc-evolutions" % PlayVersion,
   "org.avaje.ebeanorm" % "avaje-ebeanorm" % "4.5.6",
   avajeEbeanormAgent,
   "com.typesafe.play" %% "play-test" % PlayVersion % Test
