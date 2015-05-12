@@ -99,7 +99,6 @@ object SbtEbean extends AutoPlugin {
     result.copy(analysis = updatedAnalysis)
   }
 
-
   private def configuredEbeanModels = Def.task {
     import collection.JavaConverters._
     import java.util.{ Map => JMap, List => JList }
@@ -108,7 +107,7 @@ object SbtEbean extends AutoPlugin {
     // code to load the config as it would be loaded in production
     def withClassLoader[T](block: ClassLoader => T): T = {
       val classpath = unmanagedResourceDirectories.value.map(_.toURI.toURL) ++ dependencyClasspath.value.map(_.data.toURI.toURL)
-      val classLoader = new URLClassLoader(classpath.toArray, null)
+      val classLoader = new URLClassLoader(classpath.toArray, this.getClass.getClassLoader)
       try {
         block(classLoader)
       } finally {
