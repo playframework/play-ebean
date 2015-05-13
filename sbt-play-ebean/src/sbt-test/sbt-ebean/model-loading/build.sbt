@@ -1,6 +1,6 @@
 lazy val root = project
   .in(file("."))
-  .enablePlugins(PlayJava, SbtEbean)
+  .enablePlugins(PlayJava, PlayEbean)
 
 resolvers ++= DefaultOptions.resolvers(snapshot = true)
 

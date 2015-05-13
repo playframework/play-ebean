@@ -9,17 +9,16 @@ import sbt.inc._
 
 import scala.util.control.NonFatal
 
-object Import {
-  object EbeanKeys {
-    val models = TaskKey[Seq[String]]("ebeanModels", "The packages that should be searched for ebean models to enhance.")
-    val playEbeanVersion = SettingKey[String]("playEbeanVersion", "The version of Play ebean that should be added to the library dependencies.")
+object PlayEbean extends AutoPlugin {
+
+  object autoImport {
+    val playEbeanModels = taskKey[Seq[String]]("The packages that should be searched for ebean models to enhance.")
+    val playEbeanVersion = settingKey[String]("The version of Play ebean that should be added to the library dependencies.")
+    val playEbeanDebugLevel = settingKey[Int]("The debug level to use for the ebean agent. The higher, the more debug is output, with 9 being the most. -1 turns debugging off.")
+    val playEbeanAgentArgs = taskKey[Map[String, String]]("The arguments to pass to the agent.")
   }
-}
 
-object SbtEbean extends AutoPlugin {
-  import Import.EbeanKeys._
-
-  val autoImport = Import
+  import autoImport._
 
   // Must require PlayEnhancer to make sure it runs before we do
   override def requires = PlayEnhancer
@@ -29,11 +28,13 @@ object SbtEbean extends AutoPlugin {
   override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
   def scopedSettings = Seq(
-    models <<= configuredEbeanModels,
+    playEbeanModels <<= configuredEbeanModels,
     manipulateBytecode <<= ebeanEnhance
   )
 
   def unscopedSettings = Seq(
+    playEbeanDebugLevel := -1,
+    playEbeanAgentArgs := Map("debug" -> playEbeanDebugLevel.toString),
     playEbeanVersion := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
     libraryDependencies += "com.typesafe.play" %% "play-ebean" % playEbeanVersion.value
   )
@@ -43,7 +44,10 @@ object SbtEbean extends AutoPlugin {
     val deps = dependencyClasspath.value
     val classes = classDirectory.value
     val result = manipulateBytecode.value
+    val agentArgs = playEbeanAgentArgs.value
     val analysis = result.analysis
+
+    val agentArgsString = agentArgs map { case (key, value) => s"$key=$value" } mkString ";"
 
     val originalContextClassLoader = Thread.currentThread.getContextClassLoader
 
@@ -51,19 +55,19 @@ object SbtEbean extends AutoPlugin {
 
       val classpath = deps.map(_.data.toURI.toURL).toArray :+ classes.toURI.toURL
 
-      Thread.currentThread.setContextClassLoader(new java.net.URLClassLoader(classpath, ClassLoader.getSystemClassLoader))
+      val classLoader = new java.net.URLClassLoader(classpath, null)
+
+      Thread.currentThread.setContextClassLoader(classLoader)
 
       import com.avaje.ebean.enhance.agent._
       import com.avaje.ebean.enhance.ant._
 
-      val classloader = ClassLoader.getSystemClassLoader
+      val transformer = new Transformer(classpath, agentArgsString)
 
-      val transformer = new Transformer(classpath, "debug=-1")
-
-      val fileTransform = new OfflineFileTransform(transformer, classloader, classes.getAbsolutePath, classes.getAbsolutePath)
+      val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath, classes.getAbsolutePath)
 
       try {
-        fileTransform.process(models.value.mkString(","))
+        fileTransform.process(playEbeanModels.value.mkString(","))
       } catch {
         case NonFatal(_) =>
       }
