@@ -111,6 +111,20 @@ object SbtEbean extends AutoPlugin {
       val classLoader = new URLClassLoader(classpath.toArray, null)
       try {
         block(classLoader)
+      } catch {
+        case e: Exception =>
+          // Since we're about to close the classloader, we can't risk any classloading that the thrown exception may
+          // do when we later interogate it, so instead we create a new exception here, with the old exceptions message
+          // and stack trace
+          def clone(t: Throwable): RuntimeException = {
+            val cloned = new RuntimeException(s"${t.getClass.getName}: ${t.getMessage}")
+            cloned.setStackTrace(t.getStackTrace)
+            if (t.getCause != null) {
+              cloned.initCause(clone(t.getCause))
+            }
+            cloned
+          }
+          throw clone(e)
       } finally {
         classLoader.close()
       }
