@@ -4,7 +4,7 @@ jdk:
   - oraclejdk8
 script:
   - sbt +test +publishLocal plugin/test plugin/scripted
-  - cd docs && sbt test validateDocs
+  - cd docs && sbt test validateDocs evaluateSbtFiles
 cache:
   directories:
     - $HOME/.ivy2/cache

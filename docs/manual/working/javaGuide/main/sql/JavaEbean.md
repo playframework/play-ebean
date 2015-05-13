@@ -5,18 +5,19 @@
 
 Play comes with the [Ebean](https://ebean-orm.github.io/) ORM. To enable it, add the Play Ebean plugin to your SBT plugins in `project/plugins.sbt`:
 
-```scala
-addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "1.0.0")
-```
+@[add-sbt-plugin](code/ebean.sbt)
 
 And then modify your `build.sbt` to enable the Play Ebean plugin:
 
-```scala
-lazy val myProject = (project in file("."))
-  .enablePlugins(PlayJava, SbtEbean)
-```
+@[enable-plugin](code/ebean.sbt)
 
-Then add the following line to `conf/application.conf`:
+### Configuring models
+
+Play Ebean comes with two components, a runtime library that actually talks to the database, and an sbt plugin that enhances the compiled Java bytecode of your models for use with Ebean.  Both of these components need to be configured so that Ebean knows where your models are.
+
+#### Configuring the runtime library
+
+The runtime library can be configured by putting the list of packages and/or classes that your Ebean models live in your application configuration file.  For example, if all your models are in the `models` package, add the following to `conf/application.conf`:
 
 ```properties
 ebean.default = ["models.*"]
@@ -42,6 +43,24 @@ As an example, the fairly common problem of reducing the sequence batch size in 
 Note that Ebean will also make use of a `conf/orm.xml` file (if present), to configure `<entity-mappings>`.
 
 > For more information about Ebean, see the [Ebean documentation](https://ebean-orm.github.io/docs).
+
+#### Configuring the sbt plugin
+
+By default, the sbt plugin will attempt to load your `application.conf` file to discover what your models configuration is. This will work in a simple project setup, however, for projects that have multiple sub projects, where the `application.conf` file lives in a different project to where the ebean model classes live, this may not work. In this case you will need to manually specify the ebean models for each sub project that contains ebean models, using the `playEbeanModels` configuration item:
+
+@[play-ebean-models](code/ebean.sbt)
+
+In addition to configuring the models, you may wish to enable debug of the configuration. This can be done using `playEbeanDebugLevel`, with -1 being off, and 9 showing the most amount of debug:
+
+@[play-ebean-debug](code/ebean.sbt)
+
+You may also configure custom arguments for the ebean agent, this can be done using the `playEbeanAgentArgs` setting:
+
+@[play-ebean-agent-args](code/ebean.sbt)
+
+Finally, if you want to also enhance models in your tests, you can do this by configuring the ebean test configuration:
+
+@[play-ebean-test](code/ebean.sbt)
 
 ## Using Model superclass
 
