@@ -34,7 +34,7 @@ object PlayEbean extends AutoPlugin {
 
   def unscopedSettings = Seq(
     playEbeanDebugLevel := -1,
-    playEbeanAgentArgs := Map("debug" -> playEbeanDebugLevel.toString),
+    playEbeanAgentArgs := Map("debug" -> playEbeanDebugLevel.value.toString),
     playEbeanVersion := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
     libraryDependencies += "com.typesafe.play" %% "play-ebean" % playEbeanVersion.value
   )
