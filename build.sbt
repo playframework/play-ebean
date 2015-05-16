@@ -61,7 +61,7 @@ def playEbeanDeps = Seq(
 
 def sbtPlayEbeanDeps = Seq(
   avajeEbeanormAgent,
-  "com.typesafe" % "config" % "1.3.0-M3"
+  "com.typesafe" % "config" % "1.3.0"
 )
 
 def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "4.5.3"
