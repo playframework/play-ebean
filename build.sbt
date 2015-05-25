@@ -1,6 +1,8 @@
 import sbt.inc.Analysis
 
-val PlayVersion = playVersion("2.4.0-RC3")
+val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.4.0-RC5"))
+
+val PlayEnhancerVersion = "1.1.0-RC2"
 
 lazy val root = project
   .in(file("."))
@@ -31,7 +33,7 @@ lazy val plugin = project
     name := "sbt-play-ebean",
     organization := "com.typesafe.sbt",
     libraryDependencies ++= sbtPlayEbeanDeps,
-    addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % "1.1.0-RC2"),
+    addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % PlayEnhancerVersion),
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % PlayVersion),
     resourceGenerators in Compile <+= generateVersionFile,
     scriptedLaunchOpts ++= Seq("-Dplay-ebean.version=" + version.value),
