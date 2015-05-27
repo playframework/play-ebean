@@ -1,8 +1,8 @@
 import sbt.inc.Analysis
 
-val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.4.0-RC5"))
+val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.4.0"))
 
-val PlayEnhancerVersion = "1.1.0-RC2"
+val PlayEnhancerVersion = "1.1.0"
 
 lazy val root = project
   .in(file("."))
