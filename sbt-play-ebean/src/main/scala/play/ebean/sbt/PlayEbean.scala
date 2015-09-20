@@ -64,7 +64,7 @@ object PlayEbean extends AutoPlugin {
 
       val transformer = new Transformer(classpath, agentArgsString)
 
-      val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath, classes.getAbsolutePath)
+      val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
 
       try {
         fileTransform.process(playEbeanModels.value.mkString(","))
