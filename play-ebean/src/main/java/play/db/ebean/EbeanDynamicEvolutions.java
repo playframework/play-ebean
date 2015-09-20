@@ -6,8 +6,8 @@ package play.db.ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;
 import play.inject.ApplicationLifecycle;
@@ -93,7 +93,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
      */
     public static String generateEvolutionScript(EbeanServer server, ServerConfig config) {
         DdlGenerator ddl = new DdlGenerator();
-        ddl.setup((SpiEbeanServer)server, config.getDatabasePlatform(), config);
+        ddl.setup((SpiEbeanServer)server, config);
         String ups = ddl.generateCreateDdl();
         String downs = ddl.generateDropDdl();
 
