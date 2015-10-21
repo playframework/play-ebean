@@ -1,3 +1,5 @@
+SettingKey[Seq[File]]("migrationManualSources") := Nil
+
 lazy val docs = project
   .in(file("."))
   .enablePlugins(PlayDocsPlugin, PlayEnhancer)
