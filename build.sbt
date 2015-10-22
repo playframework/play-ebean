@@ -9,7 +9,8 @@ lazy val root = project
   .enablePlugins(PlayRootProject)
   .aggregate(core)
   .settings(
-    name := "play-ebean-root"
+    name := "play-ebean-root",
+    releaseCrossBuild := false
   )
 
 lazy val core = project
@@ -44,9 +45,9 @@ lazy val plugin = project
   )
 
 playBuildRepoName in ThisBuild := "play-ebean"
-playBuildExtraTests := {
-  (scripted in plugin).toTask("").value
-}
+// playBuildExtraTests := {
+//  (scripted in plugin).toTask("").value
+// }
 playBuildExtraPublish := {
   (PgpKeys.publishSigned in plugin).value
 }
