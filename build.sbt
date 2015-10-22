@@ -33,6 +33,7 @@ lazy val plugin = project
     name := "sbt-play-ebean",
     organization := "com.typesafe.sbt",
     libraryDependencies ++= sbtPlayEbeanDeps,
+    crossScalaVersions := Seq(),
     addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % PlayEnhancerVersion),
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % PlayVersion),
     resourceGenerators in Compile <+= generateVersionFile,
