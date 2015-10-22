@@ -1,6 +1,6 @@
 import sbt.inc.Analysis
 
-val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.4.2"))
+val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.5.0-M1"))
 
 val PlayEnhancerVersion = "1.1.0"
 

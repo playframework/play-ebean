@@ -3,7 +3,7 @@ sudo: false
 jdk:
   - oraclejdk8
 script:
-  - sbt +test +publishLocal plugin/test plugin/scripted
+  - sbt test publishLocal plugin/test plugin/scripted
   - cd docs && sbt test validateDocs evaluateSbtFiles
 cache:
   directories:
