@@ -62,6 +62,13 @@ Finally, if you want to also enhance models in your tests, you can do this by co
 
 @[play-ebean-test](code/ebean.sbt)
 
+## Generating Typesafe query beans.
+
+The plugin can also be configured to generate type safe query beans. By default, this is disabled.
+To enable it, set the property `playEbeanQueryGenerate` to true. You will also need to set `playEbeanQueryEnhance` to true if you wish to use enhancement with the query beans.
+
+Note that the Play enhancer can interfere with the use of query beans. You may need to set `playEnhancerEnabled := false` or disable package scanning of the affected classes.
+
 ## Using Model superclass
 
 Ebean defines a convenient superclass for your Ebean model classes, `com.avaje.ebean.Model`. Here is a typical Ebean class, mapped in Play:
