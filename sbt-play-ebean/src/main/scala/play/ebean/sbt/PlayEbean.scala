@@ -30,7 +30,7 @@ object PlayEbean extends AutoPlugin {
     val playEbeanQueryGeneratePublicWhereField = settingKey[Boolean]("Public finder field")
     val playEbeanQueryGenerateAopStyle = settingKey[Boolean]("Use AOP style generation. Default true")
     val playEbeanQueryArgs = settingKey[String]("Args for generation, useful for logging / debugging generation ")
-    val playEbeanQueryProcessPackages = settingKey[String]("Change to alter the initial package for scanning for model classes. By default views all")
+    val playEbeanQueryProcessPackages = settingKey[Option[String]]("Change to alter the initial package for scanning for model classes. By default views all")
   }
 
   import autoImport._
@@ -53,7 +53,7 @@ object PlayEbean extends AutoPlugin {
       playEbeanQueryGeneratePublicWhereField := true,
       playEbeanQueryGenerateAopStyle := true,
       playEbeanQueryArgs := "",
-      playEbeanQueryProcessPackages := null
+      playEbeanQueryProcessPackages := None
     )
 
     inConfig(Compile)(scopedSettings) ++ unscopedSettings ++ querySettings
@@ -121,7 +121,7 @@ object PlayEbean extends AutoPlugin {
           val queryTransform = new org.avaje.ebean.typequery.agent.Transformer(playEbeanQueryArgs.value, classLoader, playEbeanQueryModelsQueryModificationPackage.value.asJava)
           val fileQueryTransform = new org.avaje.ebean.typequery.agent.offline.OfflineFileTransform(queryTransform, classLoader, classes.getAbsolutePath)
           //Defaults to null, like the Maven plugin
-          fileQueryTransform.process(playEbeanQueryProcessPackages.value)
+          fileQueryTransform.process(playEbeanQueryProcessPackages.value.orNull)
         }
       } catch {
         case NonFatal(_) =>
