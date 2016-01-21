@@ -1,6 +1,6 @@
 import sbt.inc.Analysis
 
-val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.5.0-M1"))
+val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.5.0-M2"))
 
 val PlayEnhancerVersion = "1.1.0"
 
@@ -92,4 +92,3 @@ def generateVersionFile = Def.task {
   IO.write(file, content)
   Seq(file)
 }
-
