@@ -3,9 +3,11 @@ package play.ebean.sbt
 import java.net.URLClassLoader
 
 import com.typesafe.play.sbt.enhancer.PlayEnhancer
+import org.avaje.ebean.typequery.generator.{Generator, GeneratorConfig}
 import sbt.Keys._
 import sbt._
 import sbt.inc._
+import scala.collection.JavaConverters._
 
 import scala.util.control.NonFatal
 
@@ -16,6 +18,19 @@ object PlayEbean extends AutoPlugin {
     val playEbeanVersion = settingKey[String]("The version of Play ebean that should be added to the library dependencies.")
     val playEbeanDebugLevel = settingKey[Int]("The debug level to use for the ebean agent. The higher, the more debug is output, with 9 being the most. -1 turns debugging off.")
     val playEbeanAgentArgs = taskKey[Map[String, String]]("The arguments to pass to the agent.")
+
+    val playEbeanQueryGenerate = settingKey[Boolean]("Generate Query Beans from model classes. Default false.")
+    val playEbeanQueryEnhance = settingKey[Boolean]("Enhance Query Beans from model classes. Defaults to false")
+    val playEbeanQueryDestDirectory = settingKey[String]("Target directory for generated classes. Defaults to app ")
+    val playEbeanQueryResourceDirectory = settingKey[String]("Resource directory to read configuration. Defaults to conf")
+    val playEbeanQueryModelsPackage = settingKey[String]("Directory of models to scan to build query beans")
+    val playEbeanQueryModelsQueryModificationPackage = settingKey[Set[String]]("Directories of matching query objects to rewrite field access to use getters. Defaults to [model/query]")
+    val playEbeanQueryGenerateFinder = settingKey[Boolean]("Generate finder objects")
+    val playEbeanQueryGenerateFinderField = settingKey[Boolean]("Modify models to add finder field")
+    val playEbeanQueryGeneratePublicWhereField = settingKey[Boolean]("Public finder field")
+    val playEbeanQueryGenerateAopStyle = settingKey[Boolean]("Use AOP style generation. Default true")
+    val playEbeanQueryArgs = settingKey[String]("Args for generation, useful for logging / debugging generation ")
+    val playEbeanQueryProcessPackages = settingKey[Option[String]]("Change to alter the initial package for scanning for model classes. By default views all")
   }
 
   import autoImport._
@@ -25,7 +40,24 @@ object PlayEbean extends AutoPlugin {
 
   override def trigger = noTrigger
 
-  override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
+  override def projectSettings = {
+    val querySettings = Seq(
+      playEbeanQueryGenerate := false,
+      playEbeanQueryEnhance := false,
+      playEbeanQueryDestDirectory := "app",
+      playEbeanQueryResourceDirectory := "conf",
+      playEbeanQueryModelsPackage := "models",
+      playEbeanQueryModelsQueryModificationPackage := Set("models/query"),
+      playEbeanQueryGenerateFinder := true,
+      playEbeanQueryGenerateFinderField := true,
+      playEbeanQueryGeneratePublicWhereField := true,
+      playEbeanQueryGenerateAopStyle := true,
+      playEbeanQueryArgs := "",
+      playEbeanQueryProcessPackages := None
+    )
+
+    inConfig(Compile)(scopedSettings) ++ unscopedSettings ++ querySettings
+  }
 
   def scopedSettings = Seq(
     playEbeanModels <<= configuredEbeanModels,
@@ -61,13 +93,36 @@ object PlayEbean extends AutoPlugin {
 
       import com.avaje.ebean.enhance.agent._
       import com.avaje.ebean.enhance.ant._
-
-      val transformer = new Transformer(classpath, agentArgsString)
-
-      val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
-
       try {
+        if(playEbeanQueryGenerate.value) {
+          val config = new GeneratorConfig()
+          config.setClassesDirectory(classes.getAbsolutePath)
+          config.setDestDirectory(playEbeanQueryDestDirectory.value)
+          config.setDestResourceDirectory(playEbeanQueryResourceDirectory.value)
+
+          config.setEntityBeanPackage(playEbeanQueryModelsPackage.value)
+          config.setAddFinderWherePublic(playEbeanQueryGeneratePublicWhereField.value)
+          config.setAopStyle(playEbeanQueryGenerateAopStyle.value)
+
+          val generator: Generator = new Generator(config)
+          generator.generateQueryBeans()
+          if (playEbeanQueryGenerateFinder.value) {
+            generator.generateFinders()
+          }
+          if (playEbeanQueryGenerateFinderField.value) {
+            generator.modifyEntityBeansAddFinderField()
+          }
+        }
+
+        val transformer = new Transformer(classpath, agentArgsString)
+        val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
         fileTransform.process(playEbeanModels.value.mkString(","))
+        if(playEbeanQueryEnhance.value) {
+          val queryTransform = new org.avaje.ebean.typequery.agent.Transformer(playEbeanQueryArgs.value, classLoader, playEbeanQueryModelsQueryModificationPackage.value.asJava)
+          val fileQueryTransform = new org.avaje.ebean.typequery.agent.offline.OfflineFileTransform(queryTransform, classLoader, classes.getAbsolutePath)
+          //Defaults to null, like the Maven plugin
+          fileQueryTransform.process(playEbeanQueryProcessPackages.value.orNull)
+        }
       } catch {
         case NonFatal(_) =>
       }

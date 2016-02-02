@@ -3,6 +3,8 @@
 
 docs/conf
 
+/.idea
+
 # sbt specific
 dist/*
 target/

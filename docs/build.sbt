@@ -15,6 +15,18 @@ lazy val docs = project
   )
   .settings(PlayEbean.unscopedSettings: _*)
   .settings(inConfig(Test)(Seq(
+    playEbeanQueryGenerate := false,
+    playEbeanQueryEnhance := false,
+    playEbeanQueryDestDirectory := "app",
+    playEbeanQueryResourceDirectory := "conf",
+    playEbeanQueryModelsPackage := "models",
+    playEbeanQueryModelsQueryModificationPackage := Set("models/query"),
+    playEbeanQueryGenerateFinder := true,
+    playEbeanQueryGenerateFinderField := true,
+    playEbeanQueryGeneratePublicWhereField := true,
+    playEbeanQueryGenerateAopStyle := true,
+    playEbeanQueryArgs := "",
+    playEbeanQueryProcessPackages := None,
     playEbeanModels := Seq("javaguide.ebean.*"),
     manipulateBytecode <<= PlayEbean.ebeanEnhance
   )): _*)
