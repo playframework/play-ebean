@@ -3,11 +3,12 @@ package models;
 import org.junit.*;
 import static org.junit.Assert.*;
 import play.test.*;
+import play.Application;
 import static play.test.Helpers.*;
 
 public class TestTask extends WithApplication {
 
-    protected FakeApplication provideFakeApplication() {
+    protected Application provideApplication() {
         return fakeApplication(inMemoryDatabase());
     }
 
