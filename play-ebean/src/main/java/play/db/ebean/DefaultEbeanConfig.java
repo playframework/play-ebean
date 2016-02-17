@@ -67,7 +67,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
             EbeanParsedConfig config = EbeanParsedConfig.parseFromConfig(configuration);
 
-            Map<String, ServerConfig> serverConfigs = new HashMap<String, ServerConfig>();
+            Map<String, ServerConfig> serverConfigs = new HashMap<>();
 
             for (Map.Entry<String, List<String>> entry: config.getDatasourceModels().entrySet()) {
                 String key = entry.getKey();
