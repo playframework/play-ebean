@@ -4,7 +4,6 @@
 package play.db.ebean;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigValue;
 import com.typesafe.config.ConfigValueType;
 import play.Configuration;
 
@@ -45,10 +44,7 @@ public class EbeanParsedConfig {
 
         if (config.hasPath(ebeanConfigKey)) {
             Config ebeanConfig = config.getConfig(ebeanConfigKey);
-
-            for (String key : ebeanConfig.root().keySet()) {
-
-                ConfigValue raw = ebeanConfig.getValue(key);
+            ebeanConfig.root().forEach((key, raw) -> {
                 List<String> models;
                 if (raw.valueType() == ConfigValueType.STRING) {
                     // Support legacy comma separated string
@@ -58,8 +54,7 @@ public class EbeanParsedConfig {
                 }
 
                 datasourceModels.put(key, models);
-
-            }
+            });
         }
         return new EbeanParsedConfig(defaultDatasource, datasourceModels);
     }

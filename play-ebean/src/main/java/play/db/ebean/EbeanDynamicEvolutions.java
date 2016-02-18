@@ -5,7 +5,6 @@ package play.db.ebean;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
-import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.model.CurrentModel;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import play.Environment;
@@ -47,11 +46,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
      * Initialise the Ebean servers.
      */
     public void start() {
-        for (Map.Entry<String, ServerConfig> entry : config.serverConfigs().entrySet()) {
-            String key = entry.getKey();
-            ServerConfig serverConfig = entry.getValue();
-            servers.put(key, EbeanServerFactory.create(serverConfig));
-        }
+        config.serverConfigs().forEach((key, serverConfig) -> servers.put(key, EbeanServerFactory.create(serverConfig)));
     }
 
     /**
@@ -60,16 +55,13 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
     @Override
     public void create() {
         if (!environment.isProd()) {
-            for (Map.Entry<String, ServerConfig> entry : config.serverConfigs().entrySet()) {
-                String key = entry.getKey();
+            config.serverConfigs().forEach((key, serverConfig) -> {
                 String evolutionScript = generateEvolutionScript(servers.get(key));
                 if (evolutionScript != null) {
                     File evolutions = environment.getFile("conf/evolutions/" + key + "/1.sql");
                     try {
-                        String content;
-                        if (!evolutions.exists()) {
-                            content = "";
-                        } else {
+                        String content = "";
+                        if (evolutions.exists()) {
                             content = new String(Files.readAllBytes(evolutions.toPath()), "utf-8");
                         }
 
@@ -83,7 +75,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                         throw new RuntimeException(e);
                     }
                 }
-            }
+            });
         }
     }
 

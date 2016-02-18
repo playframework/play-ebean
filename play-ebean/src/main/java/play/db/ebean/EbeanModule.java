@@ -10,8 +10,6 @@ import play.api.inject.Binding;
 import play.api.inject.Module;
 import scala.collection.Seq;
 
-import javax.inject.Singleton;
-
 /**
  * Injection module with default Ebean components.
  */

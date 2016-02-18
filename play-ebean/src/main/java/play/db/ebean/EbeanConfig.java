@@ -9,8 +9,8 @@ import java.util.Map;
 
 public interface EbeanConfig {
 
-    public String defaultServer();
+    String defaultServer();
 
-    public Map<String, ServerConfig> serverConfigs();
+    Map<String, ServerConfig> serverConfigs();
 
 }

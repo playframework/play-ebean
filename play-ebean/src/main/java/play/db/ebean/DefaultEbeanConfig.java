@@ -4,8 +4,6 @@
 package play.db.ebean;
 
 import com.avaje.ebean.config.ServerConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import play.Configuration;
 import play.Environment;
 import play.db.DBApi;
@@ -20,8 +18,6 @@ import java.util.*;
  */
 @Singleton
 public class DefaultEbeanConfig implements EbeanConfig {
-
-    private static final Logger log = LoggerFactory.getLogger(DefaultEbeanConfig.class);
 
     private final String defaultServer;
     private final Map<String, ServerConfig> serverConfigs;
@@ -75,45 +71,60 @@ public class DefaultEbeanConfig implements EbeanConfig {
                 ServerConfig serverConfig = new ServerConfig();
                 serverConfig.setName(key);
                 serverConfig.loadFromProperties();
-                try {
-                    serverConfig.setDataSource(new WrappingDatasource(dbApi.getDatabase(key).getDataSource()));
-                } catch(Exception e) {
-                    throw configuration.reportError(
-                        "ebean." + key,
-                        e.getMessage(),
-                        e
-                    );
-                }
+
+                setServerConfigDataSource(key, serverConfig);
 
                 if (config.getDefaultDatasource().equals(key)) {
                     serverConfig.setDefaultServer(true);
                 }
 
-                Set<String> classes = new HashSet<String>();
-                for (String load: entry.getValue()) {
-                    load = load.trim();
-                    if (load.endsWith(".*")) {
-                        classes.addAll(play.libs.Classpath.getTypes(environment, load.substring(0, load.length()-2)));
-                    } else {
-                        classes.add(load);
-                    }
-                }
-                for (String clazz: classes) {
-                    try {
-                        serverConfig.addClass(Class.forName(clazz, true, environment.classLoader()));
-                    } catch (Throwable e) {
-                        throw configuration.reportError(
-                            "ebean." + key,
-                            "Cannot register class [" + clazz + "] in Ebean server",
-                            e
-                        );
-                    }
-                }
+                Set<String> classes = getModelClasses(entry);
+                addModelClassesToServerConfig(key, serverConfig, classes);
 
                 serverConfigs.put(key, serverConfig);
             }
 
             return new DefaultEbeanConfig(config.getDefaultDatasource(), serverConfigs);
+        }
+
+        private void setServerConfigDataSource(String key, ServerConfig serverConfig) {
+            try {
+                serverConfig.setDataSource(new WrappingDatasource(dbApi.getDatabase(key).getDataSource()));
+            } catch(Exception e) {
+                throw configuration.reportError(
+                    "ebean." + key,
+                    e.getMessage(),
+                    e
+                );
+            }
+        }
+
+        private void addModelClassesToServerConfig(String key, ServerConfig serverConfig, Set<String> classes) {
+            for (String clazz: classes) {
+                try {
+                    serverConfig.addClass(Class.forName(clazz, true, environment.classLoader()));
+                } catch (Throwable e) {
+                    throw configuration.reportError(
+                        "ebean." + key,
+                        "Cannot register class [" + clazz + "] in Ebean server",
+                        e
+                    );
+                }
+            }
+        }
+
+        private Set<String> getModelClasses(Map.Entry<String, List<String>> entry) {
+            Set<String> classes = new HashSet<>();
+            entry.getValue().forEach(load -> {
+                load = load.trim();
+                if (load.endsWith(".*")) {
+                    classes.addAll(play.libs.Classpath.getTypes(environment, load.substring(0, load.length()-2)));
+                } else {
+                    classes.add(load);
+                }
+            });
+
+            return classes;
         }
 
         /**

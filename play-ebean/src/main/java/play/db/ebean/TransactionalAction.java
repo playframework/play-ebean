@@ -6,7 +6,6 @@ package play.db.ebean;
 import java.util.concurrent.CompletionStage;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.TxCallable;
 import play.mvc.Action;
 import play.mvc.Http.Context;
 import play.mvc.Result;
