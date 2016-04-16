@@ -58,6 +58,8 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
         /**
          * Reads the configuration and creates config for Ebean servers.
+         *
+         * @return a config for Ebean servers.
          */
         public EbeanConfig parse() {
 
