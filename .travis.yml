@@ -3,7 +3,7 @@ sudo: false
 jdk:
   - oraclejdk8
 script:
-  - sbt test publishLocal plugin/test plugin/scripted
+  - sbt jacoco:cover publishLocal plugin/test plugin/scripted
   - cd docs && sbt test validateDocs evaluateSbtFiles
 cache:
   directories:
@@ -20,3 +20,5 @@ notifications:
       - https://webhooks.gitter.im/e/d2c8a242a2615f659595
     on_success: always
     on_failure: always
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
