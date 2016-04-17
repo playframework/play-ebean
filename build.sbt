@@ -24,8 +24,10 @@ lazy val core = project
       (compile in Compile).value,
       (classDirectory in Compile).value,
       "play/db/ebean/**"
-    )
+    ),
+    jacoco.reportFormats in jacoco.Config := Seq(de.johoop.jacoco4sbt.XMLReport(encoding = "utf-8"))
   )
+  .settings(jacoco.settings: _*)
 
 lazy val plugin = project
   .in(file("sbt-play-ebean"))
