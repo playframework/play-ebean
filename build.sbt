@@ -16,6 +16,7 @@ lazy val root = project
 lazy val core = project
   .in(file("play-ebean"))
   .enablePlugins(Playdoc, PlayLibrary)
+  .settings(jacoco.settings: _*)
   .settings(
     name := "play-ebean",
     libraryDependencies ++= playEbeanDeps,
@@ -27,7 +28,6 @@ lazy val core = project
     ),
     jacoco.reportFormats in jacoco.Config := Seq(de.johoop.jacoco4sbt.XMLReport(encoding = "utf-8"))
   )
-  .settings(jacoco.settings: _*)
 
 lazy val plugin = project
   .in(file("sbt-play-ebean"))
