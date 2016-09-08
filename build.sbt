@@ -69,7 +69,7 @@ def sbtPlayEbeanDeps = Seq(
   "com.typesafe" % "config" % "1.3.0"
 )
 
-def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "4.9.2"
+def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "8.1.1"
 
 // Ebean enhancement
 
