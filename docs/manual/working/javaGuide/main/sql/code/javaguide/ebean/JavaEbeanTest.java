@@ -44,7 +44,9 @@ public class JavaEbeanTest extends WithApplication {
         List<Task> cocoTasks = Task.find.where()
                 .ilike("name", "%coco%")
                 .orderBy("dueDate asc")
-                .findPagedList(1, 25)
+                .setFirstRow(0)
+                .setMaxRows(25)
+                .findPagedList()
                 .getList();
         //#operations
 
