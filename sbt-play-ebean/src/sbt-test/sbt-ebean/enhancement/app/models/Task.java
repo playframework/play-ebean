@@ -10,6 +10,8 @@ import play.data.validation.*;
 @Entity
 public class Task extends Model {
 
+    public static Model.Finder<Long, Task> find = new Model.Finder<>(Task.class);
+
     @Id
     public Long id;
 
@@ -18,11 +20,6 @@ public class Task extends Model {
 
     public boolean done;
 
-    @Formats.DateTime(pattern="dd/MM/yyyy")
+    @Formats.DateTime(pattern = "dd/MM/yyyy")
     public Date dueDate = new Date();
-
-    public static Finder<Long,Task> find = new Finder<Long,Task>(
-            Long.class, Task.class
-    );
-
 }
