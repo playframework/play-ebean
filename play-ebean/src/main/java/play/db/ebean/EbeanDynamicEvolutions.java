@@ -7,6 +7,7 @@ import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.dbmigration.model.CurrentModel;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.server.lib.ShutdownManager;
 import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;
 import play.inject.ApplicationLifecycle;
@@ -35,6 +36,9 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
     public EbeanDynamicEvolutions(EbeanConfig config, Environment environment, ApplicationLifecycle lifecycle) {
         this.config = config;
         this.environment = environment;
+        if (!environment.isProd()) {
+            ShutdownManager.deregisterShutdownHook();
+        }
         start();
         lifecycle.addStopHook(() -> {
             servers.forEach((database, server) -> server.shutdown(false, false));
