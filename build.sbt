@@ -59,7 +59,7 @@ playBuildExtraPublish := {
 def playEbeanDeps = Seq(
   "com.typesafe.play" %% "play-java-jdbc" % PlayVersion,
   "com.typesafe.play" %% "play-jdbc-evolutions" % PlayVersion,
-  "org.avaje.ebean" % "ebean" % "8.4.1",
+  "org.avaje.ebean" % "ebean" % "9.1.2",
   avajeEbeanormAgent,
   "com.typesafe.play" %% "play-test" % PlayVersion % Test
 )
