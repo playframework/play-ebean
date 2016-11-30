@@ -28,8 +28,8 @@ object PlayEbean extends AutoPlugin {
   override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
   def scopedSettings = Seq(
-    playEbeanModels <<= configuredEbeanModels,
-    manipulateBytecode <<= ebeanEnhance
+    playEbeanModels := configuredEbeanModels.value,
+    manipulateBytecode := ebeanEnhance.value
   )
 
   def unscopedSettings = Seq(
@@ -118,7 +118,7 @@ object PlayEbean extends AutoPlugin {
       } catch {
         case e: Exception =>
           // Since we're about to close the classloader, we can't risk any classloading that the thrown exception may
-          // do when we later interogate it, so instead we create a new exception here, with the old exceptions message
+          // do when we later interrogate it, so instead we create a new exception here, with the old exceptions message
           // and stack trace
           def clone(t: Throwable): RuntimeException = {
             val cloned = new RuntimeException(s"${t.getClass.getName}: ${t.getMessage}")

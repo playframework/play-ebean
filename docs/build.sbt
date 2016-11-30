@@ -16,7 +16,7 @@ lazy val docs = project
   .settings(PlayEbean.unscopedSettings: _*)
   .settings(inConfig(Test)(Seq(
     playEbeanModels := Seq("javaguide.ebean.*"),
-    manipulateBytecode <<= PlayEbean.ebeanEnhance
+    manipulateBytecode := PlayEbean.ebeanEnhance.value
   )): _*)
   .dependsOn(playEbean)
 
