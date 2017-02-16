@@ -28,8 +28,8 @@ object PlayEbean extends AutoPlugin {
   override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
   def scopedSettings = Seq(
-    playEbeanModels <<= configuredEbeanModels,
-    manipulateBytecode <<= ebeanEnhance
+    playEbeanModels := configuredEbeanModels.value,
+    manipulateBytecode := ebeanEnhance.value
   )
 
   def unscopedSettings = Seq(
@@ -152,7 +152,7 @@ object PlayEbean extends AutoPlugin {
     val stream = getClass.getClassLoader.getResourceAsStream(resource)
     try { props.load(stream) }
     catch { case e: Exception => }
-    finally { if (stream ne null) stream.close }
+    finally { if (stream ne null) stream.close() }
     props.getProperty(property)
   }
 }

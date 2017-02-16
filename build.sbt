@@ -1,6 +1,7 @@
 import sbt.inc.Analysis
+import interplay.ScalaVersions._
 
-val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.5.6"))
+val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.6.0-M1"))
 
 val PlayEnhancerVersion = "1.1.0"
 
@@ -10,7 +11,7 @@ lazy val root = project
   .aggregate(core)
   .settings(
     name := "play-ebean-root",
-    releaseCrossBuild := false
+    releaseCrossBuild := true
   )
 
 lazy val core = project
@@ -19,6 +20,7 @@ lazy val core = project
   .settings(jacoco.settings: _*)
   .settings(
     name := "play-ebean",
+    crossScalaVersions := Seq(scala211),
     libraryDependencies ++= playEbeanDeps,
     compile in Compile := enhanceEbeanClasses(
       (dependencyClasspath in Compile).value,
@@ -38,7 +40,7 @@ lazy val plugin = project
     libraryDependencies ++= sbtPlayEbeanDeps,
     addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % PlayEnhancerVersion),
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % PlayVersion),
-    resourceGenerators in Compile <+= generateVersionFile,
+    resourceGenerators in Compile += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq("-Dplay-ebean.version=" + version.value),
     scriptedDependencies := {
       val () = publishLocal.value
@@ -57,6 +59,7 @@ playBuildExtraPublish := {
 // Dependencies
 
 def playEbeanDeps = Seq(
+  "com.typesafe.play" %% "play-guice" % PlayVersion,
   "com.typesafe.play" %% "play-java-jdbc" % PlayVersion,
   "com.typesafe.play" %% "play-jdbc-evolutions" % PlayVersion,
   "org.avaje.ebean" % "ebean" % "8.4.1",
@@ -66,7 +69,7 @@ def playEbeanDeps = Seq(
 
 def sbtPlayEbeanDeps = Seq(
   avajeEbeanormAgent,
-  "com.typesafe" % "config" % "1.3.0"
+  "com.typesafe" % "config" % "1.3.1"
 )
 
 def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "8.1.1"

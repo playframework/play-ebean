@@ -6,17 +6,19 @@ lazy val docs = project
   .settings(
     // use special snapshot play version for now
     resolvers ++= DefaultOptions.resolvers(snapshot = true),
+    libraryDependencies += component("play-java-forms"),
     libraryDependencies += component("play-test") % Test,
+    libraryDependencies += "com.h2database" % "h2" % "1.4.193" % Test,
     PlayDocsKeys.javaManualSourceDirectories := (baseDirectory.value / "manual" / "working" / "javaGuide" ** "code").get,
     // No resource directories shuts the ebean agent up about java sources in the classes directory
     unmanagedResourceDirectories in Test := Nil,
     parallelExecution in Test := false,
-    scalaVersion := "2.11.7"
+    scalaVersion := "2.12.1"
   )
   .settings(PlayEbean.unscopedSettings: _*)
   .settings(inConfig(Test)(Seq(
     playEbeanModels := Seq("javaguide.ebean.*"),
-    manipulateBytecode <<= PlayEbean.ebeanEnhance
+    manipulateBytecode := PlayEbean.ebeanEnhance.value
   )): _*)
   .dependsOn(playEbean)
 

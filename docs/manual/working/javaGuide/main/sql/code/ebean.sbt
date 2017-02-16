@@ -1,10 +1,11 @@
 //#add-sbt-plugin
-addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "3.0.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "3.1.1-SNAPSHOT")
 //#add-sbt-plugin
 
 //#enable-plugin
 lazy val myProject = (project in file("."))
   .enablePlugins(PlayJava, PlayEbean)
+
 //#enable-plugin
 
 //#play-ebean-models
