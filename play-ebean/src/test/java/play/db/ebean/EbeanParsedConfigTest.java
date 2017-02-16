@@ -5,7 +5,6 @@ package play.db.ebean;
 
 import com.google.common.collect.ImmutableMap;
 import com.typesafe.config.ConfigFactory;
-import play.Configuration;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +20,7 @@ public class EbeanParsedConfigTest {
 
     private EbeanParsedConfig parse(Map<String, ? extends Object> config) {
         return EbeanParsedConfig.parseFromConfig(
-                new Configuration(ConfigFactory.parseMap(config).withFallback(ConfigFactory.defaultReference()))
+                ConfigFactory.parseMap(config).withFallback(ConfigFactory.defaultReference())
         );
     }
 
@@ -33,10 +32,10 @@ public class EbeanParsedConfigTest {
     }
 
     @Test
-    public void withDatasources() {
+    public void withDataSources() {
         EbeanParsedConfig config = parse(ImmutableMap.of(
                 "ebean.default", Arrays.asList("a", "b"),
-                "ebean.other", Arrays.asList("c")
+                "ebean.other", Collections.singletonList("c")
         ));
         assertThat(config.getDatasourceModels().size(), equalTo(2));
         assertThat(config.getDatasourceModels().get("default"), hasItems("a", "b"));
@@ -63,7 +62,7 @@ public class EbeanParsedConfigTest {
     public void customConfig() {
         EbeanParsedConfig config = parse(ImmutableMap.of(
                 "play.ebean.config", "my.custom",
-                "my.custom.default", Arrays.asList("a")
+                "my.custom.default", Collections.singletonList("a")
         ));
         assertThat(config.getDatasourceModels().size(), equalTo(1));
         assertThat(config.getDatasourceModels().get("default"), hasItems("a"));

@@ -34,8 +34,26 @@ public class EbeanParsedConfig {
         return datasourceModels;
     }
 
+    /**
+     * Parse a play configuration.
+     *
+     * @param configuration play configuration
+     * @return ebean parsed configuration
+     *
+     * @deprecated {@link play.Configuration} was deprecated in Play 2.6 in favor of {@link com.typesafe.config.Config}. Use {@link #parseFromConfig(Config)}
+     */
     public static EbeanParsedConfig parseFromConfig(Configuration configuration) {
-        Config config = configuration.underlying();
+        return parseFromConfig(configuration.underlying());
+    }
+
+    /**
+     * Parse a play configuration.
+     *
+     * @param config play configuration
+     * @return ebean parsed configuration
+     * @see com.typesafe.config.Config
+     */
+    public static EbeanParsedConfig parseFromConfig(Config config) {
         Config playEbeanConfig = config.getConfig("play.ebean");
         String defaultDatasource = playEbeanConfig.getString("defaultDatasource");
         String ebeanConfigKey = playEbeanConfig.getString("config");
