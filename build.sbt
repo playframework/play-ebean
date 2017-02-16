@@ -59,11 +59,11 @@ playBuildExtraPublish := {
 // Dependencies
 
 def playEbeanDeps = Seq(
-  "com.typesafe.play" %% "play-guice" % PlayVersion,
   "com.typesafe.play" %% "play-java-jdbc" % PlayVersion,
   "com.typesafe.play" %% "play-jdbc-evolutions" % PlayVersion,
   "org.avaje.ebean" % "ebean" % "8.4.1",
   avajeEbeanormAgent,
+  "com.typesafe.play" %% "play-guice" % PlayVersion % Test,
   "com.typesafe.play" %% "play-test" % PlayVersion % Test
 )
 
