@@ -59,8 +59,8 @@ object PlayEbean extends AutoPlugin {
 
       Thread.currentThread.setContextClassLoader(classLoader)
 
-      import com.avaje.ebean.enhance.agent._
-      import com.avaje.ebean.enhance.ant._
+      import io.ebean.enhance.agent._
+      import io.ebean.enhance.ant._
 
       val transformer = new Transformer(classpath, agentArgsString)
 

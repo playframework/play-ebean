@@ -38,7 +38,7 @@ lazy val plugin = project
     libraryDependencies ++= sbtPlayEbeanDeps,
     addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % PlayEnhancerVersion),
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % PlayVersion),
-    resourceGenerators in Compile <+= generateVersionFile,
+    resourceGenerators in Compile += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq("-Dplay-ebean.version=" + version.value),
     scriptedDependencies := {
       val () = publishLocal.value
@@ -59,17 +59,18 @@ playBuildExtraPublish := {
 def playEbeanDeps = Seq(
   "com.typesafe.play" %% "play-java-jdbc" % PlayVersion,
   "com.typesafe.play" %% "play-jdbc-evolutions" % PlayVersion,
-  "org.avaje.ebean" % "ebean" % "8.4.1",
-  avajeEbeanormAgent,
+  "io.ebean" % "ebean" % "10.1.6",
+  ebeanAgent,
+  "com.typesafe.play" %% "play-guice" % PlayVersion % Test,
   "com.typesafe.play" %% "play-test" % PlayVersion % Test
 )
 
 def sbtPlayEbeanDeps = Seq(
-  avajeEbeanormAgent,
-  "com.typesafe" % "config" % "1.3.0"
+  ebeanAgent,
+  "com.typesafe" % "config" % "1.3.1"
 )
 
-def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "8.1.1"
+def ebeanAgent = "io.ebean" % "ebean-agent" % "10.1.2"
 
 // Ebean enhancement
 
@@ -77,8 +78,8 @@ def enhanceEbeanClasses(classpath: Classpath, analysis: Analysis, classDirectory
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
-  val t = cl.loadClass("com.avaje.ebean.enhance.agent.Transformer").getConstructor(classOf[Array[URL]], classOf[String]).newInstance(cp, "debug=0").asInstanceOf[AnyRef]
-  val ft = cl.loadClass("com.avaje.ebean.enhance.ant.OfflineFileTransform").getConstructor(
+  val t = cl.loadClass("io.ebean.enhance.agent.Transformer").getConstructor(classOf[Array[URL]], classOf[String]).newInstance(cp, "debug=0").asInstanceOf[AnyRef]
+  val ft = cl.loadClass("io.ebean.enhance.ant.OfflineFileTransform").getConstructor(
     t.getClass, classOf[ClassLoader], classOf[String]
   ).newInstance(t, ClassLoader.getSystemClassLoader, classDirectory.getAbsolutePath).asInstanceOf[AnyRef]
   ft.getClass.getDeclaredMethod("process", classOf[String]).invoke(ft, pkg)

@@ -3,7 +3,7 @@
  */
 package play.db.ebean;
 
-import com.avaje.ebean.config.ServerConfig;
+import io.ebean.config.ServerConfig;
 
 import java.util.Map;
 

@@ -3,7 +3,7 @@
  */
 package play.db.ebean;
 
-import com.avaje.ebean.config.ServerConfig;
+import io.ebean.config.ServerConfig;
 import play.Configuration;
 import play.Environment;
 import play.db.DBApi;
@@ -73,6 +73,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
                 ServerConfig serverConfig = new ServerConfig();
                 serverConfig.setName(key);
                 serverConfig.loadFromProperties();
+                serverConfig.setH2ProductionMode(true);  // Since Ebean 9.1.1: Don't override Evolution
 
                 setServerConfigDataSource(key, serverConfig);
 
