@@ -3,14 +3,14 @@ package models;
 import java.util.*;
 import javax.persistence.*;
 
-import com.avaje.ebean.*;
+import io.ebean.*;
 import play.data.format.*;
 import play.data.validation.*;
 
 @Entity
 public class Task extends Model {
 
-    public static Model.Finder<Long, Task> find = new Model.Finder<>(Task.class);
+    public static Finder<Long, Task> find = new Finder<>(Task.class);
 
     @Id
     public Long id;

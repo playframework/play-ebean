@@ -5,6 +5,6 @@
 /**
  * Provides Ebean ORM integration.
  *
- * <p><a href="http://www.avaje.org/ebean/documentation.html">http://www.avaje.org/ebean/documentation.html</a></p>
+ * <p><a href="http://ebean-orm.github.io/">http://ebean-orm.github.io/</a></p>
  */
 package play.db.ebean;
