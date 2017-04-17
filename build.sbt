@@ -72,7 +72,7 @@ def sbtPlayEbeanDeps = Seq(
   "com.typesafe" % "config" % "1.3.1"
 )
 
-def ebeanAgent = "io.ebean" % "ebean-agent" % "10.1.2"
+def ebeanAgent = "io.ebean" % "ebean-agent" % "10.1.7"
 
 // Ebean enhancement
 
