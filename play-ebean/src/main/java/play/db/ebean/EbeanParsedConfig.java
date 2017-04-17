@@ -42,6 +42,7 @@ public class EbeanParsedConfig {
      *
      * @deprecated {@link play.Configuration} was deprecated in Play 2.6 in favor of {@link com.typesafe.config.Config}. Use {@link #parseFromConfig(Config)}
      */
+    @Deprecated
     public static EbeanParsedConfig parseFromConfig(Configuration configuration) {
         return parseFromConfig(configuration.underlying());
     }
