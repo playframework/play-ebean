@@ -106,7 +106,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
             for (String clazz: classes) {
                 try {
                     serverConfig.addClass(Class.forName(clazz, true, environment.classLoader()));
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     throw configuration.reportError(
                         "ebean." + key,
                         "Cannot register class [" + clazz + "] in Ebean server",
