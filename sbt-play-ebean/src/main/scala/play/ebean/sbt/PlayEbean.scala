@@ -62,7 +62,7 @@ object PlayEbean extends AutoPlugin {
       import io.ebean.enhance._
       import io.ebean.enhance.ant._
 
-      val transformer = new Transformer(classpath, agentArgsString)
+      val transformer = new Transformer(classLoader, agentArgsString)
 
       val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
 
