@@ -24,6 +24,6 @@ public class Task extends Model {
     @Formats.DateTime(pattern="dd/MM/yyyy")
     public Date dueDate = new Date();
 
-    public static Finder<Long, Task> find = new Finder<Long,Task>(Task.class);
+    public static final Finder<Long, Task> find = new Finder<>(Task.class);
 }
 //#content

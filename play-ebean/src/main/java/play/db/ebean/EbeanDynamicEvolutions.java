@@ -97,7 +97,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                 return null;
             }
 
-            return (
+            return
                 "# --- Created by Ebean DDL\r\n" +
                 "# To stop Ebean DDL generation, remove this comment and start using Evolutions\r\n" +
                 "\r\n" +
@@ -107,8 +107,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                 "\r\n" +
                 "# --- !Downs\r\n" +
                 "\r\n" +
-                downs
-            );
+                downs;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
