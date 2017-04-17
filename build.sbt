@@ -80,7 +80,7 @@ def enhanceEbeanClasses(classpath: Classpath, analysis: Analysis, classDirectory
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
-  val t = cl.loadClass("io.ebean.enhance.agent.Transformer").getConstructor(classOf[Array[URL]], classOf[String]).newInstance(cp, "debug=0").asInstanceOf[AnyRef]
+  val t = cl.loadClass("io.ebean.enhance.Transformer").getConstructor(classOf[Array[URL]], classOf[String]).newInstance(cp, "debug=0").asInstanceOf[AnyRef]
   val ft = cl.loadClass("io.ebean.enhance.ant.OfflineFileTransform").getConstructor(
     t.getClass, classOf[ClassLoader], classOf[String]
   ).newInstance(t, ClassLoader.getSystemClassLoader, classDirectory.getAbsolutePath).asInstanceOf[AnyRef]
