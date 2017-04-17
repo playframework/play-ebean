@@ -82,7 +82,7 @@ As you can see, we've added a `find` static field, defining a `Finder` for an en
 
 ## Transactional actions
 
-By default Ebean will use transactions. However this transactions will be created before and commited or rollbacked after every single query, update, create or delete, as you can see here:
+By default Ebean will use transactions. However these transactions will be created before and commited or rollbacked after every single query, update, create or delete, as you can see here:
 
 @[transaction](code/javaguide/ebean/JavaEbeanTest.java)
 
