@@ -20,7 +20,7 @@ public class JavaEbeanTest extends WithApplication {
 
     @Override
     protected Application provideApplication() {
-        Map<String, String> config = new HashMap<String, String>();
+        Map<String, String> config = new HashMap<>();
         config.putAll(inMemoryDatabase());
         config.put("ebean.default", "javaguide.ebean.Task");
         return fakeApplication(config);
