@@ -72,7 +72,7 @@ def sbtPlayEbeanDeps = Seq(
   "com.typesafe" % "config" % "1.3.1"
 )
 
-def ebeanAgent = "io.ebean" % "ebean-agent" % "10.1.2"
+def ebeanAgent = "io.ebean" % "ebean-agent" % "10.1.7"
 
 // Ebean enhancement
 
@@ -80,7 +80,7 @@ def enhanceEbeanClasses(classpath: Classpath, analysis: Analysis, classDirectory
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
-  val t = cl.loadClass("io.ebean.enhance.agent.Transformer").getConstructor(classOf[Array[URL]], classOf[String]).newInstance(cp, "debug=0").asInstanceOf[AnyRef]
+  val t = cl.loadClass("io.ebean.enhance.Transformer").getConstructor(classOf[ClassLoader], classOf[String]).newInstance(cl, "debug=0").asInstanceOf[AnyRef]
   val ft = cl.loadClass("io.ebean.enhance.ant.OfflineFileTransform").getConstructor(
     t.getClass, classOf[ClassLoader], classOf[String]
   ).newInstance(t, ClassLoader.getSystemClassLoader, classDirectory.getAbsolutePath).asInstanceOf[AnyRef]
