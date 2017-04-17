@@ -78,6 +78,7 @@ def ebeanAgent = "io.ebean" % "ebean-agent" % "10.1.7"
 
 def enhanceEbeanClasses(classpath: Classpath, analysis: Analysis, classDirectory: File, pkg: String): Analysis = {
   // Ebean (really hacky sorry)
+  val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
   val t = cl.loadClass("io.ebean.enhance.Transformer").getConstructor(classOf[ClassLoader], classOf[String]).newInstance(cl, "debug=0").asInstanceOf[AnyRef]
   val ft = cl.loadClass("io.ebean.enhance.ant.OfflineFileTransform").getConstructor(
