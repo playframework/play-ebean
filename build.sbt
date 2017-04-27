@@ -1,7 +1,7 @@
 import sbt.inc.Analysis
 import interplay.ScalaVersions._
 
-val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.6.0-M1"))
+val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.6.0-M5"))
 
 val PlayEnhancerVersion = "1.1.0"
 
