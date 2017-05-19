@@ -7,6 +7,8 @@ Play comes with the [Ebean](https://ebean-orm.github.io/) ORM. To enable it, add
 
 @[add-sbt-plugin](code/ebean.sbt)
 
+> **Note**: see all available version [here](https://github.com/playframework/play-ebean#releases).
+
 And then modify your `build.sbt` to enable the Play Ebean plugin:
 
 @[enable-plugin](code/ebean.sbt)
