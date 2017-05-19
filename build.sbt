@@ -1,8 +1,14 @@
 import sbt.inc.Analysis
+import interplay.ScalaVersions._
 
-val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.5.6"))
+val Versions = new {
+  val play = playVersion(sys.props.getOrElse("play.version", "2.5.15"))
+  val playEnhancer = "1.1.0"
+  val ebean = "10.2.2"
+  val ebeanAgent = "10.2.1"
+  val typesafeConfig = "1.3.1"
+}
 
-val PlayEnhancerVersion = "1.1.0"
 
 lazy val root = project
   .in(file("."))
@@ -10,7 +16,7 @@ lazy val root = project
   .aggregate(core)
   .settings(
     name := "play-ebean-root",
-    releaseCrossBuild := false
+    releaseCrossBuild := true
   )
 
 lazy val core = project
@@ -19,6 +25,7 @@ lazy val core = project
   .settings(jacoco.settings: _*)
   .settings(
     name := "play-ebean",
+    crossScalaVersions := Seq(scala211),
     libraryDependencies ++= playEbeanDeps,
     compile in Compile := enhanceEbeanClasses(
       (dependencyClasspath in Compile).value,
@@ -36,8 +43,8 @@ lazy val plugin = project
     name := "sbt-play-ebean",
     organization := "com.typesafe.sbt",
     libraryDependencies ++= sbtPlayEbeanDeps,
-    addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % PlayEnhancerVersion),
-    addSbtPlugin("com.typesafe.play" % "sbt-plugin" % PlayVersion),
+    addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % Versions.playEnhancer),
+    addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
     resourceGenerators in Compile += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq("-Dplay-ebean.version=" + version.value),
     scriptedDependencies := {
@@ -57,20 +64,20 @@ playBuildExtraPublish := {
 // Dependencies
 
 def playEbeanDeps = Seq(
-  "com.typesafe.play" %% "play-java-jdbc" % PlayVersion,
-  "com.typesafe.play" %% "play-jdbc-evolutions" % PlayVersion,
-  "io.ebean" % "ebean" % "10.2.1",
+  "com.typesafe.play" %% "play-java-jdbc" % Versions.play,
+  "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
+  "io.ebean" % "ebean" % Versions.ebean,
   ebeanAgent,
-  "com.typesafe.play" %% "play-guice" % PlayVersion % Test,
-  "com.typesafe.play" %% "play-test" % PlayVersion % Test
+  "com.typesafe.play" %% "play-guice" % Versions.play % Test,
+  "com.typesafe.play" %% "play-test" % Versions.play % Test
 )
 
 def sbtPlayEbeanDeps = Seq(
   ebeanAgent,
-  "com.typesafe" % "config" % "1.3.1"
+  "com.typesafe" % "config" % Versions.typesafeConfig
 )
 
-def ebeanAgent = "io.ebean" % "ebean-agent" % "10.1.7"
+def ebeanAgent = "io.ebean" % "ebean-agent" % Versions.ebeanAgent
 
 // Ebean enhancement
 
