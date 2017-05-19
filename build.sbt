@@ -4,7 +4,7 @@ import interplay.ScalaVersions._
 val Versions = new {
   val play = playVersion(sys.props.getOrElse("play.version", "2.6.0-M5"))
   val playEnhancer = "1.1.0"
-  val ebean = "10.2.2"
+  val ebean = "10.2.3"
   val ebeanAgent = "10.2.1"
   val typesafeConfig = "1.3.1"
 }
