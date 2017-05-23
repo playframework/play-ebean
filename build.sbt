@@ -2,6 +2,7 @@ import sbt.inc.Analysis
 import interplay.ScalaVersions._
 
 val Versions = new {
+  val akkaHttp = "10.0.6+7-e2ba6752"
   val play = playVersion(sys.props.getOrElse("play.version", "2.6.0-RC1"))
   val playEnhancer = "1.1.0"
   val ebean = "10.2.3"
@@ -68,6 +69,7 @@ def playEbeanDeps = Seq(
   "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
   "io.ebean" % "ebean" % Versions.ebean,
   ebeanAgent,
+  "com.typesafe.akka" %% "akka-http-core" % Versions.akkaHttp % Test,
   "com.typesafe.play" %% "play-guice" % Versions.play % Test,
   "com.typesafe.play" %% "filters-helpers" % Versions.play % Test,
   "com.typesafe.play" %% "play-test" % Versions.play % Test
