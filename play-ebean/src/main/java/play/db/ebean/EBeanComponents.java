@@ -3,31 +3,20 @@
  */
 package play.db.ebean;
 
-
-import play.Configuration;
-import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;
-import play.db.DBApi;
-import play.inject.ApplicationLifecycle;
+import play.components.ConfigurationComponents;
+import play.db.DBComponents;
 
 /**
  * Classes for Java compile time dependency injection.
  */
-public interface EBeanComponents {
-
-    ApplicationLifecycle applicationLifecycle();
-
-    Environment environment();
-
-    Configuration configuration();
-
-    DBApi dbApi();
+public interface EBeanComponents extends ConfigurationComponents, DBComponents {
 
     default DynamicEvolutions dynamicEvolutions() {
         return new EbeanDynamicEvolutions(ebeanConfig(), environment(), applicationLifecycle());
     }
 
     default EbeanConfig ebeanConfig() {
-        return new DefaultEbeanConfig.EbeanConfigParser(configuration(), environment(), dbApi()).get();
+        return new DefaultEbeanConfig.EbeanConfigParser(config(), environment(), dbApi()).get();
     }
 }

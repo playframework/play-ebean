@@ -3,6 +3,8 @@
  */
 package play.db.ebean;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigException;
 import io.ebean.config.ServerConfig;
 import play.Configuration;
 import play.Environment;
@@ -40,13 +42,13 @@ public class DefaultEbeanConfig implements EbeanConfig {
     @Singleton
     public static class EbeanConfigParser implements Provider<EbeanConfig> {
 
-        private final Configuration configuration;
+        private final Config config;
         private final Environment environment;
         private final DBApi dbApi;
 
         @Inject
-        public EbeanConfigParser(Configuration configuration, Environment environment, DBApi dbApi) {
-            this.configuration = configuration;
+        public EbeanConfigParser(Config config, Environment environment, DBApi dbApi) {
+            this.config = config;
             this.environment = environment;
             this.dbApi = dbApi;
         }
@@ -63,11 +65,11 @@ public class DefaultEbeanConfig implements EbeanConfig {
          */
         public EbeanConfig parse() {
 
-            EbeanParsedConfig config = EbeanParsedConfig.parseFromConfig(configuration);
+            EbeanParsedConfig ebeanConfig = EbeanParsedConfig.parseFromConfig(config);
 
             Map<String, ServerConfig> serverConfigs = new HashMap<>();
 
-            for (Map.Entry<String, List<String>> entry: config.getDatasourceModels().entrySet()) {
+            for (Map.Entry<String, List<String>> entry: ebeanConfig.getDatasourceModels().entrySet()) {
                 String key = entry.getKey();
 
                 ServerConfig serverConfig = new ServerConfig();
@@ -77,7 +79,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
                 setServerConfigDataSource(key, serverConfig);
 
-                if (config.getDefaultDatasource().equals(key)) {
+                if (ebeanConfig.getDefaultDatasource().equals(key)) {
                     serverConfig.setDefaultServer(true);
                 }
 
@@ -87,17 +89,17 @@ public class DefaultEbeanConfig implements EbeanConfig {
                 serverConfigs.put(key, serverConfig);
             }
 
-            return new DefaultEbeanConfig(config.getDefaultDatasource(), serverConfigs);
+            return new DefaultEbeanConfig(ebeanConfig.getDefaultDatasource(), serverConfigs);
         }
 
         private void setServerConfigDataSource(String key, ServerConfig serverConfig) {
             try {
                 serverConfig.setDataSource(new WrappingDatasource(dbApi.getDatabase(key).getDataSource()));
             } catch(Exception e) {
-                throw configuration.reportError(
-                    "ebean." + key,
-                    e.getMessage(),
-                    e
+                throw new ConfigException.BadValue(
+                        "ebean." + key,
+                        e.getMessage(),
+                        e
                 );
             }
         }
@@ -107,7 +109,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
                 try {
                     serverConfig.addClass(Class.forName(clazz, true, environment.classLoader()));
                 } catch (Exception e) {
-                    throw configuration.reportError(
+                    throw new ConfigException.BadValue(
                         "ebean." + key,
                         "Cannot register class [" + clazz + "] in Ebean server",
                         e
