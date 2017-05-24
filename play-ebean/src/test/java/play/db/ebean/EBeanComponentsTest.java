@@ -26,7 +26,7 @@ public class EBeanComponentsTest {
 
         @Override
         public play.routing.Router router() {
-            RoutingDsl routingDsl = new RoutingDsl(scalaBodyParsers(), javaContextComponents());
+            RoutingDsl routingDsl = new RoutingDsl(scalaParsers(), javaContextComponents());
             return routingDsl.GET("/").routeTo(() ->
                     Results.ok("Hello")
             ).build();
