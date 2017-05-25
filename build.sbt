@@ -69,6 +69,7 @@ def playEbeanDeps = Seq(
   "io.ebean" % "ebean" % Versions.ebean,
   ebeanAgent,
   "com.typesafe.play" %% "play-guice" % Versions.play % Test,
+  "com.typesafe.play" %% "filters-helpers" % Versions.play % Test,
   "com.typesafe.play" %% "play-test" % Versions.play % Test
 )
 
