@@ -28,8 +28,8 @@ object PlayEbean extends AutoPlugin {
   override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
   def scopedSettings = Seq(
-    playEbeanModels <<= configuredEbeanModels,
-    manipulateBytecode <<= ebeanEnhance
+    playEbeanModels := configuredEbeanModels.value,
+    manipulateBytecode := ebeanEnhance.value
   )
 
   def unscopedSettings = Seq(
