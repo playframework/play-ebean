@@ -10,7 +10,7 @@ The Play Ebean plugin supports several different versions of Play and Ebean.
 
 | Plugin version | Play version | Ebean version |
 |----------------|--------------|---------------|
-| 4.0.0-M3       | 2.6.x        | 10.2.x        |
+| 4.0.0          | 2.6.x        | 10.2.x        |
 | 3.0.2          | 2.5.x        | 7.6.x         |
 | 3.0.1          | 2.5.x        | 6.18.x        |
 | 3.0.0          | 2.5.x        | 6.18.x        |

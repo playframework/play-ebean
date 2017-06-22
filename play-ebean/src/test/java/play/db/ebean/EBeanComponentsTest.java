@@ -6,6 +6,7 @@ package play.db.ebean;
 
 import org.junit.Test;
 import play.*;
+import play.routing.*;
 import play.api.Play;
 import play.components.BodyParserComponents;
 import play.db.HikariCPComponents;
@@ -17,7 +18,7 @@ import java.util.Collections;
 
 public class EBeanComponentsTest {
 
-    class MyComponents extends BuiltInComponentsFromContext
+    class MyComponents extends RoutingDslComponentsFromContext
             implements NoHttpFiltersComponents, BodyParserComponents, EBeanComponents, HikariCPComponents {
 
         public MyComponents(ApplicationLoader.Context context) {
@@ -26,8 +27,7 @@ public class EBeanComponentsTest {
 
         @Override
         public play.routing.Router router() {
-            RoutingDsl routingDsl = new RoutingDsl(scalaParsers(), javaContextComponents());
-            return routingDsl.GET("/").routeTo(() ->
+            return routingDsl().GET("/").routeTo(() ->
                     Results.ok("Hello")
             ).build();
         }
