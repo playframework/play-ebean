@@ -1,5 +1,5 @@
 //#add-sbt-plugin
-addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "4.0.0-M3")
+addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "4.0.0")
 //#add-sbt-plugin
 
 //#enable-plugin
