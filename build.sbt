@@ -1,8 +1,13 @@
 import sbt.inc.Analysis
 
-val PlayVersion = playVersion(sys.props.getOrElse("play.version", "2.5.6"))
+val Versions = new {
+  val play = playVersion(sys.props.getOrElse("play.version", "2.5.15"))
+  val playEnhancer = "1.1.0"
+  val ebean = "10.3.2"
+  val ebeanAgent = "10.3.1"
+  val typesafeConfig = "1.3.1"
+}
 
-val PlayEnhancerVersion = "1.1.0"
 
 lazy val root = project
   .in(file("."))
@@ -36,9 +41,9 @@ lazy val plugin = project
     name := "sbt-play-ebean",
     organization := "com.typesafe.sbt",
     libraryDependencies ++= sbtPlayEbeanDeps,
-    addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % PlayEnhancerVersion),
-    addSbtPlugin("com.typesafe.play" % "sbt-plugin" % PlayVersion),
-    resourceGenerators in Compile <+= generateVersionFile,
+    addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % Versions.playEnhancer),
+    addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
+    resourceGenerators in Compile += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq("-Dplay-ebean.version=" + version.value),
     scriptedDependencies := {
       val () = publishLocal.value
@@ -57,19 +62,19 @@ playBuildExtraPublish := {
 // Dependencies
 
 def playEbeanDeps = Seq(
-  "com.typesafe.play" %% "play-java-jdbc" % PlayVersion,
-  "com.typesafe.play" %% "play-jdbc-evolutions" % PlayVersion,
-  "org.avaje.ebean" % "ebean" % "8.2.3",
-  avajeEbeanormAgent,
-  "com.typesafe.play" %% "play-test" % PlayVersion % Test
+  "com.typesafe.play" %% "play-java-jdbc" % Versions.play,
+  "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
+  "io.ebean" % "ebean" % Versions.ebean,
+  ebeanAgent,
+  "com.typesafe.play" %% "play-test" % Versions.play % Test
 )
 
 def sbtPlayEbeanDeps = Seq(
-  avajeEbeanormAgent,
-  "com.typesafe" % "config" % "1.3.0"
+  ebeanAgent,
+  "com.typesafe" % "config" % Versions.typesafeConfig
 )
 
-def avajeEbeanormAgent = "org.avaje.ebeanorm" % "avaje-ebeanorm-agent" % "8.1.1"
+def ebeanAgent = "io.ebean" % "ebean-agent" % Versions.ebeanAgent
 
 // Ebean enhancement
 
@@ -77,8 +82,8 @@ def enhanceEbeanClasses(classpath: Classpath, analysis: Analysis, classDirectory
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
-  val t = cl.loadClass("com.avaje.ebean.enhance.agent.Transformer").getConstructor(classOf[Array[URL]], classOf[String]).newInstance(cp, "debug=0").asInstanceOf[AnyRef]
-  val ft = cl.loadClass("com.avaje.ebean.enhance.ant.OfflineFileTransform").getConstructor(
+  val t = cl.loadClass("io.ebean.enhance.Transformer").getConstructor(classOf[ClassLoader], classOf[String]).newInstance(cl, "debug=0").asInstanceOf[AnyRef]
+  val ft = cl.loadClass("io.ebean.enhance.ant.OfflineFileTransform").getConstructor(
     t.getClass, classOf[ClassLoader], classOf[String]
   ).newInstance(t, ClassLoader.getSystemClassLoader, classDirectory.getAbsolutePath).asInstanceOf[AnyRef]
   ft.getClass.getDeclaredMethod("process", classOf[String]).invoke(ft, pkg)

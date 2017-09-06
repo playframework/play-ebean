@@ -64,7 +64,7 @@ Finally, if you want to also enhance models in your tests, you can do this by co
 
 ## Using Model superclass
 
-Ebean defines a convenient superclass for your Ebean model classes, `com.avaje.ebean.Model`. Here is a typical Ebean class, mapped in Play:
+Ebean defines a convenient superclass for your Ebean model classes, `io.ebean.Model`. Here is a typical Ebean class, mapped in Play:
 
 @[content](code/javaguide/ebean/Task.java)
 

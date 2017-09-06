@@ -3,10 +3,10 @@
  */
 package play.db.ebean;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.EbeanServerFactory;
-import com.avaje.ebean.dbmigration.model.CurrentModel;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import io.ebean.EbeanServer;
+import io.ebean.EbeanServerFactory;
+import io.ebean.dbmigration.model.CurrentModel;
+import io.ebeaninternal.api.SpiEbeanServer;
 import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;
 import play.inject.ApplicationLifecycle;

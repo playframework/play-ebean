@@ -28,8 +28,8 @@ object PlayEbean extends AutoPlugin {
   override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
   def scopedSettings = Seq(
-    playEbeanModels <<= configuredEbeanModels,
-    manipulateBytecode <<= ebeanEnhance
+    playEbeanModels := configuredEbeanModels.value,
+    manipulateBytecode := ebeanEnhance.value
   )
 
   def unscopedSettings = Seq(
@@ -59,10 +59,10 @@ object PlayEbean extends AutoPlugin {
 
       Thread.currentThread.setContextClassLoader(classLoader)
 
-      import com.avaje.ebean.enhance.agent._
-      import com.avaje.ebean.enhance.ant._
+      import io.ebean.enhance._
+      import io.ebean.enhance.ant._
 
-      val transformer = new Transformer(classpath, agentArgsString)
+      val transformer = new Transformer(classLoader, agentArgsString)
 
       val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
 
