@@ -73,7 +73,6 @@ public class DefaultEbeanConfig implements EbeanConfig {
                 ServerConfig serverConfig = new ServerConfig();
                 serverConfig.setName(key);
                 serverConfig.loadFromProperties();
-                serverConfig.setH2ProductionMode(true);  // Since Ebean 9.1.1: Don't override Evolution
 
                 setServerConfigDataSource(key, serverConfig);
 
