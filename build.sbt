@@ -3,7 +3,7 @@ import sbt.inc.Analysis
 val Versions = new {
   val play = playVersion(sys.props.getOrElse("play.version", "2.5.16"))
   val playEnhancer = "1.1.0"
-  val ebean = "10.4.4"
+  val ebean = "10.4.7"
   val ebeanAgent = "10.4.1"
   val typesafeConfig = "1.3.1"
 }
