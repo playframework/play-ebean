@@ -73,7 +73,6 @@ public class DefaultEbeanConfig implements EbeanConfig {
                 ServerConfig serverConfig = new ServerConfig();
                 serverConfig.setName(key);
                 serverConfig.loadFromProperties();
-
                 setServerConfigDataSource(key, serverConfig);
 
                 if (config.getDefaultDatasource().equals(key)) {
