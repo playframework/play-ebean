@@ -2,17 +2,16 @@ import sbt.inc.Analysis
 import interplay.ScalaVersions._
 
 val Versions = new {
-  val play: String = playVersion(sys.props.getOrElse("play.version", "2.6.5"))
-  val playEnhancer = "1.2.1"
+  val play: String = playVersion(sys.props.getOrElse("play.version", "2.6.6"))
+  val playEnhancer = "1.2.2"
   val ebean = "10.4.4"
   val ebeanAgent = "10.4.1"
-  val typesafeConfig = "1.3.1"
+  val typesafeConfig = "1.3.2"
 }
-
 
 lazy val root = project
   .in(file("."))
-  .enablePlugins(PlayRootProject)
+  .enablePlugins(PlayRootProject, CrossPerProjectPlugin)
   .aggregate(core)
   .settings(
     name := "play-ebean-root",
@@ -21,11 +20,10 @@ lazy val root = project
 
 lazy val core = project
   .in(file("play-ebean"))
-  .enablePlugins(Playdoc, PlayLibrary)
-  .settings(jacoco.settings: _*)
+  .enablePlugins(Playdoc, PlayLibrary, JacocoPlugin)
   .settings(
     name := "play-ebean",
-    crossScalaVersions := Seq(scala211),
+    crossScalaVersions := Seq(scala211, scala212),
     libraryDependencies ++= playEbeanDeps,
     compile in Compile := enhanceEbeanClasses(
       (dependencyClasspath in Compile).value,
@@ -33,7 +31,7 @@ lazy val core = project
       (classDirectory in Compile).value,
       "play/db/ebean/**"
     ),
-    jacoco.reportFormats in jacoco.Config := Seq(de.johoop.jacoco4sbt.XMLReport(encoding = "utf-8"))
+    jacocoReportSettings := JacocoReportSettings("Jacoco Coverage Report", None, JacocoThresholds(), Seq(JacocoReportFormats.XML), "utf-8")
   )
 
 lazy val plugin = project
@@ -43,13 +41,16 @@ lazy val plugin = project
     name := "sbt-play-ebean",
     organization := "com.typesafe.sbt",
     libraryDependencies ++= sbtPlayEbeanDeps,
-    addSbtPlugin("com.typesafe.sbt" % "sbt-play-enhancer" % Versions.playEnhancer),
-    addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
+
+    libraryDependencies ++= Seq(
+      sbtPluginDep("com.typesafe.sbt" % "sbt-play-enhancer" % Versions.playEnhancer, (sbtVersion in pluginCrossBuild).value, scalaVersion.value),
+      sbtPluginDep("com.typesafe.play" % "sbt-plugin" % Versions.play, (sbtVersion in pluginCrossBuild).value, scalaVersion.value)
+    ),
+
     resourceGenerators in Compile += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq("-Dplay-ebean.version=" + version.value),
     scriptedDependencies := {
       val () = publishLocal.value
-      val () = (publishLocal in core).value
     }
   )
 
@@ -62,26 +63,29 @@ playBuildExtraPublish := {
 }
 
 // Dependencies
+lazy val ebeanDeps = Seq(
+  "io.ebean" % "ebean" % Versions.ebean,
+  "io.ebean" % "ebean-agent" % Versions.ebeanAgent
+)
 
-def playEbeanDeps = Seq(
+lazy val playEbeanDeps = ebeanDeps ++ Seq(
   "com.typesafe.play" %% "play-java-jdbc" % Versions.play,
   "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
-  "io.ebean" % "ebean" % Versions.ebean,
-  ebeanAgent,
   "com.typesafe.play" %% "play-guice" % Versions.play % Test,
   "com.typesafe.play" %% "filters-helpers" % Versions.play % Test,
   "com.typesafe.play" %% "play-test" % Versions.play % Test
 )
 
-def sbtPlayEbeanDeps = Seq(
-  ebeanAgent,
+lazy val sbtPlayEbeanDeps = ebeanDeps ++ Seq(
   "com.typesafe" % "config" % Versions.typesafeConfig
 )
 
-def ebeanAgent = "io.ebean" % "ebean-agent" % Versions.ebeanAgent
+// sbt deps
+def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
+  Defaults.sbtPluginExtra(moduleId, CrossVersion.binarySbtVersion(sbtVersion), CrossVersion.binaryScalaVersion(scalaVersion))
+}
 
 // Ebean enhancement
-
 def enhanceEbeanClasses(classpath: Classpath, analysis: Analysis, classDirectory: File, pkg: String): Analysis = {
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL

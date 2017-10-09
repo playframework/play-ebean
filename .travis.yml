@@ -3,8 +3,8 @@ sudo: false
 jdk:
   - oraclejdk8
 env:
-  - SCRIPT="sbt jacoco:cover"
-  - SCRIPT="sbt publishLocal plugin/test plugin/scripted"
+  - SCRIPT="sbt +jacoco"
+  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted"
   - SCRIPT="cd docs && sbt test"
   - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"
 script:
