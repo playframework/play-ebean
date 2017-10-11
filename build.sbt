@@ -12,10 +12,10 @@ val Versions = new {
 lazy val root = project
   .in(file("."))
   .enablePlugins(PlayRootProject, CrossPerProjectPlugin)
-  .aggregate(core)
+  .aggregate(core, plugin)
   .settings(
     name := "play-ebean-root",
-    releaseCrossBuild := true
+    releaseCrossBuild := false
   )
 
 lazy val core = project
