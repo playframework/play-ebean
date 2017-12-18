@@ -78,8 +78,8 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
                 setServerConfigDataSource(key, serverConfig);
 
-                if (ebeanConfig.getDefaultDatasource().equals(key)) {
-                    serverConfig.setDefaultServer(true);
+                if (!ebeanConfig.getDefaultDatasource().equals(key)) {
+                    serverConfig.setDefaultServer(false);
                 }
 
                 Set<String> classes = getModelClasses(entry);
