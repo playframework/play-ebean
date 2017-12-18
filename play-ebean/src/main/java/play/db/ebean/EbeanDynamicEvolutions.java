@@ -5,7 +5,7 @@ package play.db.ebean;
 
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
-import io.ebean.dbmigration.model.CurrentModel;
+import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.api.SpiEbeanServer;
 import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;

@@ -15,6 +15,6 @@ import play.mvc.Result;
  */
 public class TransactionalAction extends Action<Transactional> {
     public CompletionStage<Result> call(final Context ctx) {
-        return Ebean.execute(() -> delegate.call(ctx));
+        return Ebean.executeCall(() -> delegate.call(ctx));
     }
 }
