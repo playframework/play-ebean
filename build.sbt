@@ -1,4 +1,5 @@
-import sbt.inc.Analysis
+import sbt.internal.inc.Analysis
+import xsbti.compile.CompileAnalysis
 import interplay.ScalaVersions._
 
 val Versions = new {
@@ -11,7 +12,7 @@ val Versions = new {
 
 lazy val root = project
   .in(file("."))
-  .enablePlugins(PlayRootProject, CrossPerProjectPlugin)
+  .enablePlugins(PlayRootProject)
   .aggregate(core, plugin)
   .settings(
     name := "play-ebean-root",
@@ -86,7 +87,7 @@ def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) =
 }
 
 // Ebean enhancement
-def enhanceEbeanClasses(classpath: Classpath, analysis: Analysis, classDirectory: File, pkg: String): Analysis = {
+def enhanceEbeanClasses(classpath: Classpath, analysis: CompileAnalysis, classDirectory: File, pkg: String): Analysis = {
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
@@ -95,7 +96,7 @@ def enhanceEbeanClasses(classpath: Classpath, analysis: Analysis, classDirectory
     t.getClass, classOf[ClassLoader], classOf[String]
   ).newInstance(t, ClassLoader.getSystemClassLoader, classDirectory.getAbsolutePath).asInstanceOf[AnyRef]
   ft.getClass.getDeclaredMethod("process", classOf[String]).invoke(ft, pkg)
-  analysis
+  analysis.asInstanceOf[Analysis]
 }
 
 // Version file
