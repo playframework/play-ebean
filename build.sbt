@@ -22,6 +22,7 @@ lazy val root = project
 lazy val core = project
   .in(file("play-ebean"))
   .enablePlugins(Playdoc, PlayLibrary, JacocoPlugin)
+  .configs(Docs)
   .settings(
     name := "play-ebean",
     crossScalaVersions := Seq(scala211, scala212),
