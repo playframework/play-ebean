@@ -6,6 +6,6 @@ scalaVersion := "2.12.1"
 
 resolvers ++= DefaultOptions.resolvers(snapshot = true)
 
-libraryDependencies += "com.h2database" % "h2" % "1.4.193"
+libraryDependencies += "com.h2database" % "h2" % "1.4.196"
 
 PlayKeys.playOmnidoc := false
