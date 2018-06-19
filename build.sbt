@@ -9,6 +9,8 @@ val Versions = new {
   val typesafeConfig = "1.3.3"
 }
 
+val scala213Version = "2.13.0-M3"
+
 lazy val root = project
   .in(file("."))
   .enablePlugins(PlayRootProject, CrossPerProjectPlugin)
@@ -23,7 +25,7 @@ lazy val core = project
   .enablePlugins(Playdoc, PlayLibrary, JacocoPlugin)
   .settings(
     name := "play-ebean",
-    crossScalaVersions := Seq(scala211, scala212),
+    crossScalaVersions := Seq(scala211, scala212, scala213Version),
     libraryDependencies ++= playEbeanDeps,
     compile in Compile := enhanceEbeanClasses(
       (dependencyClasspath in Compile).value,
