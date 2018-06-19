@@ -2,9 +2,9 @@ import sbt.inc.Analysis
 import interplay.ScalaVersions._
 
 val Versions = new {
-  val play: String = playVersion(sys.props.getOrElse("play.version", "2.6.13"))
+  val play: String = playVersion(sys.props.getOrElse("play.version", "2.7.0-M1"))
   val playEnhancer = "1.2.2"
-  val ebean = "11.15.4"
+  val ebean = "11.17.5"
   val ebeanAgent = "11.11.1"
   val typesafeConfig = "1.3.3"
 }
@@ -68,13 +68,19 @@ lazy val ebeanDeps = Seq(
   "io.ebean" % "ebean-agent" % Versions.ebeanAgent
 )
 
+lazy val reflectionDeps = Seq(
+  ("org.reflections" % "reflections" % "0.9.11")
+    .exclude("com.google.code.findbugs", "annotations")
+    .classifier("")
+)
+
 lazy val playEbeanDeps = ebeanDeps ++ Seq(
   "com.typesafe.play" %% "play-java-jdbc" % Versions.play,
   "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
   "com.typesafe.play" %% "play-guice" % Versions.play % Test,
   "com.typesafe.play" %% "filters-helpers" % Versions.play % Test,
   "com.typesafe.play" %% "play-test" % Versions.play % Test
-)
+) ++ reflectionDeps
 
 lazy val sbtPlayEbeanDeps = ebeanDeps ++ Seq(
   "com.typesafe" % "config" % Versions.typesafeConfig

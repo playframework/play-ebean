@@ -6,7 +6,13 @@ package play.db.ebean;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigException;
 import io.ebean.config.ServerConfig;
-import play.Configuration;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.scanners.TypeElementsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import play.Environment;
 import play.db.DBApi;
 
@@ -122,7 +128,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
             entry.getValue().forEach(load -> {
                 load = load.trim();
                 if (load.endsWith(".*")) {
-                    classes.addAll(play.libs.Classpath.getTypes(environment, load.substring(0, load.length()-2)));
+                    classes.addAll(Classpath.getTypes(environment, load.substring(0, load.length()-2)));
                 } else {
                     classes.add(load);
                 }
@@ -185,6 +191,49 @@ public class DefaultEbeanConfig implements EbeanConfig {
                 return null;
             }
 
+        }
+
+    }
+
+    /**
+     * Set of utilities for classpath manipulation.  This class should not be used, as
+     * it was part of the Plugin API system which no longer exists in Play.
+     */
+    private static class Classpath {
+
+        /**
+         * Scans the environment classloader to retrieve all types within a specific package.
+         * <p>
+         * This method is useful for some plug-ins, for example the EBean plugin will automatically detect all types
+         * within the models package.
+         * <p>
+         * Note that it is better to specify a very specific package to avoid expensive searches.
+         *
+         * @param env         the Play environment.
+         * @param packageName the root package to scan
+         * @return a set of types names satisfying the condition
+         */
+        static Set<String> getTypes(Environment env, String packageName) {
+            return getReflections(env, packageName).getStore().get(TypeElementsScanner.class.getSimpleName()).keySet();
+        }
+        private static Reflections getReflections(Environment env, String packageName) {
+            // This is not supposed to happen very often, but just when starting the application.
+            // So it should be okay to not have a cache.
+            return new Reflections(getReflectionsConfiguration(packageName, env.classLoader()));
+        }
+
+        /**
+         * Create {@link org.reflections.Configuration} object for given package name and class loader.
+         *
+         * @param packageName the root package to scan
+         * @param classLoader class loader to be used in reflections
+         * @return the configuration builder
+         */
+        private static ConfigurationBuilder getReflectionsConfiguration(String packageName, ClassLoader classLoader) {
+            return new ConfigurationBuilder()
+                    .addUrls(ClasspathHelper.forPackage(packageName, classLoader))
+                    .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(packageName + ".")))
+                    .setScanners(new TypeElementsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner());
         }
 
     }
