@@ -5,7 +5,6 @@ package play.db.ebean;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValueType;
-import play.Configuration;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,19 +31,6 @@ public class EbeanParsedConfig {
 
     public Map<String, List<String>> getDatasourceModels() {
         return datasourceModels;
-    }
-
-    /**
-     * Parse a play configuration.
-     *
-     * @param configuration play configuration
-     * @return ebean parsed configuration
-     *
-     * @deprecated {@link play.Configuration} was deprecated in Play 2.6 in favor of {@link com.typesafe.config.Config}. Use {@link #parseFromConfig(Config)}
-     */
-    @Deprecated
-    public static EbeanParsedConfig parseFromConfig(Configuration configuration) {
-        return parseFromConfig(configuration.underlying());
     }
 
     /**

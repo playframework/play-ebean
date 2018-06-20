@@ -4,7 +4,8 @@
 
 package play.db.ebean;
 
-import play.Configuration;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import play.Environment;
 import play.Mode;
 
@@ -24,7 +25,7 @@ public class ModelsConfigLoader implements Function<ClassLoader, Map<String, Lis
     public  Map<String, List<String>> apply(ClassLoader classLoader) {
         // Using TEST mode is the only way to load configuration without failing if application.conf doesn't exist
         Environment env = new Environment(new File("."), classLoader, Mode.TEST);
-        Configuration config = Configuration.load(env);
+        Config config  = ConfigFactory.load(env.classLoader());
         return EbeanParsedConfig.parseFromConfig(config).getDatasourceModels();
     }
 }
