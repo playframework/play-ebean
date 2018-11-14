@@ -22,4 +22,4 @@ The Play Ebean plugin supports several different versions of Play and Ebean.
 | 2.0.0          | 2.4.x        | 6.8.x         |
 | 1.0.0          | 2.4.x        | 4.6.x         |
 
-> * Release Candidate: these releases are not stable and should not used in be production.
+> * Release Candidate: these releases are not stable and should not be used in production.
