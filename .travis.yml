@@ -1,5 +1,5 @@
 language: scala
-sudo: false
+sudo: required
 jdk:
   - oraclejdk8
 env:
