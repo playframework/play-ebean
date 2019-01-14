@@ -1,28 +1,47 @@
 language: scala
-sudo: false
-jdk:
-  - oraclejdk8
+
 env:
-  - SCRIPT="sbt +jacoco"
-  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted"
-  - SCRIPT="cd docs && sbt test"
-  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"
-script:
-  - $SCRIPT
+  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=adopt@1.8.192-12
+  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=adopt@1.11.0-1
+  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=adopt@1.8.192-12
+  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=adopt@1.11.0-1
+  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=adopt@1.8.192-12
+  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=adopt@1.11.0-1
+  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=adopt@1.8.192-12
+  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=adopt@1.11.0-1
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    # Java 11 is not fully supported, but this allows for problem discovery
+    - env: SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=adopt@1.11.0-1
+    - env: SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=adopt@1.11.0-1
+    - env: SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=adopt@1.11.0-1
+    - env: SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=adopt@1.11.0-1
+
+before_install:
+  - curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+
+install:
+  - $JABBA_HOME/bin/jabba install $TRAVIS_JDK
+  - export JAVA_HOME="$JABBA_HOME/jdk/$TRAVIS_JDK" && export PATH="$JAVA_HOME/bin:$PATH" && java -Xmx32m -version
+
+script: $SCRIPT
+
+after_success: bash <(curl -s https://codecov.io/bash)
+
 cache:
   directories:
     - $HOME/.ivy2/cache
+    - $HOME/.jabba/jdk
+    - $HOME/.sbt
+
 before_cache:
-  # Ensure changes to the cache aren't persisted
-  - rm -rf $HOME/.ivy2/cache/com.typesafe.play/play-ebean*
-  - rm -rf $HOME/.ivy2/cache/scala_*/sbt_*/com.typesafe.sbt/sbt-play-ebean
-  # Delete all ivydata files since ivy touches them on each build
-  - find $HOME/.ivy2/cache -name "ivydata-*.properties" | xargs rm
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
+
 notifications:
   webhooks:
-    urls:
-      - https://webhooks.gitter.im/e/d2c8a242a2615f659595
+    urls: https://webhooks.gitter.im/e/d2c8a242a2615f659595
     on_success: always
     on_failure: always
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
