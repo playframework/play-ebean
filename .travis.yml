@@ -5,6 +5,8 @@ env:
   - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=adopt@1.11.0-1
   - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=adopt@1.8.192-12
   - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=adopt@1.11.0-1
+  - SCRIPT="sbt +mimaReportBinaryIssues"                     TRAVIS_JDK=adopt@1.8.192-12
+  - SCRIPT="sbt +mimaReportBinaryIssues"                     TRAVIS_JDK=adopt@1.11.0-1
   - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=adopt@1.8.192-12
   - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=adopt@1.11.0-1
   - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=adopt@1.8.192-12
@@ -16,6 +18,7 @@ matrix:
     # Java 11 is not fully supported, but this allows for problem discovery
     - env: SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=adopt@1.11.0-1
     - env: SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=adopt@1.11.0-1
+    - env: SCRIPT="sbt +mimaReportBinaryIssues"                     TRAVIS_JDK=adopt@1.11.0-1
     - env: SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=adopt@1.11.0-1
     - env: SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=adopt@1.11.0-1
 

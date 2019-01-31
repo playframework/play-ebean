@@ -9,6 +9,12 @@ val Versions = new {
   val typesafeConfig = "1.3.3"
 }
 
+val PreviousVersion = "5.0.1"
+
+lazy val mimaSettings = Seq(
+  mimaPreviousArtifacts := Set(organization.value %% name.value % PreviousVersion)
+)
+
 lazy val root = project
   .in(file("."))
   .enablePlugins(PlayRootProject, CrossPerProjectPlugin)
@@ -21,6 +27,7 @@ lazy val root = project
 lazy val core = project
   .in(file("play-ebean"))
   .enablePlugins(Playdoc, PlayLibrary, JacocoPlugin)
+  .settings(mimaSettings)
   .settings(
     name := "play-ebean",
     crossScalaVersions := Seq(scala211, scala212, scala213),
@@ -37,6 +44,7 @@ lazy val core = project
 lazy val plugin = project
   .in(file("sbt-play-ebean"))
   .enablePlugins(PlaySbtPlugin)
+  .settings(mimaSettings)
   .settings(
     name := "sbt-play-ebean",
     organization := "com.typesafe.sbt",
