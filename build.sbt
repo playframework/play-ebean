@@ -44,7 +44,6 @@ lazy val core = project
 lazy val plugin = project
   .in(file("sbt-play-ebean"))
   .enablePlugins(PlaySbtPlugin)
-  .settings(mimaSettings)
   .settings(
     name := "sbt-play-ebean",
     organization := "com.typesafe.sbt",
