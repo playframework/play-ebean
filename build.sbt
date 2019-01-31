@@ -23,7 +23,7 @@ lazy val core = project
   .enablePlugins(Playdoc, PlayLibrary, JacocoPlugin)
   .settings(
     name := "play-ebean",
-    crossScalaVersions := Seq(scala211, scala212),
+    crossScalaVersions := Seq(scala211, scala212, scala213),
     libraryDependencies ++= playEbeanDeps,
     compile in Compile := enhanceEbeanClasses(
       (dependencyClasspath in Compile).value,
