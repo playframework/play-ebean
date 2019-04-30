@@ -2,7 +2,7 @@ import sbt.inc.Analysis
 import interplay.ScalaVersions._
 
 val Versions = new {
-  val play: String = playVersion(sys.props.getOrElse("play.version", "2.7.0"))
+  val play: String = playVersion(sys.props.getOrElse("play.version", "2.7.2"))
   val playEnhancer = "1.2.2"
   val ebean = "11.33.2"
   val ebeanAgent = "11.27.1"
@@ -23,7 +23,7 @@ lazy val core = project
   .enablePlugins(Playdoc, PlayLibrary, JacocoPlugin)
   .settings(
     name := "play-ebean",
-    crossScalaVersions := Seq(scala211, scala212, scala213),
+    crossScalaVersions := Seq(scala212, scala213),
     libraryDependencies ++= playEbeanDeps,
     compile in Compile := enhanceEbeanClasses(
       (dependencyClasspath in Compile).value,
