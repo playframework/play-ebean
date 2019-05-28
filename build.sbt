@@ -9,7 +9,7 @@ val Versions = new {
   val typesafeConfig = "1.3.3"
 }
 
-val PreviousVersion = "5.0.2"
+val PreviousVersion = "5.0.1"
 
 lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := Set(organization.value %% name.value % PreviousVersion)
