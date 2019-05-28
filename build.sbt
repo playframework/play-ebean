@@ -4,12 +4,12 @@ import interplay.ScalaVersions._
 val Versions = new {
   val play: String = playVersion(sys.props.getOrElse("play.version", "2.7.0"))
   val playEnhancer = "1.2.2"
-  val ebean = "11.33.2"
-  val ebeanAgent = "11.27.1"
+  val ebean = "11.39.1"
+  val ebeanAgent = "11.39.1"
   val typesafeConfig = "1.3.3"
 }
 
-val PreviousVersion = "5.0.1"
+val PreviousVersion = "5.0.2"
 
 lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := Set(organization.value %% name.value % PreviousVersion)
