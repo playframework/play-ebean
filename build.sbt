@@ -1,9 +1,9 @@
 import sbt.inc.Analysis
 import interplay.ScalaVersions.scala212
 
-val scala213 = "2.13.0-M5"
+val scala213 = "2.13.0"
 val Versions = new {
-  val play: String = playVersion(sys.props.getOrElse("play.version", "2.7.2"))
+  val play: String = playVersion(sys.props.getOrElse("play.version", "2.7.3"))
   val playEnhancer = "1.2.2"
   val ebean = "11.33.2"
   val ebeanAgent = "11.27.1"
