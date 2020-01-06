@@ -1,30 +1,30 @@
 language: scala
 
 env:
-  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=adopt@1.8.192-12
-  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=adopt@1.11.0-1
-  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=adopt@1.8.192-12
-  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=adopt@1.11.0-1
-  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=adopt@1.8.192-12
-  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=adopt@1.11.0-1
-  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=adopt@1.8.192-12
-  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=adopt@1.11.0-1
+  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=8
+  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=11
+  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=8
+  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=11
+  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=8
+  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=11
+  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=8
+  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=11
 
 matrix:
   fast_finish: true
   allow_failures:
     # Java 11 is not fully supported, but this allows for problem discovery
-    - env: SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=adopt@1.11.0-1
-    - env: SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=adopt@1.11.0-1
-    - env: SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=adopt@1.11.0-1
-    - env: SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=adopt@1.11.0-1
+    - env: SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=11
+    - env: SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=11
+    - env: SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=11
+    - env: SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=11
 
 before_install:
   - curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
 
 install:
-  - $JABBA_HOME/bin/jabba install $TRAVIS_JDK
-  - export JAVA_HOME="$JABBA_HOME/jdk/$TRAVIS_JDK" && export PATH="$JAVA_HOME/bin:$PATH" && java -Xmx32m -version
+  - jabba install $(jabba ls-remote "adopt@~1.$TRAVIS_JDK.0-0" --latest=patch) && jabba use "$_" && java -Xmx32m -version
+
 
 script: $SCRIPT
 
