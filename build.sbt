@@ -3,11 +3,11 @@ import interplay.ScalaVersions.scala212
 
 val scala213 = "2.13.0"
 val Versions = new {
-  val play: String = playVersion(sys.props.getOrElse("play.version", "2.7.3"))
+  val play: String = playVersion(sys.props.getOrElse("play.version", "2.8.0"))
   val playEnhancer = "1.2.2"
-  val ebean = "11.33.2"
-  val ebeanAgent = "11.27.1"
-  val typesafeConfig = "1.3.3"
+  val ebean = "11.45.1"
+  val ebeanAgent = "11.45.1"
+  val typesafeConfig = "1.3.4"
 }
 
 lazy val root = project
@@ -15,6 +15,7 @@ lazy val root = project
   .enablePlugins(PlayRootProject, CrossPerProjectPlugin)
   .aggregate(core, plugin)
   .settings(
+    sources in (Compile, doc) := Seq(),
     name := "play-ebean-root",
     releaseCrossBuild := false
   )
@@ -23,6 +24,7 @@ lazy val core = project
   .in(file("play-ebean"))
   .enablePlugins(Playdoc, PlayLibrary, JacocoPlugin)
   .settings(
+    sources in (Compile, doc) := Seq(),
     name := "play-ebean",
     crossScalaVersions := Seq(scala212, scala213),
     libraryDependencies ++= playEbeanDeps,
@@ -39,6 +41,7 @@ lazy val plugin = project
   .in(file("sbt-play-ebean"))
   .enablePlugins(PlaySbtPlugin)
   .settings(
+    sources in (Compile, doc) := Seq(),
     name := "sbt-play-ebean",
     organization := "com.typesafe.sbt",
     libraryDependencies ++= sbtPlayEbeanDeps,
