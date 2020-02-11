@@ -27,7 +27,7 @@ public class EBeanComponentsTest {
 
         @Override
         public play.routing.Router router() {
-            return routingDsl().GET("/").routeTo(() ->
+            return routingDsl().GET("/").routingTo((req) ->
                     Results.ok("Hello")
             ).build();
         }

@@ -6,21 +6,16 @@ package play.ebean.sbt
 
 import io.ebean.enhance.Transformer
 import io.ebean.enhance.ant.OfflineFileTransform
-
 import sbt._
-import sbt.Keys._
-
+import sbt.Keys.{libraryDependencies, _}
 import xsbti.compile.CompileResult
 import xsbti.compile.analysis.Stamp
-
 import sbt.internal.inc.Hash
 import sbt.internal.inc.Stamper
 import sbt.internal.inc.LastModified
-
 import java.net.URLClassLoader
 
 import scala.util.control.NonFatal
-
 import com.typesafe.play.sbt.enhancer.PlayEnhancer
 
 object PlayEbean extends AutoPlugin {
@@ -50,7 +45,8 @@ object PlayEbean extends AutoPlugin {
     playEbeanDebugLevel := -1,
     playEbeanAgentArgs := Map("debug" -> playEbeanDebugLevel.value.toString),
     playEbeanVersion := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
-    libraryDependencies += "com.typesafe.play" %% "play-ebean" % playEbeanVersion.value
+    libraryDependencies += "com.typesafe.play" %% "play-ebean" % playEbeanVersion.value,
+    libraryDependencies += "org.glassfish.jaxb" % "jaxb-runtime" % "2.3.2"
   )
 
   // This is replacement of old Stamp `Exists` representation
