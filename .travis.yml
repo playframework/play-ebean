@@ -5,15 +5,6 @@ language: scala
 env:
   - TRAVIS_JDK=8
   - TRAVIS_JDK=11
-#env:
-#  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=8
-#  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=11
-#  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=8
-#  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=11
-#  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=8
-#  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=11
-#  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=8
-#  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=11
 
 before_install:
   - curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash && . ~/.jabba/jabba.sh
@@ -35,12 +26,16 @@ jobs:
 
     - stage: test
     - script: sbt +publishLocal +plugin/test +plugin/scripted
+      name: "Test plugins"
       env: TRAVIS_JDK=8
     - script: sbt +publishLocal +plugin/test +plugin/scripted
+      name: "Test plugins"
       env: TRAVIS_JDK=11
     - script: cd docs && sbt validateDocs evaluateSbtFiles
+      name: "Validate docs, Evaluate sbt files"
       env: TRAVIS_JDK=8
     - script: cd docs && sbt validateDocs evaluateSbtFiles
+      name: "Validate docs, Evaluate sbt files"
       env: TRAVIS_JDK=11
 
     - stage: deploy
