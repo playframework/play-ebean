@@ -28,12 +28,20 @@ script:
 jobs:
   include:
     - stage: jacoco
+      env: TRAVIS_JDK=8
+      script: sbt +jacoco
+    - env: TRAVIS_JDK=11
       script: sbt +jacoco
 
     - stage: test
     - script: sbt +publishLocal +plugin/test +plugin/scripted
-    - script: cd docs && sbt test
+      env: TRAVIS_JDK=8
+    - script: sbt +publishLocal +plugin/test +plugin/scripted
+      env: TRAVIS_JDK=11
     - script: cd docs && sbt validateDocs evaluateSbtFiles
+      env: TRAVIS_JDK=8
+    - script: cd docs && sbt validateDocs evaluateSbtFiles
+      env: TRAVIS_JDK=11
 
     - stage: deploy
       name: "TEMP Publish artifacts to Bintray"
