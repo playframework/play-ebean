@@ -19,23 +19,25 @@ script:
 jobs:
   include:
     - stage: jacoco
-      env: TRAVIS_JDK=8
       script: sbt +jacoco
+      env: TRAVIS_JDK=8
+      name: "Jacoco JDK8"
     - env: TRAVIS_JDK=11
+      name: "Jacoco JDK11"
       script: sbt +jacoco
 
     - stage: test
     - script: sbt +publishLocal +plugin/test +plugin/scripted
-      name: "Test plugins"
+      name: "Test plugins JDK 8"
       env: TRAVIS_JDK=8
     - script: sbt +publishLocal +plugin/test +plugin/scripted
-      name: "Test plugins"
+      name: "Test plugins JDK11"
       env: TRAVIS_JDK=11
     - script: cd docs && sbt validateDocs evaluateSbtFiles
-      name: "Validate docs, Evaluate sbt files"
+      name: "Validate docs, Evaluate sbt files JDK 8"
       env: TRAVIS_JDK=8
     - script: cd docs && sbt validateDocs evaluateSbtFiles
-      name: "Validate docs, Evaluate sbt files"
+      name: "Validate docs, Evaluate sbt files JDK 11"
       env: TRAVIS_JDK=11
 
     - stage: deploy
@@ -47,7 +49,7 @@ stages:
   - name: jacoco
   - name: test
   - name: deploy
-#    if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
+    if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
 
 after_success: bash <(curl -s https://codecov.io/bash)
 
