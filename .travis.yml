@@ -1,31 +1,59 @@
+version: ~> 1.0
+
 language: scala
 
 env:
-  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=8
-  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=11
-  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=8
-  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=11
-  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=8
-  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=11
-  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=8
-  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=11
+  - TRAVIS_JDK=8
+  - TRAVIS_JDK=11
+#env:
+#  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=8
+#  - SCRIPT="sbt +jacoco"                                     TRAVIS_JDK=11
+#  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=8
+#  - SCRIPT="sbt +publishLocal +plugin/test +plugin/scripted" TRAVIS_JDK=11
+#  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=8
+#  - SCRIPT="cd docs && sbt test"                             TRAVIS_JDK=11
+#  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=8
+#  - SCRIPT="cd docs && sbt validateDocs evaluateSbtFiles"    TRAVIS_JDK=11
 
 matrix:
   fast_finish: true
 
 before_install:
-  - curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+  - curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash && . ~/.jabba/jabba.sh
 
 install:
   - jabba install $(jabba ls-remote "adopt@~1.$TRAVIS_JDK.0-0" --latest=patch) && jabba use "$_" && java -Xmx32m -version
 
 
-script: $SCRIPT
+script:
+  - cd docs && sbt test
+
+jobs:
+  include:
+    - stage: jacoco
+      script: sbt +jacoco
+
+    - stage: test
+    - script: sbt +publishLocal +plugin/test +plugin/scripted
+    - script: cd docs && sbt test
+    - script: cd docs && sbt validateDocs evaluateSbtFiles
+
+    - stage: deploy
+      name: "TEMP Publish artifacts to Bintray"
+      script: sbt +mimaReportBinaryIssues
+      env: TRAVIS_JDK=11
+
+stages:
+  - name: jacoco
+  - name: test
+  - name: deploy
+#    if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
 
 after_success: bash <(curl -s https://codecov.io/bash)
 
 cache:
   directories:
+    - $HOME/.coursier/cache
     - $HOME/.ivy2/cache
     - $HOME/.jabba/jdk
     - $HOME/.sbt
@@ -34,8 +62,8 @@ before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
   - find $HOME/.sbt -name "*.lock" -delete
 
-notifications:
-  webhooks:
-    urls: https://webhooks.gitter.im/e/d2c8a242a2615f659595
-    on_success: always
-    on_failure: always
+#notifications:
+#  webhooks:
+#    urls: https://webhooks.gitter.im/e/d2c8a242a2615f659595
+#    on_success: always
+#    on_failure: always
