@@ -3,10 +3,10 @@ import interplay.ScalaVersions.scala212
 
 val scala213 = "2.13.0"
 val Versions = new {
-  val play: String = playVersion(sys.props.getOrElse("play.version", "2.8.1"))
+  val play: String = playVersion(sys.props.getOrElse("play.version", "2.8.2"))
   val playEnhancer = "1.2.2"
-  val ebean = "11.45.1"
-  val ebeanAgent = "11.45.1"
+  val ebean = "12.1.13"
+  val ebeanAgent = "12.1.15"
   val typesafeConfig = "1.3.4"
 }
 
