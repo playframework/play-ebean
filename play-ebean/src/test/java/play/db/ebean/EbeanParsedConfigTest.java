@@ -13,7 +13,7 @@ import java.util.Map;
 import org.junit.*;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.*;
 
 
 public class EbeanParsedConfigTest {
