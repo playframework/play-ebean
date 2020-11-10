@@ -5,12 +5,9 @@
 package play.ebean.sbt
 
 import java.net.URLClassLoader
-
-import com.typesafe.play.sbt.enhancer.PlayEnhancer
 import sbt.Keys._
 import sbt._
 import sbt.inc._
-
 import scala.util.control.NonFatal
 
 object PlayEbean extends AutoPlugin {
@@ -23,9 +20,6 @@ object PlayEbean extends AutoPlugin {
   }
 
   import autoImport._
-
-  // Must require PlayEnhancer to make sure it runs before we do
-  override def requires = PlayEnhancer
 
   override def trigger = noTrigger
 

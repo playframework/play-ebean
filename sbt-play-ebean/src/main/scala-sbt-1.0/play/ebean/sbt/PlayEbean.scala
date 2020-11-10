@@ -1,22 +1,17 @@
-/*
- * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
- */
-
 package play.ebean.sbt
 
+import java.net.URLClassLoader
+import java.nio.file.Path
 import io.ebean.enhance.Transformer
 import io.ebean.enhance.ant.OfflineFileTransform
-import sbt._
-import sbt.Keys.{libraryDependencies, _}
+import sbt.Keys._
+import sbt.internal.inc.{Hash, LastModified, PlainVirtualFileConverter, Stamper}
+import sbt.{AutoPlugin, Compile, Def, Task, inConfig, settingKey, taskKey}
 import xsbti.compile.CompileResult
 import xsbti.compile.analysis.Stamp
-import sbt.internal.inc.Hash
-import sbt.internal.inc.Stamper
-import sbt.internal.inc.LastModified
-import java.net.URLClassLoader
+import sbt._
 
 import scala.util.control.NonFatal
-import com.typesafe.play.sbt.enhancer.PlayEnhancer
 
 object PlayEbean extends AutoPlugin {
 
@@ -28,9 +23,6 @@ object PlayEbean extends AutoPlugin {
   }
 
   import autoImport._
-
-  // Must require PlayEnhancer to make sure it runs before we do
-  override def requires = PlayEnhancer
 
   override def trigger = noTrigger
 
@@ -45,8 +37,11 @@ object PlayEbean extends AutoPlugin {
     playEbeanDebugLevel := -1,
     playEbeanAgentArgs := Map("debug" -> playEbeanDebugLevel.value.toString),
     playEbeanVersion := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
-    libraryDependencies += "com.typesafe.play" %% "play-ebean" % playEbeanVersion.value,
-    libraryDependencies += "org.glassfish.jaxb" % "jaxb-runtime" % "2.3.2"
+    libraryDependencies ++=
+      Seq(
+        "com.typesafe.play" %% "play-ebean" % playEbeanVersion.value,
+        "org.glassfish.jaxb" % "jaxb-runtime" % "2.3.2"
+      )
   )
 
   // This is replacement of old Stamp `Exists` representation
@@ -93,10 +88,11 @@ object PlayEbean extends AutoPlugin {
      * This way any stamp incremental compiler chooses to use to mark class files will
      * be supported.
      */
-    def updateStampForClassFile(classFile: File, stamp: Stamp): Stamp = stamp match {
-      case _: LastModified => Stamper.forLastModified(classFile)
-      case _: Hash => Stamper.forHash(classFile)
+    def updateStampForClassFile(path: Path, stamp: Stamp): Stamp = stamp match {
+      case _: LastModified => Stamper.forLastModifiedP(path)
+      case _: Hash => Stamper.forFarmHashP(path)
     }
+
     // Since we may have modified some of the products of the incremental compiler, that is, the compiled template
     // classes and compiled Java sources, we need to update their timestamps in the incremental compiler, otherwise
     // the incremental compiler will see that they've changed since it last compiled them, and recompile them.
@@ -106,7 +102,9 @@ object PlayEbean extends AutoPlugin {
         throw new java.io.IOException("Tried to update a stamp for class file that is not recorded as "
           + s"product of incremental compiler: $classFile")
       }
-      stamps.markProduct(classFile, updateStampForClassFile(classFile, existingStamp))
+
+      val fileConverter =  new PlainVirtualFileConverter()
+      stamps.markProduct(classFile, updateStampForClassFile(fileConverter.toPath(classFile), existingStamp))
     })
 
     result.withAnalysis(updatedAnalysis)
@@ -114,8 +112,9 @@ object PlayEbean extends AutoPlugin {
 
 
   private def configuredEbeanModels = Def.task {
+    import java.util.{List => JList, Map => JMap}
+
     import collection.JavaConverters._
-    import java.util.{ Map => JMap, List => JList }
 
     // Creates a classloader with all the dependencies and all the resources, from there we can use the play ebean
     // code to load the config as it would be loaded in production
@@ -137,6 +136,7 @@ object PlayEbean extends AutoPlugin {
             }
             cloned
           }
+
           throw clone(e)
       } finally {
         classLoader.close()
@@ -159,9 +159,15 @@ object PlayEbean extends AutoPlugin {
   private def readResourceProperty(resource: String, property: String): String = {
     val props = new java.util.Properties
     val stream = getClass.getClassLoader.getResourceAsStream(resource)
-    try { props.load(stream) }
-    catch { case e: Exception => }
-    finally { if (stream ne null) stream.close() }
+    try {
+      props.load(stream)
+    }
+    catch {
+      case e: Exception =>
+    }
+    finally {
+      if (stream ne null) stream.close()
+    }
     props.getProperty(property)
   }
 }

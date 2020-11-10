@@ -3,8 +3,13 @@ version: ~> 1.0
 language: scala
 
 env:
-  - TRAVIS_JDK=8
-  - TRAVIS_JDK=11
+  matrix:
+    - TRAVIS_JDK=11
+  global:
+    # encrypt with: travis encrypt --pro BINTRAY_USER=...
+    - secure: "qQSOBiN9ZRdJi4+RaHI6a9Zxldi80bwa5ufnGL7QqRdOFFjA8TcAYsW/3vJEybjlzA/gWHlN00snTC8w032EhvDgSu0YBhag1cyavflxAgQU2gPHDC5XsR/2PxHaP16nIVNf8Q7kvf2uVjmtEP+iPswVaTXwcry0zogcLsR/2A32dM/XIXVfv4/urOdgxi1DpJVbTbQkEHo+Ig+7k65nOCzbik/7NW+7eQ+1XjfytxCZBJf7LTnVWJvEDrCYIr7GSX+2iVrRoXkpfiPm4fXSM4ZbwtlSJp6gY8RQf2s/LuLaPwLoGtkEux8woaAyeniLCT50EMHdAjHd4HU1FB85DbGXWwMGwVwgZxCJF5yrIVB8eGTbzLi0PeqI0kjK/3+4ilHmoXXB+uHnD9YRcFucw6TdWlVzJNji3WaqBjkp0D57fFOM5s/15ldSMaFuhZyT3go3MBUmQidPGhf/rA1nk5AogVT70ICyzlKEl951vhohczHg7ZTOSR4pZ52KmgbqtENXyWF2f2fKH8vtDTxpcF9R3N6wfDhGWAwxiuDJYm1KxhVG0ZGpGVTCcpMswO6O2lEbDSMUy+0lI84dXovbZf6U1S1vWoJQJ8MRxXnIyK/MP6iAV4MIx8W2sdQXLqS3R3MFtDkBfSauKUtA1NH7BIXu6JLdSNhgrzwDeu+1Bd8="
+    # encrypt with: travis encrypt --pro BINTRAY_PASS=...
+    - secure: "fTnN82lSlpXBk8QPm9kUdqBekogGvDphRKgEAMvwv3pcdTpLwdLXHW7iSn9B6yTodGQCB1PvmF1Jwf3To8xCXCPSN4hdOQggh3hGyyqswbqjGkLqCv5rgBrDPvBfzEt4WGqfD1BJ1Y30vRaVM7yToCxbdrfU69sTARlPLH+FKEV6MUxQ8LflgEEo7CGLDPcgL9y9bf/oK/K0AK6Mp94REZm4NNW8H7V18k1wVTtGoG2xaBq8JQG4BnxPI9zfGG0o1haD/kXC87obg2dnmGbGJ8jdM+wVKaNYBp5yy7H+sYL2XgQBzIbCSThWyBVRQXMZIjZaxT2pPwYZQ6ViFLlgyCFwTrrEjuA5KnD78SDeZ1KqsbqS8XHK7Q5i0dTlzMDX3x8ypgfKXwWvPiYG272Ew29RXI4j2zO5vgMpEm2ux5R8cfm/YRcCrVe0SjIZ+5zA9XEetcZhqL/cD6SAerO9C5JCfZsJqmMmhd/A8vrnTfcO0Etx3c6pyap8l38tIhJDJXTdoLyJk1n7ZWz4rmPXzs+81CuBnhthf6gzOGhQCeDcT7NDIT/qWiWNGtU+p75laI3zHB1WUOme7u4U2avchqWj2AWozJBsrFqxJQRTTBMS7m1ijZGI96bkFPnUk/qgjJJskdjIPP08IgqnrW2pci+NQeJk04XW+TrxUI+7JP0="
 
 before_install:
   - curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash && . ~/.jabba/jabba.sh
@@ -12,9 +17,11 @@ before_install:
 install:
   - jabba install $(jabba ls-remote "adopt@~1.$TRAVIS_JDK.0-0" --latest=patch) && jabba use "$_" && java -Xmx32m -version
 
-
-script:
-  - cd docs && sbt test
+stages:
+  - name: jacoco
+  - name: test
+  - name: deploy
+    if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
 
 jobs:
   include:
@@ -27,29 +34,17 @@ jobs:
       script: sbt +jacoco
 
     - stage: test
-    - script: sbt +publishLocal +plugin/test +plugin/scripted
+    - script: sbt +publishLocal +plugin/test
       name: "Test plugins JDK 8"
       env: TRAVIS_JDK=8
-    - script: sbt +publishLocal +plugin/test +plugin/scripted
+    - script: sbt +publishLocal +plugin/test
       name: "Test plugins JDK11"
-      env: TRAVIS_JDK=11
-    - script: cd docs && sbt validateDocs evaluateSbtFiles
-      name: "Validate docs, Evaluate sbt files JDK 8"
-      env: TRAVIS_JDK=8
-    - script: cd docs && sbt validateDocs evaluateSbtFiles
-      name: "Validate docs, Evaluate sbt files JDK 11"
       env: TRAVIS_JDK=11
 
     - stage: deploy
-      name: "TEMP Publish artifacts to Bintray"
-      script: sbt +mimaReportBinaryIssues
+      name: "Publish artifacts to Bintray"
+      script: sbt +publish
       env: TRAVIS_JDK=11
-
-stages:
-  - name: jacoco
-  - name: test
-  - name: deploy
-    if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
 
 after_success: bash <(curl -s https://codecov.io/bash)
 
