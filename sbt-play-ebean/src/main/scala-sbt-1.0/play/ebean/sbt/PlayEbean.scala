@@ -2,10 +2,11 @@ package play.ebean.sbt
 
 import java.net.URLClassLoader
 import java.nio.file.Path
+
 import io.ebean.enhance.Transformer
 import io.ebean.enhance.ant.OfflineFileTransform
 import sbt.Keys._
-import sbt.internal.inc.{Hash, LastModified, PlainVirtualFileConverter, Stamper}
+import sbt.internal.inc.{FarmHash, Hash, LastModified, PlainVirtualFileConverter, Stamper}
 import sbt.{AutoPlugin, Compile, Def, Task, inConfig, settingKey, taskKey}
 import xsbti.compile.CompileResult
 import xsbti.compile.analysis.Stamp
@@ -90,7 +91,7 @@ object PlayEbean extends AutoPlugin {
      */
     def updateStampForClassFile(path: Path, stamp: Stamp): Stamp = stamp match {
       case _: LastModified => Stamper.forLastModifiedP(path)
-      case _: Hash => Stamper.forFarmHashP(path)
+      case _: FarmHash => Stamper.forFarmHashP(path)
     }
 
     // Since we may have modified some of the products of the incremental compiler, that is, the compiled template

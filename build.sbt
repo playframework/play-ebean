@@ -6,6 +6,7 @@ import xsbti.compile.CompileAnalysis
 lazy val root = project
   .in(file("."))
   .aggregate(core, plugin)
+  .disablePlugins(MimaPlugin)
   .settings(
     name := "play-ebean-root",
     crossScalaVersions := Nil,
@@ -19,6 +20,7 @@ lazy val core = project
     name := "play-ebean",
     crossScalaVersions := Seq(scala212, scala213),
     Dependencies.ebean,
+    mimaPreviousArtifacts :=  Set(organization.value %% name.value % "6.0.0"),
     compile in Compile := enhanceEbeanClasses(
       (dependencyClasspath in Compile).value,
       (compile in Compile).value,
@@ -31,13 +33,21 @@ lazy val core = project
 lazy val plugin = project
   .in(file("sbt-play-ebean"))
   .enablePlugins(SbtPlugin, PublishSbtPlugin)
+  .disablePlugins(MimaPlugin)
   .settings(
     name := "sbt-play-ebean",
     organization := "com.typesafe.sbt",
     Dependencies.plugin,
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
     crossScalaVersions := Seq(scala212),
-    resourceGenerators in Compile += generateVersionFile.taskValue
+    resourceGenerators in Compile += generateVersionFile.taskValue,
+    scriptedLaunchOpts ++= Seq(
+      s"-Dscala.version=${scalaVersion.value}",
+      s"-Dscala.crossVersions=${(crossScalaVersions in core).value.mkString(",")}",
+      s"-Dproject.version=${version.value}",
+    ),
+    scriptedBufferLog := false,
+    scriptedDependencies := (())
   )
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {

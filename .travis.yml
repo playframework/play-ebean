@@ -18,13 +18,21 @@ install:
   - jabba install $(jabba ls-remote "adopt@~1.$TRAVIS_JDK.0-0" --latest=patch) && jabba use "$_" && java -Xmx32m -version
 
 stages:
+  - name: mima
   - name: jacoco
   - name: test
+  - name: docs
   - name: deploy
     if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
 
 jobs:
   include:
+
+    - stage: mima
+      name: "Validate binary compatibility"
+      script: sbt +mimaReportBinaryIssues
+      env: TRAVIS_JDK=11
+
     - stage: jacoco
       script: sbt +jacoco
       env: TRAVIS_JDK=8
@@ -34,11 +42,19 @@ jobs:
       script: sbt +jacoco
 
     - stage: test
-    - script: sbt +publishLocal +plugin/test
+    - script: sbt +publishLocal +plugin/test +plugin/scripted
       name: "Test plugins JDK 8"
       env: TRAVIS_JDK=8
-    - script: sbt +publishLocal +plugin/test
+    - script: sbt +publishLocal +plugin/test +plugin/scripted
       name: "Test plugins JDK11"
+      env: TRAVIS_JDK=11
+
+    - stage: docs
+    - script: cd docs && sbt validateDocs evaluateSbtFiles
+      name: "Validate docs, Evaluate sbt files JDK 8"
+      env: TRAVIS_JDK=8
+    - script: cd docs && sbt validateDocs evaluateSbtFiles
+      name: "Validate docs, Evaluate sbt files JDK 11"
       env: TRAVIS_JDK=11
 
     - stage: deploy
