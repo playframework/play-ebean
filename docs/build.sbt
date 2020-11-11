@@ -2,7 +2,7 @@ SettingKey[Seq[File]]("migrationManualSources") := Nil
 
 lazy val docs = project
   .in(file("."))
-  .enablePlugins(PlayDocsPlugin)
+  .enablePlugins(PlayDocsPlugin, PlayEbean)
   .settings(
     // use special snapshot play version for now
     resolvers ++= DefaultOptions.resolvers(snapshot = true),

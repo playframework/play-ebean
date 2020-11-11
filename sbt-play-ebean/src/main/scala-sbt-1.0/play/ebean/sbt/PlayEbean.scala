@@ -1,13 +1,11 @@
 package play.ebean.sbt
 
 import java.net.URLClassLoader
-import java.nio.file.Path
 import io.ebean.enhance.Transformer
 import io.ebean.enhance.ant.OfflineFileTransform
 import sbt.Keys._
-import sbt.internal.inc.FarmHash
+import sbt.internal.inc.Hash
 import sbt.internal.inc.LastModified
-import sbt.internal.inc.PlainVirtualFileConverter
 import sbt.internal.inc.Stamper
 import sbt.AutoPlugin
 import sbt.Compile
@@ -19,6 +17,7 @@ import sbt.taskKey
 import xsbti.compile.CompileResult
 import xsbti.compile.analysis.Stamp
 import sbt._
+
 import scala.util.control.NonFatal
 
 object PlayEbean extends AutoPlugin {
@@ -102,10 +101,10 @@ object PlayEbean extends AutoPlugin {
        * This way any stamp incremental compiler chooses to use to mark class files will
        * be supported.
        */
-      def updateStampForClassFile(path: Path, stamp: Stamp): Stamp =
+      def updateStampForClassFile(file: File, stamp: Stamp): Stamp =
         stamp match {
-          case _: LastModified => Stamper.forLastModifiedP(path)
-          case _: FarmHash     => Stamper.forFarmHashP(path)
+          case _: LastModified => Stamper.forLastModified(file)
+          case _: Hash         => Stamper.forHash(file)
         }
 
       // Since we may have modified some of the products of the incremental compiler, that is, the compiled template
@@ -119,9 +118,7 @@ object PlayEbean extends AutoPlugin {
               + s"product of incremental compiler: $classFile"
           )
         }
-
-        val fileConverter = new PlainVirtualFileConverter()
-        stamps.markProduct(classFile, updateStampForClassFile(fileConverter.toPath(classFile), existingStamp))
+        stamps.markProduct(classFile, updateStampForClassFile(classFile, existingStamp))
       })
 
       result.withAnalysis(updatedAnalysis)
@@ -166,7 +163,7 @@ object PlayEbean extends AutoPlugin {
         val configLoader = classLoader
           .loadClass("play.db.ebean.ModelsConfigLoader")
           .asSubclass(classOf[java.util.function.Function[ClassLoader, JMap[String, JList[String]]]])
-        val config = configLoader.newInstance().apply(classLoader)
+        val config = configLoader.getDeclaredConstructor().newInstance().apply(classLoader)
 
         if (config.isEmpty) {
           Seq("models.*")
