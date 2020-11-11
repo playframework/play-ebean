@@ -4,14 +4,12 @@ import sbt._
 object Dependencies {
 
   object ScalaVersions {
-    val scala211 = "2.11.12"
     val scala212 = "2.12.10"
     val scala213 = "2.13.2"
   }
 
   object Versions {
-    val play: String = "2.8.2"
-    val playEnhancer = "1.2.2"
+    val play: String = "2.8.5"
     val ebean = "12.1.13"
     val ebeanAgent = "12.1.15"
     val typesafeConfig = "1.3.4"
@@ -25,7 +23,7 @@ object Dependencies {
     "com.typesafe.play" %% "play-guice" % Versions.play % Test,
     "com.typesafe.play" %% "filters-helpers" % Versions.play % Test,
     "com.typesafe.play" %% "play-test" % Versions.play % Test,
-    ("org.reflections" % "reflections" % "0.9.11")
+    ("org.reflections" % "reflections" % "0.9.12")
       .exclude("com.google.code.findbugs", "annotations")
       .classifier("")
   )
