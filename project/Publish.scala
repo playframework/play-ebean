@@ -9,7 +9,11 @@ class Publish(isLibrary: Boolean, repoName: String) extends AutoPlugin {
   override def trigger  = noTrigger
   override def requires = BintrayPlugin
 
-  val (releaseRepo, snapshotRepo) = ("maven", "snapshots")
+  val (releaseRepo, snapshotRepo) =
+    if (isLibrary)
+      ("maven", "snapshots")
+    else
+      ("sbt-plugin-releases", "sbt-plugin-snapshots")
 
   override def projectSettings =
     Seq(
@@ -22,5 +26,5 @@ class Publish(isLibrary: Boolean, repoName: String) extends AutoPlugin {
     )
 }
 
-object PublishLibrary   extends Publish(isLibrary = false, repoName = "play-ebean")
+object PublishLibrary   extends Publish(isLibrary = true, repoName = "play-ebean")
 object PublishSbtPlugin extends Publish(isLibrary = false, repoName = "sbt-play-ebean")

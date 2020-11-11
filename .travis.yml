@@ -19,7 +19,6 @@ install:
 
 stages:
   - name: validate
-  - name: mima
   - name: docs
   - name: jacoco
   - name: test
@@ -31,12 +30,7 @@ jobs:
 
     - stage: validate
       name: "Validate code"
-      script: sbt scalafmtCheck
-      env: TRAVIS_JDK=11
-
-    - stage: mima
-      name: "Validate binary compatibility"
-      script: sbt +mimaReportBinaryIssues
+      script: sbt scalafmtCheckAll +mimaReportBinaryIssues
       env: TRAVIS_JDK=11
 
     - stage: docs

@@ -20,7 +20,7 @@ lazy val core = project
     name := "play-ebean",
     crossScalaVersions := Seq(scala212, scala213),
     Dependencies.ebean,
-    mimaPreviousArtifacts :=  Set(organization.value %% name.value % "6.0.0"),
+    mimaPreviousArtifacts :=  Set.empty,
     compile in Compile := enhanceEbeanClasses(
       (dependencyClasspath in Compile).value,
       (compile in Compile).value,
