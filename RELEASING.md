@@ -1,6 +1,6 @@
 # Releasing
 
-This is released from the `master` branch unless it is a version older than `7.0.0`. If there is no 
+This is released from the `master` branch unless it is a version older than `6.1.0`. If there is no 
 branch for the release that needs patching, create it from the tag.
 
 ## Cutting the release
