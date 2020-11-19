@@ -17,7 +17,7 @@ class Publish(isLibrary: Boolean, repoName: String) extends AutoPlugin {
 
   override def projectSettings =
     Seq(
-      bintrayOrganization := Some("funraise"),
+      bintrayOrganization := Some("playframework"),
       bintrayRepository := (if (isSnapshot.value) snapshotRepo else releaseRepo),
       bintrayPackage := repoName,
       // maven style should only be used for libraries, not for plugins
