@@ -51,8 +51,8 @@ public class JavaEbeanTest extends WithApplication {
         //#operations
 
         assertThat(tasks.size(), equalTo(1));
-        assertThat(tasks.get(0).name, equalTo("coco"));
-        assertThat(anyTask.name, equalTo("coco"));
+        assertThat(tasks.get(0).getName(), equalTo("coco"));
+        assertThat(anyTask.getName(), equalTo("coco"));
         assertThat(cocoTasks.size(), equalTo(0));
         assertThat(Task.find.all().size(), equalTo(0));
     }
@@ -66,14 +66,14 @@ public class JavaEbeanTest extends WithApplication {
         Task task = Task.find.byId(34L);
         // Transaction committed or rolled back
 
-        task.done = true;
+        task.setDone(true);
 
         // Created implicit transaction
         task.save();
         // Transaction committed or rolled back
         //#transaction
 
-        assertThat(Task.find.byId(34L).done, is(true));
+        assertThat(Task.find.byId(34L).isDone(), is(true));
     }
 
     @Test
@@ -91,13 +91,13 @@ public class JavaEbeanTest extends WithApplication {
             System.out.println(Ebean.currentTransaction());
 
             Task task = Task.find.byId(34L);
-            task.done = true;
+            task.setDone(true);
 
             task.save();
         });
         //#txrunnable
 
-        assertThat(Task.find.byId(34L).done, is(true));
+        assertThat(Task.find.byId(34L).isDone(), is(true));
     }
 
     public class TransactionController extends Controller {
@@ -110,7 +110,7 @@ public class JavaEbeanTest extends WithApplication {
         @Transactional
         public Result done(long id) {
             Task task = Task.find.byId(34L);
-            task.done = true;
+            task.setDone(true);
 
             task.save();
             return ok();
@@ -127,7 +127,7 @@ public class JavaEbeanTest extends WithApplication {
         Ebean.beginTransaction();
         try {
             Task task = Task.find.byId(34L);
-            task.done = true;
+            task.setDone(true);
 
             task.save();
 
@@ -137,13 +137,13 @@ public class JavaEbeanTest extends WithApplication {
         }
         //#traditional
 
-        assertThat(Task.find.byId(34L).done, is(true));
+        assertThat(Task.find.byId(34L).isDone(), is(true));
     }
 
     private void createTask() {
         Task task = new Task();
-        task.id = 34L;
-        task.name = "coco";
+        task.setId(34L);
+        task.setName("coco");
         task.save();
     }
 

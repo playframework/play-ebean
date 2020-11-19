@@ -2,7 +2,7 @@ SettingKey[Seq[File]]("migrationManualSources") := Nil
 
 lazy val docs = project
   .in(file("."))
-  .enablePlugins(PlayDocsPlugin, PlayEnhancer)
+  .enablePlugins(PlayDocsPlugin, PlayEbean)
   .settings(
     // use special snapshot play version for now
     resolvers ++= DefaultOptions.resolvers(snapshot = true),
@@ -17,8 +17,7 @@ lazy val docs = project
   )
   .settings(PlayEbean.unscopedSettings: _*)
   .settings(inConfig(Test)(Seq(
-    playEbeanModels := Seq("javaguide.ebean.*"),
-    manipulateBytecode := PlayEbean.ebeanEnhance.value
+    playEbeanModels := Seq("javaguide.ebean.*")
   )): _*)
   .dependsOn(playEbean)
 

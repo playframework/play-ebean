@@ -2,7 +2,7 @@ lazy val root = project
   .in(file("."))
   .enablePlugins(PlayJava, PlayEbean)
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.12.10"
 
 sourceDirectory in Test := baseDirectory.value / "tests"
 
@@ -16,4 +16,3 @@ libraryDependencies += "com.h2database" % "h2" % "1.4.196"
 
 resolvers += "scalaz-releases" at "https://dl.bintray.com/scalaz/releases" // specs2 depends on scalaz-stream
 
-PlayKeys.playOmnidoc := false

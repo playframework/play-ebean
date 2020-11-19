@@ -214,7 +214,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
          * @return a set of types names satisfying the condition
          */
         static Set<String> getTypes(Environment env, String packageName) {
-            return getReflections(env, packageName).getStore().get(TypeElementsScanner.class.getSimpleName()).keySet();
+            return getReflections(env, packageName).getStore().keys(TypeElementsScanner.class.getSimpleName());
         }
         private static Reflections getReflections(Environment env, String packageName) {
             // This is not supposed to happen very often, but just when starting the application.
