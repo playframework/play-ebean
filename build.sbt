@@ -19,8 +19,8 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
 
 lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := Set(
-    organization.value %% name.value % previousStableVersion.value
-      .getOrElse(throw new Error("Unable to determine previous version"))
+    organization.value %% name.value % "6.0.0" //previousStableVersion.value
+      //.getOrElse(throw new Error("Unable to determine previous version"))
   ),
 )
 

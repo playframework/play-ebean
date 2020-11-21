@@ -27,4 +27,4 @@ class Publish(isLibrary: Boolean, repoName: String) extends AutoPlugin {
 }
 
 object PublishLibrary   extends Publish(isLibrary = true, repoName = "play-ebean")
-object PublishSbtPlugin extends Publish(isLibrary = false, repoName = "sbt-play-ebean")
+object PublishSbtPlugin extends Publish(isLibrary = false, repoName = "play-ebean")
