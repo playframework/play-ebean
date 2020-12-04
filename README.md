@@ -36,4 +36,4 @@ The Play Ebean support library is *[Community Driven][]*.
 
 We also recommend using the payintech fork: https://github.com/payintech/play-ebean
 
-[Community Driven]: https://developer.lightbend.com/docs/lightbend-platform/introduction/getting-help/support-terminology.html#community-driven
+[Community Driven]: https://developer.lightbend.com/docs/introduction/getting-help/support-terminology.html
