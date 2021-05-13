@@ -17,8 +17,8 @@ stages:
   - name: docs
   - name: jacoco
   - name: test
-  - name: deploy
-    if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
+  - name: release
+    if: tag IS present
 
 jobs:
   include:
@@ -52,9 +52,9 @@ jobs:
       name: "Test plugins JDK11"
       env: TRAVIS_JDK=11
 
-    - stage: deploy
-      name: "Publish artifacts to Bintray"
-      script: sbt +publish
+    - stage: release
+      name: "Publish artifacts to Sonatype"
+      script: sbt ci-release
       env: TRAVIS_JDK=8
 
 after_success: bash <(curl -s https://codecov.io/bash)
