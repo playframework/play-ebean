@@ -1,4 +1,5 @@
-import Dependencies.ScalaVersions.{scala212, scala213}
+import Dependencies.ScalaVersions.scala212
+import Dependencies.ScalaVersions.scala213
 import Dependencies.Versions
 import sbt.Append.appendSeq
 import xsbti.compile.CompileAnalysis
@@ -20,7 +21,7 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
 lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := Set(
     organization.value %% name.value % "6.0.0" //previousStableVersion.value
-      //.getOrElse(throw new Error("Unable to determine previous version"))
+    //.getOrElse(throw new Error("Unable to determine previous version"))
   ),
 )
 
@@ -48,7 +49,13 @@ lazy val core = project
       (classDirectory in Compile).value,
       "play/db/ebean/**"
     ),
-    jacocoReportSettings := JacocoReportSettings("Jacoco Coverage Report", None, JacocoThresholds(), Seq(JacocoReportFormats.XML), "utf-8")
+    jacocoReportSettings := JacocoReportSettings(
+      "Jacoco Coverage Report",
+      None,
+      JacocoThresholds(),
+      Seq(JacocoReportFormats.XML),
+      "utf-8"
+    )
   )
 
 lazy val plugin = project
@@ -72,27 +79,47 @@ lazy val plugin = project
   )
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
-  Defaults.sbtPluginExtra(moduleId, CrossVersion.binarySbtVersion(sbtVersion), CrossVersion.binaryScalaVersion(scalaVersion))
+  Defaults.sbtPluginExtra(
+    moduleId,
+    CrossVersion.binarySbtVersion(sbtVersion),
+    CrossVersion.binaryScalaVersion(scalaVersion)
+  )
 }
 
 // Ebean enhancement
-def enhanceEbeanClasses(classpath: Classpath, analysis: CompileAnalysis, classDirectory: File, pkg: String): CompileAnalysis = {
+def enhanceEbeanClasses(
+    classpath: Classpath,
+    analysis: CompileAnalysis,
+    classDirectory: File,
+    pkg: String
+): CompileAnalysis = {
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
-  val t = cl.loadClass("io.ebean.enhance.Transformer").getConstructor(classOf[ClassLoader], classOf[String]).newInstance(cl, "debug=0").asInstanceOf[AnyRef]
-  val ft = cl.loadClass("io.ebean.enhance.ant.OfflineFileTransform").getConstructor(
-    t.getClass, classOf[ClassLoader], classOf[String]
-  ).newInstance(t, ClassLoader.getSystemClassLoader, classDirectory.getAbsolutePath).asInstanceOf[AnyRef]
+  val t = cl
+    .loadClass("io.ebean.enhance.Transformer")
+    .getConstructor(classOf[ClassLoader], classOf[String])
+    .newInstance(cl, "debug=0")
+    .asInstanceOf[AnyRef]
+  val ft = cl
+    .loadClass("io.ebean.enhance.ant.OfflineFileTransform")
+    .getConstructor(
+      t.getClass,
+      classOf[ClassLoader],
+      classOf[String]
+    )
+    .newInstance(t, ClassLoader.getSystemClassLoader, classDirectory.getAbsolutePath)
+    .asInstanceOf[AnyRef]
   ft.getClass.getDeclaredMethod("process", classOf[String]).invoke(ft, pkg)
   analysis
 }
 
 // Version file
-def generateVersionFile = Def.task {
-  val version = (Keys.version in core).value
-  val file = (resourceManaged in Compile).value / "play-ebean.version.properties"
-  val content = s"play-ebean.version=$version"
-  IO.write(file, content)
-  Seq(file)
-}
+def generateVersionFile =
+  Def.task {
+    val version = (Keys.version in core).value
+    val file    = (resourceManaged in Compile).value / "play-ebean.version.properties"
+    val content = s"play-ebean.version=$version"
+    IO.write(file, content)
+    Seq(file)
+  }
