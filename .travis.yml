@@ -7,17 +7,22 @@ env:
     - TRAVIS_JDK=11
 
 before_install:
-  - curl -sL https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | bash && . ~/.jabba/jabba.sh
+  - curl -Ls https://raw.githubusercontent.com/shyiko/jabba/0.11.2/install.sh | JABBA_VERSION=0.11.2 bash && . ~/.jabba/jabba.sh
+  # Travis-CI has (as of March 2021, anyway) an outdated sbt-extras version,
+  # so overwrite it with a March 2021 version that works with sbt 1.4.8+
+  - |
+    curl -sL https://raw.githubusercontent.com/paulp/sbt-extras/dc4f350f112580fcdf5f6fa7e8d5d2116475f84a/sbt  > /tmp/sbt-launch-script || travis_terminate 1
+    chmod +x /tmp/sbt-launch-script || travis_terminate 1
+    sudo mv /tmp/sbt-launch-script /usr/local/bin/sbt || travis_terminate 1
 
-install:
-  - jabba install $(jabba ls-remote "adopt@~1.$TRAVIS_JDK.0-0" --latest=patch) && jabba use "$_" && java -Xmx32m -version
+install: jabba install "adopt@~1.$TRAVIS_JDK.0-0" && jabba use "$_" && java -Xmx32m -version
 
 stages:
   - name: validate
   - name: docs
   - name: jacoco
   - name: test
-  - name: deploy
+  - name: release
     if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
 
 jobs:
@@ -52,9 +57,9 @@ jobs:
       name: "Test plugins JDK11"
       env: TRAVIS_JDK=11
 
-    - stage: deploy
-      name: "Publish artifacts to Bintray"
-      script: sbt +publish
+    - stage: release
+      name: "Publish artifacts to Sonatype"
+      script: sbt ci-release
       env: TRAVIS_JDK=8
 
 after_success: bash <(curl -s https://codecov.io/bash)
