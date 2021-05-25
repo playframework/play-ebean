@@ -4,8 +4,9 @@ import java.net.URLClassLoader
 import io.ebean.enhance.Transformer
 import io.ebean.enhance.ant.OfflineFileTransform
 import sbt.Keys._
-import sbt.internal.inc.Hash
+import sbt.internal.inc.FarmHash
 import sbt.internal.inc.LastModified
+import sbt.internal.inc.PlainVirtualFileConverter
 import sbt.internal.inc.Stamper
 import sbt.AutoPlugin
 import sbt.Compile
@@ -17,7 +18,7 @@ import sbt.taskKey
 import xsbti.compile.CompileResult
 import xsbti.compile.analysis.Stamp
 import sbt._
-
+import xsbti.VirtualFileRef
 import scala.util.control.NonFatal
 
 object PlayEbean extends AutoPlugin {
@@ -62,12 +63,11 @@ object PlayEbean extends AutoPlugin {
   def ebeanEnhance: Def.Initialize[Task[CompileResult]] =
     Def.task {
 
-      val deps      = dependencyClasspath.value
-      val classes   = classDirectory.value
-      val result    = manipulateBytecode.value
-      val agentArgs = playEbeanAgentArgs.value
-      val analysis  = result.analysis.asInstanceOf[sbt.internal.inc.Analysis]
-
+      val deps            = dependencyClasspath.value
+      val classes         = classDirectory.value
+      val result          = manipulateBytecode.value
+      val agentArgs       = playEbeanAgentArgs.value
+      val analysis        = result.analysis.asInstanceOf[sbt.internal.inc.Analysis]
       val agentArgsString = agentArgs.map { case (key, value) => s"$key=$value" }.mkString(";")
 
       val originalContextClassLoader = Thread.currentThread.getContextClassLoader
@@ -95,16 +95,17 @@ object PlayEbean extends AutoPlugin {
       }
 
       val allProducts = analysis.relations.allProducts
+      val converter   = new PlainVirtualFileConverter()
 
       /**
        * Updates stamp of product (class file) by preserving the type of a passed stamp.
        * This way any stamp incremental compiler chooses to use to mark class files will
        * be supported.
        */
-      def updateStampForClassFile(file: File, stamp: Stamp): Stamp =
+      def updateStampForClassFile(fileRef: VirtualFileRef, stamp: Stamp): Stamp =
         stamp match {
-          case _: LastModified => Stamper.forLastModified(file)
-          case _: Hash         => Stamper.forHash(file)
+          case _: LastModified => Stamper.forLastModifiedP(converter.toPath(fileRef))
+          case _: FarmHash     => Stamper.forFarmHashP(converter.toPath(fileRef))
         }
 
       // Since we may have modified some of the products of the incremental compiler, that is, the compiled template
@@ -118,6 +119,7 @@ object PlayEbean extends AutoPlugin {
               + s"product of incremental compiler: $classFile"
           )
         }
+
         stamps.markProduct(classFile, updateStampForClassFile(classFile, existingStamp))
       })
 

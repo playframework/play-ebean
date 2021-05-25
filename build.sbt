@@ -5,7 +5,7 @@ import sbt.Append.appendSeq
 import xsbti.compile.CompileAnalysis
 
 // Customise sbt-dynver's behaviour to make it work with tags which aren't v-prefixed
-dynverVTagPrefix in ThisBuild := false
+ThisBuild / dynverVTagPrefix := false
 
 // Sanity-check: assert that version comes from a tag (e.g. not a too-shallow clone)
 // https://github.com/dwijnand/sbt-dynver/#sanity-checking-the-version
@@ -42,10 +42,10 @@ lazy val core = project
     crossScalaVersions := Seq(scala212, scala213),
     Dependencies.ebean,
     mimaSettings,
-    compile in Compile := enhanceEbeanClasses(
-      (dependencyClasspath in Compile).value,
-      (compile in Compile).value,
-      (classDirectory in Compile).value,
+    Compile / compile := enhanceEbeanClasses(
+      (Compile / dependencyClasspath).value,
+      (Compile / compile).value,
+      (Compile / classDirectory).value,
       "play/db/ebean/**"
     ),
     jacocoReportSettings := JacocoReportSettings(
@@ -67,10 +67,10 @@ lazy val plugin = project
     Dependencies.plugin,
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
     crossScalaVersions := Seq(scala212),
-    resourceGenerators in Compile += generateVersionFile.taskValue,
+    Compile / resourceGenerators += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq(
       s"-Dscala.version=${scalaVersion.value}",
-      s"-Dscala.crossVersions=${(crossScalaVersions in core).value.mkString(",")}",
+      s"-Dscala.crossVersions=${(core / crossScalaVersions).value.mkString(",")}",
       s"-Dproject.version=${version.value}",
     ),
     scriptedBufferLog := false,
@@ -116,9 +116,10 @@ def enhanceEbeanClasses(
 // Version file
 def generateVersionFile =
   Def.task {
-    val version = (Keys.version in core).value
-    val file    = (resourceManaged in Compile).value / "play-ebean.version.properties"
+    val version = (core / Keys.version).value
+    val file    = (Compile / resourceManaged).value / "play-ebean.version.properties"
     val content = s"play-ebean.version=$version"
     IO.write(file, content)
     Seq(file)
   }
+
