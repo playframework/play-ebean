@@ -58,7 +58,7 @@ jobs:
       env: TRAVIS_JDK=11
 
     - stage: release
-      name: "Publish artifacts to Sonatype"
+      name: "Release artifacts to Sonatype"
       script: sbt ci-release
       env: TRAVIS_JDK=8
 
