@@ -54,7 +54,8 @@ lazy val core = project
       JacocoThresholds(),
       Seq(JacocoReportFormats.XML),
       "utf-8"
-    )
+    ),
+    sonatypeProfileName := "com.typesafe"
   )
 
 lazy val plugin = project
