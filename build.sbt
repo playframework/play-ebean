@@ -32,7 +32,8 @@ lazy val root = project
   .settings(
     name := "play-ebean-root",
     crossScalaVersions := Nil,
-    publish / skip := true
+    publish / skip := true,
+    sonatypeProfileName := "com.typesafe"
   )
 
 lazy val core = project
