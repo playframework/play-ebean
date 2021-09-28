@@ -75,7 +75,8 @@ lazy val plugin = project
       s"-Dproject.version=${version.value}",
     ),
     scriptedBufferLog := false,
-    scriptedDependencies := (())
+    scriptedDependencies := (()),
+    sonatypeProfileName := "com.typesafe"
   )
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
