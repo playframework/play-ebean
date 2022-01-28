@@ -65,7 +65,7 @@ lazy val plugin = project
   .disablePlugins(MimaPlugin)
   .settings(
     name := "sbt-play-ebean",
-    organization := "com.typesafe.sbt",
+    organization := "com.typesafe.play",
     Dependencies.plugin,
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
     crossScalaVersions := Seq(scala212),

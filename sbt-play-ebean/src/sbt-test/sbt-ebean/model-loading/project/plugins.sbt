@@ -1,2 +1,2 @@
 resolvers ++= DefaultOptions.resolvers(snapshot = true)
-addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % sys.props("project.version"))
+addSbtPlugin("com.typesafe.play" % "sbt-play-ebean" % sys.props("project.version"))
