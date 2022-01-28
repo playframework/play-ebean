@@ -34,7 +34,7 @@ jobs:
       env: TRAVIS_JDK=11
 
     - stage: docs
-    - script: cd docs && sbt validateDocs evaluateSbtFiles
+      script: cd docs && sbt validateDocs evaluateSbtFiles
       name: "Validate docs, Evaluate sbt files JDK 8"
       env: TRAVIS_JDK=8
     - script: cd docs && sbt validateDocs evaluateSbtFiles
@@ -50,7 +50,7 @@ jobs:
       script: sbt +jacoco
 
     - stage: test
-    - script: sbt +publishLocal +plugin/test +plugin/scripted
+      script: sbt +publishLocal +plugin/test +plugin/scripted
       name: "Test plugins JDK 8"
       env: TRAVIS_JDK=8
     - script: sbt +publishLocal +plugin/test +plugin/scripted
