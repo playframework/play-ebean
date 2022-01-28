@@ -1,4 +1,4 @@
-# Config for https://github.com/toolmantim/release-drafter
+# Config for https://github.com/release-drafter/release-drafter
 name-template: 'Play Ebean, This module provides Ebean support for Play Framework.'
 tag-template: '$NEXT_PATCH_VERSION'
 
