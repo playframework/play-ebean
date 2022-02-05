@@ -23,7 +23,7 @@ stages:
   - name: jacoco
   - name: test
   - name: release
-    if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
+    if: ((branch = main AND type = push) OR (tag IS present)) AND NOT fork
 
 jobs:
   include:
