@@ -1,6 +1,6 @@
 # play-ebean
 
-[![Build Status](https://travis-ci.org/playframework/play-ebean.svg?branch=master)](https://travis-ci.org/playframework/play-ebean) [![Maven](https://img.shields.io/maven-central/v/com.typesafe.play/play-ebean_2.12.svg)](http://mvnrepository.com/artifact/com.typesafe.play/play-ebean_2.12)
+[![Build Status](https://travis-ci.org/playframework/play-ebean.svg?branch=main)](https://travis-ci.org/playframework/play-ebean) [![Maven](https://img.shields.io/maven-central/v/com.typesafe.play/play-ebean_2.12.svg)](http://mvnrepository.com/artifact/com.typesafe.play/play-ebean_2.12)
 
 This module provides Ebean support for Play Framework.
 
