@@ -1,6 +1,6 @@
 # Releasing
 
-This is released from the `master` branch unless it is a version older than `6.1.0`. If there is no branch for the
+This is released from the `main` branch unless it is a version older than `6.1.0`. If there is no branch for the
 release that needs patching, create it from the tag.
 
 ## Cutting the release
@@ -8,7 +8,7 @@ release that needs patching, create it from the tag.
 ### Requires contributor access
 
 - Check the [draft release notes](https://github.com/playframework/play-ebean/releases) to see if everything is there
-- Wait until [master build finished](https://travis-ci.com/github/playframework/play-ebean/builds) after merging the
+- Wait until [main build finished](https://travis-ci.com/github/playframework/play-ebean/builds) after merging the
   last PR
 - Update the [draft release](https://github.com/playframework/play-ebean/releases) with the next tag version
   (eg. `7.0.0`), title and release description
