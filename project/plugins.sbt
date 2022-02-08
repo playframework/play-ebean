@@ -1,6 +1,6 @@
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.6.0")
 
-addSbtPlugin("com.github.sbt" % "sbt-jacoco" % "3.2.0")
+addSbtPlugin("com.github.sbt" % "sbt-jacoco" % "3.4.0")
 
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.8.1")
 
