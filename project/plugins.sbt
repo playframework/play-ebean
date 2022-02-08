@@ -1,4 +1,4 @@
-addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.6.0")
+addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.6.5")
 
 addSbtPlugin("com.github.sbt" % "sbt-jacoco" % "3.2.0")
 
