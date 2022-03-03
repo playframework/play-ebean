@@ -125,4 +125,3 @@ def generateVersionFile =
     IO.write(file, content)
     Seq(file)
   }
-
