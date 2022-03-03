@@ -107,17 +107,16 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
     }
 
     private static String generateScript(SpiEbeanServer spiServer) {
-        try {
-            CurrentModel ddl = new CurrentModel(spiServer);
+        CurrentModel ddl = new CurrentModel(spiServer);
 
-            String ups = ddl.getCreateDdl();
-            String downs = ddl.getDropAllDdl();
+        String ups = ddl.getCreateDdl();
+        String downs = ddl.getDropAllDdl();
 
-            if (ups == null || ups.trim().isEmpty()) {
+        if (ups == null || ups.trim().isEmpty()) {
                 return null;
             }
 
-            return
+        return
                 "# --- Created by Ebean DDL\r\n" +
                 "# To stop Ebean DDL generation, remove this comment and start using Evolutions\r\n" +
                 "\r\n" +
@@ -128,8 +127,5 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                 "# --- !Downs\r\n" +
                 "\r\n" +
                 downs;
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
     }
 }
