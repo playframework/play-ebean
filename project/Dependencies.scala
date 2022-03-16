@@ -10,15 +10,14 @@ object Dependencies {
 
   object Versions {
     val play: String   = "2.8.0"
-    val ebean          = "12.15.1"
-    val ebeanAgent     = "12.16.0"
+    val ebean          = "12.16.0"
     val typesafeConfig = "1.4.2"
   }
 
   val ebean = libraryDependencies ++= Seq(
     "io.ebean"           % "ebean"                % Versions.ebean,
     "io.ebean"           % "ebean-ddl-generator"  % Versions.ebean,
-    "io.ebean"           % "ebean-agent"          % Versions.ebeanAgent,
+    "io.ebean"           % "ebean-agent"          % Versions.ebean,
     "com.typesafe.play" %% "play-java-jdbc"       % Versions.play,
     "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
     "com.typesafe.play" %% "play-guice"           % Versions.play % Test,
@@ -31,7 +30,7 @@ object Dependencies {
 
   val plugin = libraryDependencies ++= Seq(
     "io.ebean"           % "ebean"                % Versions.ebean,
-    "io.ebean"           % "ebean-agent"          % Versions.ebeanAgent,
+    "io.ebean"           % "ebean-agent"          % Versions.ebean,
     "com.typesafe"       % "config"               % Versions.typesafeConfig,
     "com.typesafe.play" %% "play-java-jdbc"       % Versions.play,
     "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
