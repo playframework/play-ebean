@@ -5,7 +5,7 @@ package play.db.ebean;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigException;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -28,11 +28,11 @@ import java.util.*;
 public class DefaultEbeanConfig implements EbeanConfig {
 
     private final String defaultServer;
-    private final Map<String, ServerConfig> serverConfigs;
+    private final Map<String, DatabaseConfig> databaseConfigs;
 
-    public DefaultEbeanConfig(String defaultServer, Map<String, ServerConfig> serverConfigs) {
+    public DefaultEbeanConfig(String defaultServer, Map<String, DatabaseConfig> databaseConfigs) {
         this.defaultServer = defaultServer;
-        this.serverConfigs = serverConfigs;
+        this.databaseConfigs = databaseConfigs;
     }
 
     @Override
@@ -41,8 +41,8 @@ public class DefaultEbeanConfig implements EbeanConfig {
     }
 
     @Override
-    public Map<String, ServerConfig> serverConfigs() {
-        return serverConfigs;
+    public Map<String, DatabaseConfig> serverConfigs() {
+        return databaseConfigs;
     }
 
     @Singleton
@@ -73,31 +73,31 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
             EbeanParsedConfig ebeanConfig = EbeanParsedConfig.parseFromConfig(config);
 
-            Map<String, ServerConfig> serverConfigs = new HashMap<>();
+            Map<String, DatabaseConfig> serverConfigs = new HashMap<>();
 
             for (Map.Entry<String, List<String>> entry: ebeanConfig.getDatasourceModels().entrySet()) {
                 String key = entry.getKey();
 
-                ServerConfig serverConfig = new ServerConfig();
-                serverConfig.setName(key);
-                serverConfig.loadFromProperties();
+                DatabaseConfig databaseConfig = new DatabaseConfig();
+                databaseConfig.setName(key);
+                databaseConfig.loadFromProperties();
 
-                setServerConfigDataSource(key, serverConfig);
+                setServerConfigDataSource(key, databaseConfig);
 
                 if (!ebeanConfig.getDefaultDatasource().equals(key)) {
-                    serverConfig.setDefaultServer(false);
+                    databaseConfig.setDefaultServer(false);
                 }
 
                 Set<String> classes = getModelClasses(entry);
-                addModelClassesToServerConfig(key, serverConfig, classes);
+                addModelClassesToServerConfig(key, databaseConfig, classes);
 
-                serverConfigs.put(key, serverConfig);
+                serverConfigs.put(key, databaseConfig);
             }
 
             return new DefaultEbeanConfig(ebeanConfig.getDefaultDatasource(), serverConfigs);
         }
 
-        private void setServerConfigDataSource(String key, ServerConfig serverConfig) {
+        private void setServerConfigDataSource(String key, DatabaseConfig serverConfig) {
             try {
                 serverConfig.setDataSource(new WrappingDatasource(dbApi.getDatabase(key).getDataSource()));
             } catch(Exception e) {
@@ -109,7 +109,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
             }
         }
 
-        private void addModelClassesToServerConfig(String key, ServerConfig serverConfig, Set<String> classes) {
+        private void addModelClassesToServerConfig(String key, DatabaseConfig serverConfig, Set<String> classes) {
             for (String clazz: classes) {
                 try {
                     serverConfig.addClass(Class.forName(clazz, true, environment.classLoader()));

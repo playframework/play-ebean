@@ -18,7 +18,7 @@ import static org.hamcrest.MatcherAssert.*;
 
 public class EbeanParsedConfigTest {
 
-    private EbeanParsedConfig parse(Map<String, ? extends Object> config) {
+    private EbeanParsedConfig parse(Map<String, ?> config) {
         return EbeanParsedConfig.parseFromConfig(
                 ConfigFactory.parseMap(config).withFallback(ConfigFactory.defaultReference())
         );
