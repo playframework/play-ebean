@@ -41,15 +41,15 @@ object PlayEbean extends AutoPlugin {
 
   def scopedSettings =
     Seq(
-      playEbeanModels    := configuredEbeanModels.value,
+      playEbeanModels := configuredEbeanModels.value,
       manipulateBytecode := ebeanEnhance.value
     )
 
   def unscopedSettings =
     Seq(
       playEbeanDebugLevel := -1,
-      playEbeanAgentArgs  := Map("debug" -> playEbeanDebugLevel.value.toString),
-      playEbeanVersion    := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
+      playEbeanAgentArgs := Map("debug" -> playEbeanDebugLevel.value.toString),
+      playEbeanVersion := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
       libraryDependencies ++=
         Seq(
           "com.typesafe.play" %% "play-ebean"   % playEbeanVersion.value,
@@ -98,8 +98,9 @@ object PlayEbean extends AutoPlugin {
       val converter   = new PlainVirtualFileConverter()
 
       /**
-       * Updates stamp of product (class file) by preserving the type of a passed stamp. This way any stamp incremental
-       * compiler chooses to use to mark class files will be supported.
+       * Updates stamp of product (class file) by preserving the type of a passed stamp.
+       * This way any stamp incremental compiler chooses to use to mark class files will
+       * be supported.
        */
       def updateStampForClassFile(fileRef: VirtualFileRef, stamp: Stamp): Stamp =
         stamp match {
