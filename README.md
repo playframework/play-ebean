@@ -30,10 +30,6 @@ The Play Ebean plugin supports several different versions of Play and Ebean.
 
 > * Release Candidate: these releases are not stable and should not be used in production.
 
-## Support
-
-The Play Ebean support library is *[Community Driven][]*.
-
 We also recommend using the payintech fork: https://github.com/payintech/play-ebean
 
 [Community Driven]: https://developer.lightbend.com/docs/introduction/getting-help/support-terminology.html
