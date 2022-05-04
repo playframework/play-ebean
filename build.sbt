@@ -45,13 +45,6 @@ lazy val core = project
       (Compile / classDirectory).value,
       "play/db/ebean/**"
     ),
-    jacocoReportSettings := JacocoReportSettings(
-      "Jacoco Coverage Report",
-      None,
-      JacocoThresholds(),
-      Seq(JacocoReportFormats.XML),
-      "utf-8"
-    ),
     sonatypeProfileName := "com.typesafe.play"
   )
 
