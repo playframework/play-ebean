@@ -114,8 +114,8 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
         String downs = ddl.getDropAllDdl();
 
         if (ups == null || ups.trim().isEmpty()) {
-                return null;
-            }
+            return null;
+        }
 
         return
                 "# --- Created by Ebean DDL\r\n" +
