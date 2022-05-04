@@ -1,4 +1,5 @@
 import Dependencies.ScalaVersions.scala212
+
 import Dependencies.ScalaVersions.scala213
 import Dependencies.Versions
 import com.typesafe.tools.mima.core._
@@ -17,8 +18,8 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
 
 lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := Set(
-    organization.value %% name.value % "6.0.0" //previousStableVersion.value
-    //.getOrElse(throw new Error("Unable to determine previous version"))
+    organization.value %% name.value % "6.0.0" // previousStableVersion.value
+    // .getOrElse(throw new Error("Unable to determine previous version"))
   ),
   mimaBinaryIssueFilters ++= Seq(
     // https://github.com/playframework/play-ebean/pull/281 - Removed io.ebean.EbeanServer in Ebean 13.6.0
@@ -31,16 +32,16 @@ lazy val root = project
   .aggregate(core, plugin)
   .disablePlugins(MimaPlugin)
   .settings(
-    name := "play-ebean-root",
-    crossScalaVersions := Nil,
-    publish / skip := true,
+    name                := "play-ebean-root",
+    crossScalaVersions  := Nil,
+    publish / skip      := true,
     sonatypeProfileName := "com.typesafe.play"
   )
 
 lazy val core = project
   .in(file("play-ebean"))
   .settings(
-    name := "play-ebean",
+    name               := "play-ebean",
     crossScalaVersions := Seq(scala212, scala213),
     Dependencies.ebean,
     mimaSettings,
@@ -50,13 +51,6 @@ lazy val core = project
       (Compile / classDirectory).value,
       "play/db/ebean/**"
     ),
-    jacocoReportSettings := JacocoReportSettings(
-      "Jacoco Coverage Report",
-      None,
-      JacocoThresholds(),
-      Seq(JacocoReportFormats.XML),
-      "utf-8"
-    ),
     sonatypeProfileName := "com.typesafe.play"
   )
 
@@ -65,7 +59,7 @@ lazy val plugin = project
   .enablePlugins(SbtPlugin)
   .disablePlugins(MimaPlugin)
   .settings(
-    name := "sbt-play-ebean",
+    name         := "sbt-play-ebean",
     organization := "com.typesafe.play",
     Dependencies.plugin,
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
@@ -76,9 +70,9 @@ lazy val plugin = project
       s"-Dscala.crossVersions=${(core / crossScalaVersions).value.mkString(",")}",
       s"-Dproject.version=${version.value}",
     ),
-    scriptedBufferLog := false,
+    scriptedBufferLog    := false,
     scriptedDependencies := (()),
-    sonatypeProfileName := "com.typesafe.play"
+    sonatypeProfileName  := "com.typesafe.play"
   )
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
@@ -126,3 +120,12 @@ def generateVersionFile =
     IO.write(file, content)
     Seq(file)
   }
+
+addCommandAlias(
+  "validateCode",
+  List(
+    "headerCheckAll",
+    "scalafmtSbtCheck",
+    "scalafmtCheckAll",
+  ).mkString(";")
+)

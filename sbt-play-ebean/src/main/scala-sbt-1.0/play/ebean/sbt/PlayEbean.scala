@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
+ */
 package play.ebean.sbt
 
 import java.net.URLClassLoader
@@ -41,15 +44,15 @@ object PlayEbean extends AutoPlugin {
 
   def scopedSettings =
     Seq(
-      playEbeanModels := configuredEbeanModels.value,
+      playEbeanModels    := configuredEbeanModels.value,
       manipulateBytecode := ebeanEnhance.value
     )
 
   def unscopedSettings =
     Seq(
       playEbeanDebugLevel := -1,
-      playEbeanAgentArgs := Map("debug" -> playEbeanDebugLevel.value.toString),
-      playEbeanVersion := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
+      playEbeanAgentArgs  := Map("debug" -> playEbeanDebugLevel.value.toString),
+      playEbeanVersion    := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
       libraryDependencies ++=
         Seq(
           "com.typesafe.play" %% "play-ebean"   % playEbeanVersion.value,
@@ -98,9 +101,8 @@ object PlayEbean extends AutoPlugin {
       val converter   = new PlainVirtualFileConverter()
 
       /**
-       * Updates stamp of product (class file) by preserving the type of a passed stamp.
-       * This way any stamp incremental compiler chooses to use to mark class files will
-       * be supported.
+       * Updates stamp of product (class file) by preserving the type of a passed stamp. This way any stamp incremental
+       * compiler chooses to use to mark class files will be supported.
        */
       def updateStampForClassFile(fileRef: VirtualFileRef, stamp: Stamp): Stamp =
         stamp match {
@@ -144,7 +146,7 @@ object PlayEbean extends AutoPlugin {
         } catch {
           case e: Exception =>
             // Since we're about to close the classloader, we can't risk any classloading that the thrown exception may
-            // do when we later interogate it, so instead we create a new exception here, with the old exceptions message
+            // do when we later interrogate it, so instead we create a new exception here, with the old exceptions message
             // and stack trace
             def clone(t: Throwable): RuntimeException = {
               val cloned = new RuntimeException(s"${t.getClass.getName}: ${t.getMessage}")
@@ -181,7 +183,7 @@ object PlayEbean extends AutoPlugin {
     try {
       props.load(stream)
     } catch {
-      case e: Exception =>
+      case _: Exception =>
     } finally {
       if (stream ne null) stream.close()
     }

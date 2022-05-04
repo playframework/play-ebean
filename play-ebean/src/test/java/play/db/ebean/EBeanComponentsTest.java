@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Lightbend Inc. <http://www.typesafe.com>
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
 package play.db.ebean;
 

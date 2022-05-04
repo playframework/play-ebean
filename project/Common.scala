@@ -1,4 +1,5 @@
 import sbt.Keys._
+
 import sbt._
 import sbt.plugins.JvmPlugin
 import Dependencies.ScalaVersions._
@@ -17,8 +18,8 @@ object Common extends AutoPlugin {
   override def globalSettings =
     Seq(
       // organization
-      organization := "com.typesafe.play",
-      organizationName := "Lightbend Inc.",
+      organization         := "com.typesafe.play",
+      organizationName     := "Lightbend Inc.",
       organizationHomepage := Some(url("https://www.lightbend.com/")),
       // scala settings
       scalaVersion := scala212,
@@ -45,6 +46,6 @@ object Common extends AutoPlugin {
   override def projectSettings =
     Seq(
       headerEmptyLine := false,
-      headerLicense := Some(HeaderLicense.Custom("Copyright (C) Lightbend Inc. <https://www.lightbend.com>"))
+      headerLicense   := Some(HeaderLicense.Custom("Copyright (C) Lightbend Inc. <https://www.lightbend.com>"))
     )
 }
