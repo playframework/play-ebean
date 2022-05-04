@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
+ */
 package play.ebean.sbt
 
 import java.net.URLClassLoader
