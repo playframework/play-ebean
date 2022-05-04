@@ -1,7 +1,6 @@
 /*
  * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
  */
-
 package play.db.ebean;
 
 import play.Mode;
