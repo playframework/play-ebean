@@ -28,11 +28,11 @@ import java.util.*;
 public class DefaultEbeanConfig implements EbeanConfig {
 
     private final String defaultServer;
-    private final Map<String, DatabaseConfig> databaseConfigs;
+    private final Map<String, DatabaseConfig> serverConfigs;
 
-    public DefaultEbeanConfig(String defaultServer, Map<String, DatabaseConfig> databaseConfigs) {
+    public DefaultEbeanConfig(String defaultServer, Map<String, DatabaseConfig> serverConfigs) {
         this.defaultServer = defaultServer;
-        this.databaseConfigs = databaseConfigs;
+        this.serverConfigs = serverConfigs;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
     @Override
     public Map<String, DatabaseConfig> serverConfigs() {
-        return databaseConfigs;
+        return serverConfigs;
     }
 
     @Singleton
@@ -78,20 +78,20 @@ public class DefaultEbeanConfig implements EbeanConfig {
             for (Map.Entry<String, List<String>> entry: ebeanConfig.getDatasourceModels().entrySet()) {
                 String key = entry.getKey();
 
-                DatabaseConfig databaseConfig = new DatabaseConfig();
-                databaseConfig.setName(key);
-                databaseConfig.loadFromProperties();
+                DatabaseConfig serverConfig = new DatabaseConfig();
+                serverConfig.setName(key);
+                serverConfig.loadFromProperties();
 
-                setServerConfigDataSource(key, databaseConfig);
+                setServerConfigDataSource(key, serverConfig);
 
                 if (!ebeanConfig.getDefaultDatasource().equals(key)) {
-                    databaseConfig.setDefaultServer(false);
+                    serverConfig.setDefaultServer(false);
                 }
 
                 Set<String> classes = getModelClasses(entry);
-                addModelClassesToServerConfig(key, databaseConfig, classes);
+                addModelClassesToServerConfig(key, serverConfig, classes);
 
-                serverConfigs.put(key, databaseConfig);
+                serverConfigs.put(key, serverConfig);
             }
 
             return new DefaultEbeanConfig(ebeanConfig.getDefaultDatasource(), serverConfigs);
