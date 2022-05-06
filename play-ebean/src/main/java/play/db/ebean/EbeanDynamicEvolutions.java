@@ -66,7 +66,10 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
             }
             File evolutions = environment.getFile("conf/evolutions/" + key + "/1.sql");
             try {
-                String content = evolutions.exists() ? Files.readString(evolutions.toPath()) : "";
+                String content = "";
+                if (evolutions.exists()) {
+                    content = new String(Files.readAllBytes(evolutions.toPath()), StandardCharsets.UTF_8);
+                }
                 if (content.isEmpty() || content.startsWith("# --- Created by Ebean DDL")) {
                     environment.getFile("conf/evolutions/" + key).mkdirs();
                     if (!content.equals(evolutionScript)) {
