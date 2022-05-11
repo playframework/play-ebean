@@ -28,11 +28,11 @@ object Common extends AutoPlugin {
       // legal
       licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")),
       // on the web
-      homepage := Some(url(s"https://github.com/playframework/${repoName}")),
+      homepage := Some(url(s"https://github.com/playframework/$repoName")),
       scmInfo := Some(
         ScmInfo(
-          url(s"https://github.com/playframework/${repoName}"),
-          s"scm:git:git@github.com:playframework/${repoName}.git"
+          url(s"https://github.com/playframework/$repoName"),
+          s"scm:git:git@github.com:playframework/$repoName.git"
         )
       ),
       developers += Developer(

@@ -4,8 +4,8 @@
 package play.db.ebean;
 
 import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.api.SpiEbeanServer;
 import play.Environment;
@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
      * Initialise the Ebean servers/databases.
      */
     public void start() {
-        config.serverConfigs().forEach((key, serverConfig) -> databases.put(key, EbeanServerFactory.create(serverConfig)));
+        config.serverConfigs().forEach((key, serverConfig) -> databases.put(key, DatabaseFactory.create(serverConfig)));
     }
 
     /**
@@ -55,31 +56,31 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
      */
     @Override
     public void create() {
-        if (!environment.isProd()) {
-            config.serverConfigs().forEach((key, serverConfig) -> {
-                String evolutionScript = generateEvolutionScript(databases.get(key));
-                if (evolutionScript != null) {
-                    File evolutions = environment.getFile("conf/evolutions/" + key + "/1.sql");
-                    try {
-                        String content = "";
-                        if (evolutions.exists()) {
-                            content = new String(Files.readAllBytes(evolutions.toPath()), "utf-8");
-                        }
-
-                        if (content.isEmpty() || content.startsWith("# --- Created by Ebean DDL")) {
-                            environment.getFile("conf/evolutions/" + key).mkdirs();
-                            if (!content.equals(evolutionScript)) {
-                                Files.write(evolutions.toPath(), evolutionScript.getBytes("utf-8"));
-                            }
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+        if (environment.isProd()) {
+            return;
+        }
+        config.serverConfigs().forEach((key, serverConfig) -> {
+            String evolutionScript = generateEvolutionScript(databases.get(key));
+            if (evolutionScript == null) {
+                return;
+            }
+            File evolutions = environment.getFile("conf/evolutions/" + key + "/1.sql");
+            try {
+                String content = "";
+                if (evolutions.exists()) {
+                    content = new String(Files.readAllBytes(evolutions.toPath()), StandardCharsets.UTF_8);
+                }
+                if (content.isEmpty() || content.startsWith("# --- Created by Ebean DDL")) {
+                    environment.getFile("conf/evolutions/" + key).mkdirs();
+                    if (!content.equals(evolutionScript)) {
+                        Files.write(evolutions.toPath(), evolutionScript.getBytes(StandardCharsets.UTF_8));
                     }
                 }
-            });
-        }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
-
 
     /**
      * Helper method that generates the required evolution to properly run Ebean/DB.
@@ -113,8 +114,8 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
         String downs = ddl.getDropAllDdl();
 
         if (ups == null || ups.trim().isEmpty()) {
-                return null;
-            }
+            return null;
+        }
 
         return
                 "# --- Created by Ebean DDL\r\n" +

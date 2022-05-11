@@ -5,20 +5,22 @@ package play.db.ebean;
 
 
 import org.junit.Test;
-import play.*;
-import play.routing.*;
+import play.Application;
+import play.ApplicationLoader;
+import play.Environment;
+import play.LoggerConfigurator;
 import play.api.Play;
 import play.components.BodyParserComponents;
 import play.db.HikariCPComponents;
 import play.filters.components.NoHttpFiltersComponents;
 import play.mvc.Results;
-import play.routing.RoutingDsl;
+import play.routing.RoutingDslComponentsFromContext;
 
 import java.util.Collections;
 
 public class EBeanComponentsTest {
 
-    class MyComponents extends RoutingDslComponentsFromContext
+    static class MyComponents extends RoutingDslComponentsFromContext
             implements NoHttpFiltersComponents, BodyParserComponents, EBeanComponents, HikariCPComponents {
 
         public MyComponents(ApplicationLoader.Context context) {
@@ -33,7 +35,7 @@ public class EBeanComponentsTest {
         }
     }
 
-    class MyApplicationLoader implements ApplicationLoader {
+    static class MyApplicationLoader implements ApplicationLoader {
         @Override
         public Application load(Context context) {
             LoggerConfigurator.apply(context.environment().classLoader()).ifPresent(lc -> {
