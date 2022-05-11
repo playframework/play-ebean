@@ -2,6 +2,7 @@ import Dependencies.ScalaVersions.scala212
 
 import Dependencies.ScalaVersions.scala213
 import Dependencies.Versions
+import com.typesafe.tools.mima.core._
 import sbt.Append.appendSeq
 import xsbti.compile.CompileAnalysis
 
@@ -20,6 +21,10 @@ lazy val mimaSettings = Seq(
     organization.value %% name.value % "6.0.0" // previousStableVersion.value
     // .getOrElse(throw new Error("Unable to determine previous version"))
   ),
+  mimaBinaryIssueFilters ++= Seq(
+    // https://github.com/playframework/play-ebean/pull/281 - Removed io.ebean.EbeanServer in Ebean 13.6.0
+    ProblemFilters.exclude[IncompatibleMethTypeProblem]("play.db.ebean.EbeanDynamicEvolutions.generateEvolutionScript")
+  )
 )
 
 lazy val root = project
