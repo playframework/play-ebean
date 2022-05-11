@@ -214,7 +214,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
          * @return a set of types names satisfying the condition
          */
         static Set<String> getTypes(Environment env, String packageName) {
-            return getReflections(env, packageName).getStore().keys(TypeElementsScanner.class.getSimpleName());
+            return getReflections(env, packageName).getStore().getOrDefault(TypeElementsScanner.class.getSimpleName(), Collections.emptyMap()).keySet();
         }
         private static Reflections getReflections(Environment env, String packageName) {
             // This is not supposed to happen very often, but just when starting the application.
@@ -232,7 +232,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
         private static ConfigurationBuilder getReflectionsConfiguration(String packageName, ClassLoader classLoader) {
             return new ConfigurationBuilder()
                     .addUrls(ClasspathHelper.forPackage(packageName, classLoader))
-                    .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(packageName + ".")))
+                    .filterInputsBy(new FilterBuilder().includePackage((packageName + ".").replace(".","\\.") + ".*"))
                     .setScanners(new TypeElementsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner());
         }
 
