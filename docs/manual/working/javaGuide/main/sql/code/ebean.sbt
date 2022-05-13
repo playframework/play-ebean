@@ -17,7 +17,7 @@ playEbeanDebugLevel := 4
 //#play-ebean-debug
 
 //#play-ebean-agent-args
-playEbeanAgentArgs += ("detect" -> "false")
+playEbeanAgentArgs += "detect" -> "false"
 //#play-ebean-agent-args
 
 //#play-ebean-test
