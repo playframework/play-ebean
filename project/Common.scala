@@ -15,7 +15,7 @@ object Common extends AutoPlugin {
 
   val repoName = "play-ebean"
 
-  override def globalSettings =
+  override def globalSettings: Seq[Setting[_]] =
     Seq(
       // organization
       organization         := "com.typesafe.play",
@@ -43,7 +43,7 @@ object Common extends AutoPlugin {
       )
     )
 
-  override def projectSettings =
+  override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       headerEmptyLine := false,
       headerLicense   := Some(HeaderLicense.Custom("Copyright (C) Lightbend Inc. <https://www.lightbend.com>"))
