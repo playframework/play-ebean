@@ -71,7 +71,7 @@ lazy val plugin = project
       s"-Dproject.version=${version.value}",
     ),
     scriptedBufferLog    := false,
-    scriptedDependencies := (),
+    scriptedDependencies := ((): Unit),
     sonatypeProfileName  := "com.typesafe.play"
   )
 

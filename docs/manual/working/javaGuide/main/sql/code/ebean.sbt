@@ -9,7 +9,7 @@ lazy val myProject = (project in file("."))
 //#enable-plugin
 
 //#play-ebean-models
-playEbeanModels in Compile := Seq("models.*")
+Compile / playEbeanModels := Seq("models.*")
 //#play-ebean-models
 
 //#play-ebean-debug
@@ -23,5 +23,5 @@ playEbeanAgentArgs += ("detect" -> "false")
 //#play-ebean-test
 inConfig(Test)(PlayEbean.scopedSettings)
 
-playEbeanModels in Test := Seq("models.*")
+Test / playEbeanModels := Seq("models.*")
 //#play-ebean-test
