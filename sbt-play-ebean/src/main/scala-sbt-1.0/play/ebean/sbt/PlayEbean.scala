@@ -98,7 +98,7 @@ object PlayEbean extends AutoPlugin {
       }
 
       val allProducts = analysis.relations.allProducts
-      val converter   = new PlainVirtualFileConverter
+      val converter   = new PlainVirtualFileConverter()
 
       /**
        * Updates stamp of product (class file) by preserving the type of a passed stamp. This way any stamp incremental

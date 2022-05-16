@@ -29,14 +29,14 @@ object PlayEbean extends AutoPlugin {
   override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
   def scopedSettings = Seq(
-    playEbeanModels    := configuredEbeanModels.value,
+    playEbeanModels := configuredEbeanModels.value,
     manipulateBytecode := ebeanEnhance.value
   )
 
   def unscopedSettings = Seq(
     playEbeanDebugLevel := -1,
-    playEbeanAgentArgs  := Map("debug" -> playEbeanDebugLevel.value.toString),
-    playEbeanVersion    := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
+    playEbeanAgentArgs := Map("debug" -> playEbeanDebugLevel.value.toString),
+    playEbeanVersion := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
     libraryDependencies += "com.typesafe.play" %% "play-ebean"   % playEbeanVersion.value,
     libraryDependencies += "org.glassfish.jaxb" % "jaxb-runtime" % "2.3.2"
   )
@@ -81,8 +81,9 @@ object PlayEbean extends AutoPlugin {
     val allProducts = analysis.relations.allProducts
 
     /**
-     * Updates stamp of product (class file) by preserving the type of a passed stamp. This way any stamp incremental
-     * compiler chooses to use to mark class files will be supported.
+     * Updates stamp of product (class file) by preserving the type of a passed stamp.
+     * This way any stamp incremental compiler chooses to use to mark class files will
+     * be supported.
      */
     def updateStampForClassFile(classFile: File, stamp: Stamp): Stamp = stamp match {
       case _: Exists       => Stamp.exists(classFile)
