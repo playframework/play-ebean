@@ -35,7 +35,6 @@ lazy val root = project
     name                := "play-ebean-root",
     crossScalaVersions  := Nil,
     publish / skip      := true,
-    sonatypeProfileName := "com.typesafe.play"
   )
 
 lazy val core = project
@@ -51,7 +50,6 @@ lazy val core = project
       (Compile / classDirectory).value,
       "play/db/ebean/**"
     ),
-    sonatypeProfileName := "com.typesafe.play"
   )
 
 lazy val plugin = project
@@ -72,7 +70,6 @@ lazy val plugin = project
     ),
     scriptedBufferLog    := false,
     scriptedDependencies := ((): Unit),
-    sonatypeProfileName  := "com.typesafe.play"
   )
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
