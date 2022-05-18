@@ -32,9 +32,9 @@ lazy val root = project
   .aggregate(core, plugin)
   .disablePlugins(MimaPlugin)
   .settings(
-    name                := "play-ebean-root",
-    crossScalaVersions  := Nil,
-    publish / skip      := true,
+    name               := "play-ebean-root",
+    crossScalaVersions := Nil,
+    publish / skip     := true,
   )
 
 lazy val core = project
