@@ -32,10 +32,9 @@ lazy val root = project
   .aggregate(core, plugin)
   .disablePlugins(MimaPlugin)
   .settings(
-    name                := "play-ebean-root",
-    crossScalaVersions  := Nil,
-    publish / skip      := true,
-    sonatypeProfileName := "com.typesafe.play"
+    name               := "play-ebean-root",
+    crossScalaVersions := Nil,
+    publish / skip     := true,
   )
 
 lazy val core = project
@@ -51,7 +50,6 @@ lazy val core = project
       (Compile / classDirectory).value,
       "play/db/ebean/**"
     ),
-    sonatypeProfileName := "com.typesafe.play"
   )
 
 lazy val plugin = project
@@ -72,7 +70,6 @@ lazy val plugin = project
     ),
     scriptedBufferLog    := false,
     scriptedDependencies := ((): Unit),
-    sonatypeProfileName  := "com.typesafe.play"
   )
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
