@@ -40,15 +40,15 @@ object PlayEbean extends AutoPlugin {
 
   override def trigger = noTrigger
 
-  override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
+  override def projectSettings: Seq[Def.Setting[_]] = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
-  def scopedSettings =
+  def scopedSettings: Seq[Def.Setting[_]] =
     Seq(
       playEbeanModels    := configuredEbeanModels.value,
       manipulateBytecode := ebeanEnhance.value
     )
 
-  def unscopedSettings =
+  def unscopedSettings: Seq[Def.Setting[_]] =
     Seq(
       playEbeanDebugLevel := -1,
       playEbeanAgentArgs  := Map("debug" -> playEbeanDebugLevel.value.toString),
@@ -76,15 +76,12 @@ object PlayEbean extends AutoPlugin {
       val originalContextClassLoader = Thread.currentThread.getContextClassLoader
 
       try {
-
-        val classpath = deps.map(_.data.toURI.toURL).toArray :+ classes.toURI.toURL
-
-        val classLoader = new java.net.URLClassLoader(classpath, null)
+        val classpath   = deps.map(_.data.toURI.toURL).toArray :+ classes.toURI.toURL
+        val classLoader = new URLClassLoader(classpath, null)
 
         Thread.currentThread.setContextClassLoader(classLoader)
 
-        val transformer = new Transformer(classLoader, agentArgsString)
-
+        val transformer   = new Transformer(classLoader, agentArgsString)
         val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
 
         try {
