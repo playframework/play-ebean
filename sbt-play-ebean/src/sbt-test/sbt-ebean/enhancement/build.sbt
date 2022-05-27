@@ -4,11 +4,11 @@ lazy val root = project
 
 scalaVersion := "2.12.15"
 
-sourceDirectory in Test := baseDirectory.value / "tests"
+Test / sourceDirectory := baseDirectory.value / "tests"
 
-scalaSource in Test := baseDirectory.value / "tests"
+Test / scalaSource := baseDirectory.value / "tests"
 
-javaSource in Test := baseDirectory.value / "tests"
+Test / javaSource := baseDirectory.value / "tests"
 
 resolvers ++= DefaultOptions.resolvers(snapshot = true)
 
