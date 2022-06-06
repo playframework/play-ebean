@@ -7,8 +7,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigException;
 import io.ebean.config.DatabaseConfig;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.scanners.Scanners;
 import org.reflections.scanners.TypeElementsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
@@ -75,7 +74,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
             Map<String, DatabaseConfig> serverConfigs = new HashMap<>();
 
-            for (Map.Entry<String, List<String>> entry: ebeanConfig.getDatasourceModels().entrySet()) {
+            for (Map.Entry<String, List<String>> entry : ebeanConfig.getDatasourceModels().entrySet()) {
                 String key = entry.getKey();
 
                 DatabaseConfig serverConfig = new DatabaseConfig();
@@ -100,7 +99,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
         private void setServerConfigDataSource(String key, DatabaseConfig serverConfig) {
             try {
                 serverConfig.setDataSource(new WrappingDatasource(dbApi.getDatabase(key).getDataSource()));
-            } catch(Exception e) {
+            } catch (Exception e) {
                 throw new ConfigException.BadValue(
                         "ebean." + key,
                         e.getMessage(),
@@ -110,7 +109,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
         }
 
         private void addModelClassesToServerConfig(String key, DatabaseConfig serverConfig, Set<String> classes) {
-            for (String clazz: classes) {
+            for (String clazz : classes) {
                 try {
                     serverConfig.addClass(Class.forName(clazz, true, environment.classLoader()));
                 } catch (Exception e) {
@@ -128,7 +127,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
             entry.getValue().forEach(load -> {
                 load = load.trim();
                 if (load.endsWith(".*")) {
-                    classes.addAll(Classpath.getTypes(environment, load.substring(0, load.length()-2)));
+                    classes.addAll(Classpath.getTypes(environment, load.substring(0, load.length() - 2)));
                 } else {
                     classes.add(load);
                 }
@@ -216,6 +215,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
         static Set<String> getTypes(Environment env, String packageName) {
             return getReflections(env, packageName).getStore().getOrDefault(TypeElementsScanner.class.getSimpleName(), Collections.emptyMap()).keySet();
         }
+
         private static Reflections getReflections(Environment env, String packageName) {
             // This is not supposed to happen very often, but just when starting the application.
             // So it should be okay to not have a cache.
@@ -232,8 +232,8 @@ public class DefaultEbeanConfig implements EbeanConfig {
         private static ConfigurationBuilder getReflectionsConfiguration(String packageName, ClassLoader classLoader) {
             return new ConfigurationBuilder()
                     .addUrls(ClasspathHelper.forPackage(packageName, classLoader))
-                    .filterInputsBy(new FilterBuilder().includePackage((packageName + ".").replace(".","\\.") + ".*"))
-                    .setScanners(new TypeElementsScanner(), new TypeAnnotationsScanner(), new SubTypesScanner());
+                    .filterInputsBy(new FilterBuilder().includePackage(packageName))
+                    .setScanners(new TypeElementsScanner(), Scanners.TypesAnnotated, Scanners.SubTypes);
         }
 
     }
