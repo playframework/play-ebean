@@ -2,7 +2,7 @@ lazy val root = project
   .in(file("."))
   .enablePlugins(PlayJava, PlayEbean)
 
-scalaVersion := "2.12.15"
+scalaVersion := "2.12.16"
 
 Test / sourceDirectory := baseDirectory.value / "tests"
 
