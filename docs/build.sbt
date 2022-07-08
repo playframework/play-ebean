@@ -12,8 +12,8 @@ lazy val docs = project
     PlayDocsKeys.javaManualSourceDirectories := (baseDirectory.value / "manual" / "working" / "javaGuide" ** "code").get,
     // No resource directories shuts the ebean agent up about java sources in the classes directory
     Test / unmanagedResourceDirectories := Nil,
-    Test / parallelExecution := false,
-    scalaVersion := "2.12.15"
+    Test / parallelExecution            := false,
+    scalaVersion                        := "2.12.15"
   )
   .settings(PlayEbean.unscopedSettings: _*)
   .settings(
