@@ -1,4 +1,7 @@
 lazy val plugins = (project in file(".")).dependsOn(sbtPlayEbean)
+  .settings(
+    scalaVersion := "2.12.17"
+  )
 
 lazy val sbtPlayEbean = ProjectRef(Path.fileProperty("user.dir").getParentFile, "plugin")
 
