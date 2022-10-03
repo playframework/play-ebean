@@ -2,7 +2,7 @@ lazy val root = project
   .in(file("."))
   .enablePlugins(PlayJava, PlayEbean)
 
-scalaVersion := "2.13.8"
+scalaVersion := "2.13.9"
 
 resolvers ++= DefaultOptions.resolvers(snapshot = true)
 
