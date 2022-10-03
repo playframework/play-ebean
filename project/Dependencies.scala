@@ -5,12 +5,12 @@ import sbt._
 object Dependencies {
 
   object ScalaVersions {
-    val scala212 = "2.12.16"
-    val scala213 = "2.13.8"
+    val scala212 = "2.12.17"
+    val scala213 = "2.13.9"
   }
 
   object Versions {
-    val play: String   = "2.8.16"
+    val play: String   = "2.9.0-M2"
     val ebean          = "12.16.1"
     val typesafeConfig = "1.4.2"
   }

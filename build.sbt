@@ -41,7 +41,8 @@ lazy val core = project
   .in(file("play-ebean"))
   .settings(
     name               := "play-ebean",
-    crossScalaVersions := Seq(scala212, scala213),
+    scalaVersion       := scala213,
+    crossScalaVersions := Seq(scala213),
     Dependencies.ebean,
     mimaSettings,
     Compile / compile := enhanceEbeanClasses(
@@ -55,13 +56,14 @@ lazy val core = project
 lazy val plugin = project
   .in(file("sbt-play-ebean"))
   .enablePlugins(SbtPlugin)
-  .disablePlugins(MimaPlugin)
   .settings(
     name         := "sbt-play-ebean",
     organization := "com.typesafe.play",
     Dependencies.plugin,
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
-    crossScalaVersions := Seq(scala212),
+    scalaVersion          := scala212,
+    crossScalaVersions    := Seq(scala212),
+    mimaPreviousArtifacts := Set.empty,
     Compile / resourceGenerators += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq(
       s"-Dscala.version=${scalaVersion.value}",
