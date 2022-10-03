@@ -60,9 +60,9 @@ lazy val plugin = project
     organization := "com.typesafe.play",
     Dependencies.plugin,
     addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
-    scalaVersion := scala212,
+    scalaVersion          := scala212,
     mimaPreviousArtifacts := Set.empty,
-    crossScalaVersions := Seq(scala212),
+    crossScalaVersions    := Seq(scala212),
     Compile / resourceGenerators += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq(
       s"-Dscala.version=${scalaVersion.value}",
