@@ -33,10 +33,5 @@ object Dependencies {
     "io.ebean"           % "ebean"                % Versions.ebean,
     "io.ebean"           % "ebean-agent"          % Versions.ebean,
     "com.typesafe"       % "config"               % Versions.typesafeConfig,
-    "com.typesafe.play" %% "play-java-jdbc"       % Versions.play,
-    "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
-    "com.typesafe.play" %% "play-guice"           % Versions.play % Test,
-    "com.typesafe.play" %% "filters-helpers"      % Versions.play % Test,
-    "com.typesafe.play" %% "play-test"            % Versions.play % Test
   )
 }
