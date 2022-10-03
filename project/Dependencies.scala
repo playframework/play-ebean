@@ -30,8 +30,8 @@ object Dependencies {
   )
 
   val plugin = libraryDependencies ++= Seq(
-    "io.ebean"           % "ebean"                % Versions.ebean,
-    "io.ebean"           % "ebean-agent"          % Versions.ebean,
-    "com.typesafe"       % "config"               % Versions.typesafeConfig,
+    "io.ebean"     % "ebean"       % Versions.ebean,
+    "io.ebean"     % "ebean-agent" % Versions.ebean,
+    "com.typesafe" % "config"      % Versions.typesafeConfig,
   )
 }
