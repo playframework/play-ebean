@@ -22,7 +22,7 @@ object Common extends AutoPlugin {
       organizationName     := "Lightbend Inc.",
       organizationHomepage := Some(url("https://www.lightbend.com/")),
       // scala settings
-      scalaVersion := scala212,
+      scalaVersion := scala213,
       scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-encoding", "utf8"),
       javacOptions ++= Seq("-encoding", "UTF-8"),
       // legal
