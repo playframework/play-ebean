@@ -2,7 +2,6 @@ import sbt.Keys._
 
 import sbt._
 import sbt.plugins.JvmPlugin
-import Dependencies.ScalaVersions._
 import de.heikoseeberger.sbtheader.HeaderPlugin
 
 object Common extends AutoPlugin {
@@ -21,8 +20,6 @@ object Common extends AutoPlugin {
       organization         := "com.typesafe.play",
       organizationName     := "Lightbend Inc.",
       organizationHomepage := Some(url("https://www.lightbend.com/")),
-      // scala settings
-      scalaVersion := scala213,
       scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-encoding", "utf8"),
       javacOptions ++= Seq("-encoding", "UTF-8"),
       // legal
