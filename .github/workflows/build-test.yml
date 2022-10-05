@@ -28,7 +28,7 @@ jobs:
     uses: playframework/.github/.github/workflows/cmd.yml@v3
     with:
       java: 17, 11
-      scala: 2.13.9
+      scala: 2.13.x
       cmd: cd docs && sbt validateDocs evaluateSbtFiles
 
   tests:
@@ -40,7 +40,7 @@ jobs:
     uses: playframework/.github/.github/workflows/cmd.yml@v3
     with:
       java: 17, 11
-      scala: 2.13.9
+      scala: 2.13.x
       cmd: sbt +publishLocal +plugin/test +plugin/scripted
 
   finish:
