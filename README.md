@@ -42,3 +42,7 @@ The Play Ebean plugin supports several different versions of Play and Ebean.
 > * Release Candidate: these releases are not stable and should not be used in production.
 
 We also recommend using the payintech fork: https://github.com/payintech/play-ebean
+
+## Releasing a new version
+
+See https://github.com/playframework/.github/blob/main/RELEASING.md
