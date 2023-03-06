@@ -36,7 +36,7 @@ In this example, we have access to two Ebean servers - each using its own databa
 
 Each `ebean.` config line (as above) can map *any* classes that Ebean may be interested in registering (eg. `@Entity`/`Model` classes, `@Embeddable`s, custom `ScalarType`s and `CompoundType`s, `BeanPersistController`s, `BeanPersistListener`s, `BeanFinder`s, `ServerConfigStartup`s, etc). These can be individually listed separated by commas, and/or you can use the wildcard `.*`. For example, `models.*` registers with Ebean all classes within the models package that Ebean can make use of.
 
-To customise the underlying Ebean Server configuration, you can either add a `conf/ebean.properties` file, or create an instance of the `ServerConfigStartup` interface to programmatically manipulate the Ebean `ServerConfig` before the server is initialised.
+To customise the underlying Ebean Server configuration, you can either add a [`conf/application.yaml`](https://ebean.io/docs/intro/configuration/) file, or create an instance of the `ServerConfigStartup` interface to programmatically manipulate the Ebean `ServerConfig` before the server is initialised.
 
 As an example, the fairly common problem of reducing the sequence batch size in order to minimise sequence gaps, could be solved quite simply with a class like this:
 
