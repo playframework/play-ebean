@@ -33,9 +33,9 @@ object Common extends AutoPlugin {
         )
       ),
       developers += Developer(
-        "contributors",
-        "Contributors",
-        "https://gitter.im/playframework/contributors",
+        "playframework",
+        "Play Framework Team",
+        "contact@playframework.com",
         url("https://github.com/playframework")
       )
     )
