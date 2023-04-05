@@ -17,10 +17,14 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
 }
 
 lazy val mimaSettings = Seq(
-  mimaPreviousArtifacts := Set(
-    organization.value %% name.value % "6.0.0" // previousStableVersion.value
-    // .getOrElse(throw new Error("Unable to determine previous version"))
-  ),
+  mimaPreviousArtifacts := {
+    if (scalaBinaryVersion.value == "3") Set.empty[ModuleID]
+    else
+      Set(
+        organization.value %% name.value % "6.0.0" // previousStableVersion.value
+        // .getOrElse(throw new Error("Unable to determine previous version"))
+      )
+  },
   mimaBinaryIssueFilters ++= Seq(
     // https://github.com/playframework/play-ebean/pull/281 - Removed io.ebean.EbeanServer in Ebean 13.6.0
     ProblemFilters.exclude[IncompatibleMethTypeProblem]("play.db.ebean.EbeanDynamicEvolutions.generateEvolutionScript")
