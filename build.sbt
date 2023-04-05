@@ -67,8 +67,6 @@ lazy val plugin = project
     mimaPreviousArtifacts := Set.empty,
     Compile / resourceGenerators += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq(
-      s"-Dscala.version=${scalaVersion.value}",
-      s"-Dscala.crossVersions=${(core / crossScalaVersions).value.mkString(",")}",
       s"-Dproject.version=${version.value}",
     ),
     scriptedBufferLog    := false,

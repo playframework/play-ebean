@@ -28,8 +28,8 @@ jobs:
     uses: playframework/.github/.github/workflows/cmd.yml@v3
     with:
       java: 17, 11
-      scala: 2.13.x
-      cmd: cd docs && sbt validateDocs evaluateSbtFiles
+      scala: 2.13.x, 3.x
+      cmd: cd docs && sbt ++$MATRIX_SCALA validateDocs evaluateSbtFiles
 
   tests:
     name: Tests
@@ -40,12 +40,33 @@ jobs:
     uses: playframework/.github/.github/workflows/cmd.yml@v3
     with:
       java: 17, 11
-      scala: 2.13.x
-      cmd: sbt +publishLocal +plugin/test +plugin/scripted
+      scala: 2.13.x, 3.x
+      cmd: >-
+        sbt ++$MATRIX_SCALA test
+
+  scripted-tests:
+    name: Scripted tests
+    needs:
+      - "check-code-style"
+      - "check-binary-compatibility"
+      - "check-docs"
+    uses: playframework/.github/.github/workflows/cmd.yml@v3
+    with:
+      java: 17, 11
+      scala: 2.13.10, 3.3.0-RC3
+      cmd: >-
+        sbt "
+          +publishLocal;
+          set plugin/scriptedLaunchOpts += \"-Dscala.version=$MATRIX_SCALA\";
+          show scriptedSbt;
+          show scriptedLaunchOpts;
+          plugin/scripted;
+        "
 
   finish:
     name: Finish
     if: github.event_name == 'pull_request'
     needs: # Should be last
       - "tests"
+      - "scripted-tests"
     uses: playframework/.github/.github/workflows/rtm.yml@v3
