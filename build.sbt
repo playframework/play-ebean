@@ -1,6 +1,6 @@
 import Dependencies.ScalaVersions.scala212
 import Dependencies.ScalaVersions.scala213
-import Dependencies.ScalaVersions.scala33
+import Dependencies.ScalaVersions.scala3
 import Dependencies.Versions
 import com.typesafe.tools.mima.core._
 import sbt.Append.appendSeq
@@ -32,7 +32,7 @@ lazy val root = project
   .aggregate(core, plugin)
   .disablePlugins(MimaPlugin)
   .settings(
-    scalaVersion       := scala33,
+    scalaVersion       := scala3,
     name               := "play-ebean-root",
     crossScalaVersions := Nil,
     publish / skip     := true,
@@ -42,8 +42,8 @@ lazy val core = project
   .in(file("play-ebean"))
   .settings(
     name               := "play-ebean",
-    scalaVersion       := scala33,
-    crossScalaVersions := Seq(scala213, scala33),
+    scalaVersion       := scala213,
+    crossScalaVersions := Seq(scala213, scala3),
     Dependencies.ebean,
     mimaSettings,
     Compile / compile := enhanceEbeanClasses(
