@@ -14,7 +14,7 @@ lazy val docs = project
     Test / unmanagedResourceDirectories := Nil,
     Test / parallelExecution            := false,
     scalaVersion                        := "2.13.10",
-    crossScalaVersions                  := Seq("2.13.10", "3.3.0-RC3"),
+    crossScalaVersions                  := Seq("2.13.10", "3.3.0-RC5"),
   )
   .settings(PlayEbean.unscopedSettings: _*)
   .settings(
