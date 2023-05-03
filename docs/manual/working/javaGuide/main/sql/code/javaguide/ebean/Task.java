@@ -3,7 +3,7 @@
 package javaguide.ebean;
 
 import java.util.*;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import io.ebean.*;
 import play.data.format.*;
