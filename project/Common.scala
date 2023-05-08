@@ -43,6 +43,10 @@ object Common extends AutoPlugin {
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       headerEmptyLine := false,
-      headerLicense   := Some(HeaderLicense.Custom("Copyright (C) Lightbend Inc. <https://www.lightbend.com>"))
+      headerLicense := Some(
+        HeaderLicense.Custom(
+          "Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>"
+        )
+      )
     )
 }
