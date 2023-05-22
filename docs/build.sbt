@@ -16,6 +16,9 @@ lazy val docs = project
     scalaVersion                        := "2.13.10",
     crossScalaVersions                  := Seq("2.13.10", "3.3.0-RC5"),
   )
+  .settings(
+    Test / javafmt / sourceDirectories ++= (Test / unmanagedSourceDirectories).value,
+  )
   .settings(PlayEbean.unscopedSettings: _*)
   .settings(
     inConfig(Test)(
@@ -27,3 +30,18 @@ lazy val docs = project
   .dependsOn(playEbean)
 
 lazy val playEbean = ProjectRef(Path.fileProperty("user.dir").getParentFile, "core")
+
+// TODO: use common.sbt instead
+addCommandAlias(
+  "validateCode",
+  List(
+    "scalafmtSbtCheck",
+    "scalafmtCheckAll",
+    "javafmtCheckAll"
+  ).mkString(";") + sys.props.get("sbt_validateCode").map(";" + _).getOrElse("")
+)
+
+val _ = sys.props += ("sbt_validateCode" -> List(
+  "evaluateSbtFiles",
+  "validateDocs",
+).mkString(";"))
