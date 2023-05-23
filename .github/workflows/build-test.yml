@@ -29,7 +29,7 @@ jobs:
     with:
       java: 17, 11
       scala: 2.13.x, 3.x
-      cmd: cd docs && sbt ++$MATRIX_SCALA validateDocs evaluateSbtFiles
+      cmd: cd docs && sbt ++$MATRIX_SCALA validateCode
 
   tests:
     name: Tests

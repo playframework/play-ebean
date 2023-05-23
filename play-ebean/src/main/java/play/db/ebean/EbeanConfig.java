@@ -4,13 +4,11 @@
 package play.db.ebean;
 
 import io.ebean.config.DatabaseConfig;
-
 import java.util.Map;
 
 public interface EbeanConfig {
 
-    String defaultServer();
+  String defaultServer();
 
-    Map<String, DatabaseConfig> serverConfigs();
-
+  Map<String, DatabaseConfig> serverConfigs();
 }
