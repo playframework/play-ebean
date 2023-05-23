@@ -1,8 +1,15 @@
-import sbt.Keys._
+/*
+ * Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
+ */
 
-import sbt._
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.HeaderPattern.commentBetween
+import sbt.Keys.*
+import sbt.*
 import sbt.plugins.JvmPlugin
+import de.heikoseeberger.sbtheader.CommentStyle
+import de.heikoseeberger.sbtheader.FileType
 import de.heikoseeberger.sbtheader.HeaderPlugin
+import de.heikoseeberger.sbtheader.LineCommentCreator
 
 object Common extends AutoPlugin {
 
@@ -46,6 +53,11 @@ object Common extends AutoPlugin {
         HeaderLicense.Custom(
           "Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>"
         )
+      ),
+      headerMappings ++= Map(
+        FileType("sbt")        -> HeaderCommentStyle.cppStyleLineComment,
+        FileType("properties") -> HeaderCommentStyle.hashLineComment,
+        FileType("md") -> CommentStyle(new LineCommentCreator("<!---", "-->"), commentBetween("<!---", "*", "-->"))
       )
     )
 }

@@ -1,3 +1,11 @@
+// Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
+
+import de.heikoseeberger.sbtheader.CommentStyle
+import de.heikoseeberger.sbtheader.FileType
+import de.heikoseeberger.sbtheader.HeaderPlugin
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.HeaderPattern.commentBetween
+import de.heikoseeberger.sbtheader.LineCommentCreator
+
 SettingKey[Seq[File]]("migrationManualSources") := Nil
 
 lazy val docs = project
@@ -19,6 +27,21 @@ lazy val docs = project
   .settings(
     Test / javafmt / sourceDirectories ++= (Test / unmanagedSourceDirectories).value,
   )
+  .settings(
+    headerLicense := Some(
+      HeaderLicense.Custom(
+        "Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>"
+      )
+    ),
+    headerMappings ++= Map(
+      FileType("sbt")        -> HeaderCommentStyle.cppStyleLineComment,
+      FileType("properties") -> HeaderCommentStyle.hashLineComment,
+      FileType("md") -> CommentStyle(new LineCommentCreator("<!---", "-->"), commentBetween("<!---", "*", "-->"))
+    ),
+    Compile / headerSources ++=
+      ((baseDirectory.value ** ("*.properties" || "*.md" || "*.sbt"))
+        --- (baseDirectory.value ** "target" ** "*")).get,
+  )
   .settings(PlayEbean.unscopedSettings: _*)
   .settings(
     inConfig(Test)(
@@ -35,6 +58,7 @@ lazy val playEbean = ProjectRef(Path.fileProperty("user.dir").getParentFile, "co
 addCommandAlias(
   "validateCode",
   List(
+    "headerCheckAll",
     "scalafmtSbtCheck",
     "scalafmtCheckAll",
     "javafmtCheckAll"

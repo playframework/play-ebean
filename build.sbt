@@ -1,3 +1,5 @@
+// Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
+
 import Dependencies.ScalaVersions.scala212
 import Dependencies.ScalaVersions.scala213
 import Dependencies.ScalaVersions.scala3
@@ -41,6 +43,15 @@ lazy val root = project
     crossScalaVersions := Nil,
     publish / skip     := true,
   )
+  .settings(
+    (Compile / headerSources) ++=
+      ((baseDirectory.value ** ("*.properties" || "*.md" || "*.sbt"))
+        --- (baseDirectory.value ** "target" ** "*")
+        --- (baseDirectory.value / ".github" ** "*")
+        --- (baseDirectory.value / "docs" ** "*")
+        --- (baseDirectory.value / "sbt-play-ebean" ** "*")).get ++
+        (baseDirectory.value / "project" ** "*.scala" --- (baseDirectory.value ** "target" ** "*")).get
+  )
 
 lazy val core = project
   .in(file("play-ebean"))
@@ -75,6 +86,10 @@ lazy val plugin = project
     ),
     scriptedBufferLog    := false,
     scriptedDependencies := ((): Unit),
+  )
+  .settings(
+    (Compile / headerSources) ++=
+      (sourceDirectory.value / "sbt-test" ** ("*.java" || "*.sbt")).get
   )
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
