@@ -137,13 +137,3 @@ def generateVersionFile =
     IO.write(file, content)
     Seq(file)
   }
-
-addCommandAlias(
-  "validateCode",
-  List(
-    "headerCheckAll",
-    "scalafmtSbtCheck",
-    "scalafmtCheckAll",
-    "javafmtCheckAll",
-  ).mkString(";")
-)
