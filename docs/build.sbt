@@ -54,17 +54,6 @@ lazy val docs = project
 
 lazy val playEbean = ProjectRef(Path.fileProperty("user.dir").getParentFile, "core")
 
-// TODO: use common.sbt instead
-addCommandAlias(
-  "validateCode",
-  List(
-    "headerCheckAll",
-    "scalafmtSbtCheck",
-    "scalafmtCheckAll",
-    "javafmtCheckAll"
-  ).mkString(";") + sys.props.get("sbt_validateCode").map(";" + _).getOrElse("")
-)
-
 val _ = sys.props += ("sbt_validateCode" -> List(
   "evaluateSbtFiles",
   "validateDocs",
