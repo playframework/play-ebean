@@ -53,7 +53,7 @@ jobs:
     uses: playframework/.github/.github/workflows/cmd.yml@v3
     with:
       java: 17, 11
-      scala: 2.13.10, 3.3.0-RC5
+      scala: 2.13.11, 3.3.0
       cmd: >-
         sbt "
           +publishLocal;
