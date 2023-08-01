@@ -16,7 +16,7 @@ lazy val docs = project
     resolvers ++= DefaultOptions.resolvers(snapshot = true),
     libraryDependencies += component("play-java-forms"),
     libraryDependencies += component("play-test") % Test,
-    libraryDependencies += "com.h2database"       % "h2" % "2.1.214" % Test,
+    libraryDependencies += "com.h2database"       % "h2" % "2.2.220" % Test,
     PlayDocsKeys.javaManualSourceDirectories := (baseDirectory.value / "manual" / "working" / "javaGuide" ** "code").get,
     // No resource directories shuts the ebean agent up about java sources in the classes directory
     Test / unmanagedResourceDirectories := Nil,
