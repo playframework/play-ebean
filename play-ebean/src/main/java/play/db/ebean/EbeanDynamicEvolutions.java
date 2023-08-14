@@ -71,7 +71,9 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                   content =
                       new String(Files.readAllBytes(evolutions.toPath()), StandardCharsets.UTF_8);
                 }
-                if (content.isEmpty() || content.startsWith("# --- Created by Ebean DDL")) {
+                if (content.isEmpty()
+                    || content.startsWith("# --- Created by Ebean DDL")
+                    || content.startsWith("-- Created by Ebean DDL")) {
                   environment.getFile("conf/evolutions/" + key).mkdirs();
                   if (!content.equals(evolutionScript)) {
                     Files.write(
@@ -104,14 +106,14 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
       return null;
     }
 
-    return "# --- Created by Ebean DDL\r\n"
-        + "# To stop Ebean DDL generation, remove this comment and start using Evolutions\r\n"
+    return "-- Created by Ebean DDL\r\n"
+        + "-- To stop Ebean DDL generation, remove this comment (both lines) and start using Evolutions\r\n"
         + "\r\n"
-        + "# --- !Ups\r\n"
+        + "-- !Ups\r\n"
         + "\r\n"
         + ups
         + "\r\n"
-        + "# --- !Downs\r\n"
+        + "-- !Downs\r\n"
         + "\r\n"
         + downs;
   }
