@@ -4,7 +4,9 @@
 
 package play.db.ebean;
 
+import play.api.db.evolutions.DefaultEvolutionsConfigParser;
 import play.api.db.evolutions.DynamicEvolutions;
+import play.api.db.evolutions.EvolutionsConfig;
 import play.components.ConfigurationComponents;
 import play.db.DBComponents;
 
@@ -12,10 +14,15 @@ import play.db.DBComponents;
 public interface EBeanComponents extends ConfigurationComponents, DBComponents {
 
   default DynamicEvolutions dynamicEvolutions() {
-    return new EbeanDynamicEvolutions(ebeanConfig(), environment(), applicationLifecycle());
+    return new EbeanDynamicEvolutions(
+        ebeanConfig(), environment(), applicationLifecycle(), evolutionsConfig());
   }
 
   default EbeanConfig ebeanConfig() {
     return new DefaultEbeanConfig.EbeanConfigParser(config(), environment(), dbApi()).get();
+  }
+
+  default EvolutionsConfig evolutionsConfig() {
+    return new DefaultEvolutionsConfigParser(configuration()).parse();
   }
 }

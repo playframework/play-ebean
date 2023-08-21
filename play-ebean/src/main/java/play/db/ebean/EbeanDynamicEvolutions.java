@@ -19,6 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;
+import play.api.db.evolutions.Evolutions$;
+import play.api.db.evolutions.EvolutionsConfig;
 import play.inject.ApplicationLifecycle;
 
 /** A Play module that automatically manages Ebean configuration. */
@@ -28,13 +30,19 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
   private final EbeanConfig config;
   private final Environment environment;
 
+  private final EvolutionsConfig evolutionsConfig;
+
   private final Map<String, Database> databases = new HashMap<>();
 
   @Inject
   public EbeanDynamicEvolutions(
-      EbeanConfig config, Environment environment, ApplicationLifecycle lifecycle) {
+      EbeanConfig config,
+      Environment environment,
+      ApplicationLifecycle lifecycle,
+      EvolutionsConfig evolutionsConfig) {
     this.config = config;
     this.environment = environment;
+    this.evolutionsConfig = evolutionsConfig;
     start();
     lifecycle.addStopHook(
         () -> {
@@ -64,7 +72,10 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
               if (evolutionScript == null) {
                 return;
               }
-              File evolutions = environment.getFile("conf/evolutions/" + key + "/1.sql");
+              File evolutions =
+                  environment.getFile(
+                      Evolutions$.MODULE$.fileName(
+                          key, 1, evolutionsConfig.forDatasource(key).path()));
               try {
                 String content = "";
                 if (evolutions.exists()) {
@@ -74,7 +85,11 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                 if (content.isEmpty()
                     || content.startsWith("# --- Created by Ebean DDL")
                     || content.startsWith("-- Created by Ebean DDL")) {
-                  environment.getFile("conf/evolutions/" + key).mkdirs();
+                  environment
+                      .getFile(
+                          Evolutions$.MODULE$.directoryName(
+                              key, evolutionsConfig.forDatasource(key).path()))
+                      .mkdirs();
                   if (!content.equals(evolutionScript)) {
                     Files.write(
                         evolutions.toPath(), evolutionScript.getBytes(StandardCharsets.UTF_8));

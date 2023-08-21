@@ -29,7 +29,9 @@ lazy val mimaSettings = Seq(
   },
   mimaBinaryIssueFilters ++= Seq(
     // https://github.com/playframework/play-ebean/pull/281 - Removed io.ebean.EbeanServer in Ebean 13.6.0
-    ProblemFilters.exclude[IncompatibleMethTypeProblem]("play.db.ebean.EbeanDynamicEvolutions.generateEvolutionScript")
+    ProblemFilters.exclude[IncompatibleMethTypeProblem]("play.db.ebean.EbeanDynamicEvolutions.generateEvolutionScript"),
+    // https://github.com/playframework/play-ebean/pull/387 - Respect `play.evolutions[.db.default].path` config for dynamic evolutions
+    ProblemFilters.exclude[DirectMissingMethodProblem]("play.db.ebean.EbeanDynamicEvolutions.this"),
   )
 )
 
