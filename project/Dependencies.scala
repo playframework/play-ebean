@@ -15,7 +15,7 @@ object Dependencies {
   }
 
   object Versions {
-    val play: String   = "2.9.0-M6"
+    val play: String   = "2.9.0-M7"
     val ebean          = "13.17.3"
     val ebeanJakarta   = s"$ebean-jakarta"
     val typesafeConfig = "1.4.2"
@@ -28,7 +28,7 @@ object Dependencies {
     "com.typesafe.play" %% "play-java-jdbc"       % Versions.play,
     "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
     "com.typesafe.play" %% "play-guice"           % Versions.play % Test,
-    "com.typesafe.play" %% "filters-helpers"      % Versions.play % Test,
+    "com.typesafe.play" %% "play-filters-helpers" % Versions.play % Test,
     "com.typesafe.play" %% "play-test"            % Versions.play % Test,
     ("org.reflections"   % "reflections"          % "0.10.2")
       .exclude("com.google.code.findbugs", "annotations")
