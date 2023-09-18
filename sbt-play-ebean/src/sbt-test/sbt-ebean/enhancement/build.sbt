@@ -14,4 +14,4 @@ Test / javaSource := baseDirectory.value / "tests"
 
 resolvers ++= DefaultOptions.resolvers(snapshot = true)
 
-libraryDependencies += "com.h2database" % "h2" % "2.2.222"
+libraryDependencies += "com.h2database" % "h2" % "2.2.224"
