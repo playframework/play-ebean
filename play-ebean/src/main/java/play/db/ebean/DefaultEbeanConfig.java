@@ -18,6 +18,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import play.Environment;
+import play.Logger;
 import play.db.DBApi;
 
 /** Ebean server configuration. */
@@ -49,6 +50,8 @@ public class DefaultEbeanConfig implements EbeanConfig {
     private final Environment environment;
     private final DBApi dbApi;
 
+    private static final Logger.ALogger LOGGER = Logger.of(DefaultEbeanConfig.class);
+
     @Inject
     public EbeanConfigParser(Config config, Environment environment, DBApi dbApi) {
       this.config = config;
@@ -74,6 +77,12 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
       for (Map.Entry<String, List<String>> entry : ebeanConfig.getDatasourceModels().entrySet()) {
         String key = entry.getKey();
+
+        if (dbApi.getDatabase(key) == null) {
+          LOGGER.debug("There is an 'ebean.{}' but no 'db.{}' configuration", key, key);
+          LOGGER.info("Skipping connection for datasource '{}'", key);
+          continue;
+        }
 
         DatabaseConfig serverConfig = new DatabaseConfig();
         serverConfig.setName(key);
