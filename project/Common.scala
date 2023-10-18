@@ -24,7 +24,7 @@ object Common extends AutoPlugin {
   override def globalSettings: Seq[Setting[_]] =
     Seq(
       // organization
-      organization         := "com.typesafe.play",
+      organization         := "org.playframework",
       organizationName     := "The Play Framework Project",
       organizationHomepage := Some(url("https://playframework.com/")),
       scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-encoding", "utf8"),

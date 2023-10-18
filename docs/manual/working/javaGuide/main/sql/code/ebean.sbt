@@ -1,7 +1,7 @@
 // Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
 
 //#add-sbt-plugin
-addSbtPlugin("com.typesafe.play" % "sbt-play-ebean" % "6.2.0")
+addSbtPlugin("org.playframework" % "sbt-play-ebean" % "8.0.0")
 //#add-sbt-plugin
 
 //#enable-plugin
