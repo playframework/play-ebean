@@ -19,7 +19,12 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
 }
 
 lazy val mimaSettings = Seq(
-  mimaPreviousArtifacts := Set.empty, // TODO: revert
+  mimaPreviousArtifacts :=
+    Set(
+      organization.value %% name.value % previousStableVersion.value.getOrElse(
+        throw new Error("Unable to determine previous version")
+      )
+    ),
   mimaBinaryIssueFilters ++= Seq(
   )
 )
