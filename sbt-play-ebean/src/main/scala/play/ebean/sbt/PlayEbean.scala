@@ -56,7 +56,7 @@ object PlayEbean extends AutoPlugin {
       playEbeanVersion    := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
       libraryDependencies ++=
         Seq(
-          "com.typesafe.play" %% "play-ebean"   % playEbeanVersion.value,
+          "org.playframework" %% "play-ebean"   % playEbeanVersion.value,
           "org.glassfish.jaxb" % "jaxb-runtime" % "4.0.3"
         )
     )

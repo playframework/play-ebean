@@ -19,12 +19,7 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
 }
 
 lazy val mimaSettings = Seq(
-  mimaPreviousArtifacts :=
-    Set(
-      organization.value %% name.value % previousStableVersion.value.getOrElse(
-        throw new Error("Unable to determine previous version")
-      )
-    ),
+  mimaPreviousArtifacts := Set.empty, // TODO: revert
   mimaBinaryIssueFilters ++= Seq(
   )
 )
@@ -70,9 +65,9 @@ lazy val plugin = project
   .enablePlugins(SbtPlugin)
   .settings(
     name         := "sbt-play-ebean",
-    organization := "com.typesafe.play",
+    organization := "org.playframework",
     Dependencies.plugin,
-    addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
+    addSbtPlugin("org.playframework" % "sbt-plugin" % Versions.play),
     scalaVersion          := scala212,
     crossScalaVersions    := Seq(scala212),
     mimaPreviousArtifacts := Set.empty,
