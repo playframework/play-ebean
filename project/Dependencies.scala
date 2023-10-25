@@ -18,7 +18,7 @@ object Dependencies {
     val play: String   = "3.0.0-M3"
     val ebean          = "13.17.3"
     val ebeanJakarta   = s"$ebean-jakarta"
-    val typesafeConfig = "1.4.2"
+    val typesafeConfig = "1.4.3"
   }
 
   val ebean = libraryDependencies ++= Seq(
