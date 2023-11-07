@@ -18,7 +18,7 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
   s
 }
 
-val previousVersion: Option[String] = Some("8.0.0-M1")
+val previousVersion: Option[String] = Some("8.0.0")
 
 lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := previousVersion.map(organization.value %% moduleName.value % _).toSet,
