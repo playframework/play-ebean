@@ -8,6 +8,7 @@ import io.ebean.config.DatabaseConfig;
 import java.util.Map;
 
 public interface EbeanConfig {
+  Boolean ddlGenerate();
 
   String defaultServer();
 
