@@ -24,13 +24,22 @@ import play.db.DBApi;
 /** Ebean server configuration. */
 @Singleton
 public class DefaultEbeanConfig implements EbeanConfig {
+  private final Boolean ddlGenerate;
 
   private final String defaultServer;
+
   private final Map<String, DatabaseConfig> serverConfigs;
 
-  public DefaultEbeanConfig(String defaultServer, Map<String, DatabaseConfig> serverConfigs) {
+  public DefaultEbeanConfig(
+      Boolean ddlGenerate, String defaultServer, Map<String, DatabaseConfig> serverConfigs) {
+    this.ddlGenerate = ddlGenerate;
     this.defaultServer = defaultServer;
     this.serverConfigs = serverConfigs;
+  }
+
+  @Override
+  public Boolean ddlGenerate() {
+    return ddlGenerate;
   }
 
   @Override
@@ -70,7 +79,6 @@ public class DefaultEbeanConfig implements EbeanConfig {
      * @return a config for Ebean servers.
      */
     public EbeanConfig parse() {
-
       EbeanParsedConfig ebeanConfig = EbeanParsedConfig.parseFromConfig(config);
 
       Map<String, DatabaseConfig> serverConfigs = new HashMap<>();
@@ -100,7 +108,8 @@ public class DefaultEbeanConfig implements EbeanConfig {
         serverConfigs.put(key, serverConfig);
       }
 
-      return new DefaultEbeanConfig(ebeanConfig.getDefaultDatasource(), serverConfigs);
+      return new DefaultEbeanConfig(
+          ebeanConfig.getDdlGenerate(), ebeanConfig.getDefaultDatasource(), serverConfigs);
     }
 
     private void setServerConfigDataSource(String key, DatabaseConfig serverConfig) {

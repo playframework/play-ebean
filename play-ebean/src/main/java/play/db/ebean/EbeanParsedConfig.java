@@ -17,12 +17,19 @@ import java.util.Map;
  */
 public class EbeanParsedConfig {
 
+  private final Boolean ddlGenerate;
   private final String defaultDatasource;
   private final Map<String, List<String>> datasourceModels;
 
-  public EbeanParsedConfig(String defaultDatasource, Map<String, List<String>> datasourceModels) {
+  public EbeanParsedConfig(
+      Boolean ddlGenerate, String defaultDatasource, Map<String, List<String>> datasourceModels) {
+    this.ddlGenerate = ddlGenerate;
     this.defaultDatasource = defaultDatasource;
     this.datasourceModels = datasourceModels;
+  }
+
+  public Boolean getDdlGenerate() {
+    return ddlGenerate;
   }
 
   public String getDefaultDatasource() {
@@ -42,8 +49,9 @@ public class EbeanParsedConfig {
    */
   public static EbeanParsedConfig parseFromConfig(Config config) {
     Config playEbeanConfig = config.getConfig("play.ebean");
-    String defaultDatasource = playEbeanConfig.getString("defaultDatasource");
     String ebeanConfigKey = playEbeanConfig.getString("config");
+    Boolean ebeanDdlGenerateKey = playEbeanConfig.getBoolean("ddlGenerate");
+    String ebeanDefaultDatasourceKey = playEbeanConfig.getString("defaultDatasource");
 
     Map<String, List<String>> datasourceModels = new HashMap<>();
 
@@ -64,6 +72,6 @@ public class EbeanParsedConfig {
                 datasourceModels.put(key, models);
               });
     }
-    return new EbeanParsedConfig(defaultDatasource, datasourceModels);
+    return new EbeanParsedConfig(ebeanDdlGenerateKey, ebeanDefaultDatasourceKey, datasourceModels);
   }
 }
