@@ -24,9 +24,9 @@ public class EbeanParsedConfigTest {
   @Test
   public void defaultConfig() {
     EbeanParsedConfig config = parse(Collections.emptyMap());
-    assertThat(config.getDdlGenerate(), equalTo(Boolean.TRUE));
     assertThat(config.getDefaultDatasource(), equalTo("default"));
     assertThat(config.getDatasourceModels().size(), equalTo(0));
+    assertThat(config.generateEvolutionsScripts(), equalTo(Boolean.TRUE));
   }
 
   @Test
@@ -54,9 +54,10 @@ public class EbeanParsedConfigTest {
   }
 
   @Test
-  public void disableDdlGenerate() {
-    EbeanParsedConfig config = parse(ImmutableMap.of("play.ebean.ddlGenerate", false));
-    assertThat(config.getDdlGenerate(), equalTo(Boolean.FALSE));
+  public void disableGenerateEvolutionsScripts() {
+    EbeanParsedConfig config =
+        parse(ImmutableMap.of("play.ebean.generateEvolutionsScripts", false));
+    assertThat(config.generateEvolutionsScripts(), equalTo(Boolean.FALSE));
   }
 
   @Test

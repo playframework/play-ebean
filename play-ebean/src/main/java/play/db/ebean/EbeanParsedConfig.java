@@ -16,20 +16,23 @@ import java.util.Map;
  * database connection pools to create.
  */
 public class EbeanParsedConfig {
-
-  private final Boolean ddlGenerate;
   private final String defaultDatasource;
+
   private final Map<String, List<String>> datasourceModels;
 
+  private final Boolean generateEvolutionsScripts;
+
   public EbeanParsedConfig(
-      Boolean ddlGenerate, String defaultDatasource, Map<String, List<String>> datasourceModels) {
-    this.ddlGenerate = ddlGenerate;
+      String defaultDatasource,
+      Map<String, List<String>> datasourceModels,
+      Boolean generateEvolutionsScripts) {
     this.defaultDatasource = defaultDatasource;
     this.datasourceModels = datasourceModels;
+    this.generateEvolutionsScripts = generateEvolutionsScripts;
   }
 
-  public Boolean getDdlGenerate() {
-    return ddlGenerate;
+  public EbeanParsedConfig(String defaultDatasource, Map<String, List<String>> datasourceModels) {
+    this(defaultDatasource, datasourceModels, true);
   }
 
   public String getDefaultDatasource() {
@@ -38,6 +41,10 @@ public class EbeanParsedConfig {
 
   public Map<String, List<String>> getDatasourceModels() {
     return datasourceModels;
+  }
+
+  public Boolean generateEvolutionsScripts() {
+    return generateEvolutionsScripts;
   }
 
   /**
@@ -50,8 +57,9 @@ public class EbeanParsedConfig {
   public static EbeanParsedConfig parseFromConfig(Config config) {
     Config playEbeanConfig = config.getConfig("play.ebean");
     String ebeanConfigKey = playEbeanConfig.getString("config");
-    Boolean ebeanDdlGenerateKey = playEbeanConfig.getBoolean("ddlGenerate");
-    String ebeanDefaultDatasourceKey = playEbeanConfig.getString("defaultDatasource");
+    String ebeanDefaultDatasource = playEbeanConfig.getString("defaultDatasource");
+    Boolean ebeanGenerateEvolutionsScripts =
+        playEbeanConfig.getBoolean("generateEvolutionsScripts");
 
     Map<String, List<String>> datasourceModels = new HashMap<>();
 
@@ -72,6 +80,7 @@ public class EbeanParsedConfig {
                 datasourceModels.put(key, models);
               });
     }
-    return new EbeanParsedConfig(ebeanDdlGenerateKey, ebeanDefaultDatasourceKey, datasourceModels);
+    return new EbeanParsedConfig(
+        ebeanDefaultDatasource, datasourceModels, ebeanGenerateEvolutionsScripts);
   }
 }
