@@ -24,22 +24,23 @@ import play.db.DBApi;
 /** Ebean server configuration. */
 @Singleton
 public class DefaultEbeanConfig implements EbeanConfig {
-  private final Boolean ddlGenerate;
-
   private final String defaultServer;
 
   private final Map<String, DatabaseConfig> serverConfigs;
 
+  private final Boolean generateEvolutionsScripts;
+
   public DefaultEbeanConfig(
-      Boolean ddlGenerate, String defaultServer, Map<String, DatabaseConfig> serverConfigs) {
-    this.ddlGenerate = ddlGenerate;
+      String defaultServer,
+      Map<String, DatabaseConfig> serverConfigs,
+      Boolean generateEvolutionsScripts) {
     this.defaultServer = defaultServer;
     this.serverConfigs = serverConfigs;
+    this.generateEvolutionsScripts = generateEvolutionsScripts;
   }
 
-  @Override
-  public Boolean ddlGenerate() {
-    return ddlGenerate;
+  public DefaultEbeanConfig(String defaultServer, Map<String, DatabaseConfig> serverConfigs) {
+    this(defaultServer, serverConfigs, true);
   }
 
   @Override
@@ -52,14 +53,20 @@ public class DefaultEbeanConfig implements EbeanConfig {
     return serverConfigs;
   }
 
+  @Override
+  public Boolean generateEvolutionsScripts() {
+    return generateEvolutionsScripts;
+  }
+
   @Singleton
   public static class EbeanConfigParser implements Provider<EbeanConfig> {
+    private static final Logger.ALogger LOGGER = Logger.of(DefaultEbeanConfig.class);
 
     private final Config config;
-    private final Environment environment;
-    private final DBApi dbApi;
 
-    private static final Logger.ALogger LOGGER = Logger.of(DefaultEbeanConfig.class);
+    private final Environment environment;
+
+    private final DBApi dbApi;
 
     @Inject
     public EbeanConfigParser(Config config, Environment environment, DBApi dbApi) {
@@ -109,7 +116,9 @@ public class DefaultEbeanConfig implements EbeanConfig {
       }
 
       return new DefaultEbeanConfig(
-          ebeanConfig.getDdlGenerate(), ebeanConfig.getDefaultDatasource(), serverConfigs);
+          ebeanConfig.getDefaultDatasource(),
+          serverConfigs,
+          ebeanConfig.generateEvolutionsScripts());
     }
 
     private void setServerConfigDataSource(String key, DatabaseConfig serverConfig) {
