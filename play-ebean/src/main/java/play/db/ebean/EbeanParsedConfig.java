@@ -16,16 +16,17 @@ import java.util.Map;
  * database connection pools to create.
  */
 public class EbeanParsedConfig {
+
   private final String defaultDatasource;
 
   private final Map<String, List<String>> datasourceModels;
 
-  private final Boolean generateEvolutionsScripts;
+  private final boolean generateEvolutionsScripts;
 
   public EbeanParsedConfig(
       String defaultDatasource,
       Map<String, List<String>> datasourceModels,
-      Boolean generateEvolutionsScripts) {
+      boolean generateEvolutionsScripts) {
     this.defaultDatasource = defaultDatasource;
     this.datasourceModels = datasourceModels;
     this.generateEvolutionsScripts = generateEvolutionsScripts;
@@ -43,7 +44,7 @@ public class EbeanParsedConfig {
     return datasourceModels;
   }
 
-  public Boolean generateEvolutionsScripts() {
+  public boolean generateEvolutionsScripts() {
     return generateEvolutionsScripts;
   }
 
@@ -56,10 +57,9 @@ public class EbeanParsedConfig {
    */
   public static EbeanParsedConfig parseFromConfig(Config config) {
     Config playEbeanConfig = config.getConfig("play.ebean");
+    String defaultDatasource = playEbeanConfig.getString("defaultDatasource");
     String ebeanConfigKey = playEbeanConfig.getString("config");
-    String ebeanDefaultDatasource = playEbeanConfig.getString("defaultDatasource");
-    Boolean ebeanGenerateEvolutionsScripts =
-        playEbeanConfig.getBoolean("generateEvolutionsScripts");
+    boolean generateEvolutionsScripts = playEbeanConfig.getBoolean("generateEvolutionsScripts");
 
     Map<String, List<String>> datasourceModels = new HashMap<>();
 
@@ -80,7 +80,6 @@ public class EbeanParsedConfig {
                 datasourceModels.put(key, models);
               });
     }
-    return new EbeanParsedConfig(
-        ebeanDefaultDatasource, datasourceModels, ebeanGenerateEvolutionsScripts);
+    return new EbeanParsedConfig(defaultDatasource, datasourceModels, generateEvolutionsScripts);
   }
 }

@@ -8,9 +8,10 @@ import io.ebean.config.DatabaseConfig;
 import java.util.Map;
 
 public interface EbeanConfig {
+
   String defaultServer();
 
   Map<String, DatabaseConfig> serverConfigs();
 
-  Boolean generateEvolutionsScripts();
+  boolean generateEvolutionsScripts();
 }

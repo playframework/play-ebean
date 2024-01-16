@@ -24,16 +24,17 @@ import play.db.DBApi;
 /** Ebean server configuration. */
 @Singleton
 public class DefaultEbeanConfig implements EbeanConfig {
+
   private final String defaultServer;
 
   private final Map<String, DatabaseConfig> serverConfigs;
 
-  private final Boolean generateEvolutionsScripts;
+  private final boolean generateEvolutionsScripts;
 
   public DefaultEbeanConfig(
       String defaultServer,
       Map<String, DatabaseConfig> serverConfigs,
-      Boolean generateEvolutionsScripts) {
+      boolean generateEvolutionsScripts) {
     this.defaultServer = defaultServer;
     this.serverConfigs = serverConfigs;
     this.generateEvolutionsScripts = generateEvolutionsScripts;
@@ -54,19 +55,20 @@ public class DefaultEbeanConfig implements EbeanConfig {
   }
 
   @Override
-  public Boolean generateEvolutionsScripts() {
+  public boolean generateEvolutionsScripts() {
     return generateEvolutionsScripts;
   }
 
   @Singleton
   public static class EbeanConfigParser implements Provider<EbeanConfig> {
-    private static final Logger.ALogger LOGGER = Logger.of(DefaultEbeanConfig.class);
 
     private final Config config;
 
     private final Environment environment;
 
     private final DBApi dbApi;
+
+    private static final Logger.ALogger LOGGER = Logger.of(DefaultEbeanConfig.class);
 
     @Inject
     public EbeanConfigParser(Config config, Environment environment, DBApi dbApi) {
@@ -86,6 +88,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
      * @return a config for Ebean servers.
      */
     public EbeanConfig parse() {
+
       EbeanParsedConfig ebeanConfig = EbeanParsedConfig.parseFromConfig(config);
 
       Map<String, DatabaseConfig> serverConfigs = new HashMap<>();
