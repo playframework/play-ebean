@@ -64,6 +64,9 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
     if (environment.isProd()) {
       return;
     }
+    if (!config.generateEvolutionsScripts()) {
+      return;
+    }
     config
         .serverConfigs()
         .forEach(

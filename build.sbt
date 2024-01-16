@@ -23,6 +23,7 @@ val previousVersion: Option[String] = Some("7.0.0")
 lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := previousVersion.map(organization.value %% moduleName.value % _).toSet,
   mimaBinaryIssueFilters ++= Seq(
+    ProblemFilters.exclude[ReversedMissingMethodProblem]("play.db.ebean.EbeanConfig.generateEvolutionsScripts"),
   )
 )
 
