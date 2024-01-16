@@ -26,11 +26,22 @@ import play.db.DBApi;
 public class DefaultEbeanConfig implements EbeanConfig {
 
   private final String defaultServer;
+
   private final Map<String, DatabaseConfig> serverConfigs;
 
-  public DefaultEbeanConfig(String defaultServer, Map<String, DatabaseConfig> serverConfigs) {
+  private final boolean generateEvolutionsScripts;
+
+  public DefaultEbeanConfig(
+      String defaultServer,
+      Map<String, DatabaseConfig> serverConfigs,
+      boolean generateEvolutionsScripts) {
     this.defaultServer = defaultServer;
     this.serverConfigs = serverConfigs;
+    this.generateEvolutionsScripts = generateEvolutionsScripts;
+  }
+
+  public DefaultEbeanConfig(String defaultServer, Map<String, DatabaseConfig> serverConfigs) {
+    this(defaultServer, serverConfigs, true);
   }
 
   @Override
@@ -43,11 +54,18 @@ public class DefaultEbeanConfig implements EbeanConfig {
     return serverConfigs;
   }
 
+  @Override
+  public boolean generateEvolutionsScripts() {
+    return generateEvolutionsScripts;
+  }
+
   @Singleton
   public static class EbeanConfigParser implements Provider<EbeanConfig> {
 
     private final Config config;
+
     private final Environment environment;
+
     private final DBApi dbApi;
 
     private static final Logger.ALogger LOGGER = Logger.of(DefaultEbeanConfig.class);
@@ -100,7 +118,10 @@ public class DefaultEbeanConfig implements EbeanConfig {
         serverConfigs.put(key, serverConfig);
       }
 
-      return new DefaultEbeanConfig(ebeanConfig.getDefaultDatasource(), serverConfigs);
+      return new DefaultEbeanConfig(
+          ebeanConfig.getDefaultDatasource(),
+          serverConfigs,
+          ebeanConfig.generateEvolutionsScripts());
     }
 
     private void setServerConfigDataSource(String key, DatabaseConfig serverConfig) {
