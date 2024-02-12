@@ -1,5 +1,7 @@
+// Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
+
 //#add-sbt-plugin
-addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "6.1.0")
+addSbtPlugin("org.playframework" % "sbt-play-ebean" % "8.0.0")
 //#add-sbt-plugin
 
 //#enable-plugin
@@ -9,7 +11,7 @@ lazy val myProject = (project in file("."))
 //#enable-plugin
 
 //#play-ebean-models
-playEbeanModels in Compile := Seq("models.*")
+Compile / playEbeanModels := Seq("models.*")
 //#play-ebean-models
 
 //#play-ebean-debug
@@ -23,5 +25,5 @@ playEbeanAgentArgs += ("detect" -> "false")
 //#play-ebean-test
 inConfig(Test)(PlayEbean.scopedSettings)
 
-playEbeanModels in Test := Seq("models.*")
+Test / playEbeanModels := Seq("models.*")
 //#play-ebean-test

@@ -1,8 +1,15 @@
-import sbt.Keys._
-import sbt._
+/*
+ * Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
+ */
+
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.HeaderPattern.commentBetween
+import sbt.Keys.*
+import sbt.*
 import sbt.plugins.JvmPlugin
-import Dependencies.ScalaVersions._
+import de.heikoseeberger.sbtheader.CommentStyle
+import de.heikoseeberger.sbtheader.FileType
 import de.heikoseeberger.sbtheader.HeaderPlugin
+import de.heikoseeberger.sbtheader.LineCommentCreator
 
 object Common extends AutoPlugin {
 
@@ -14,37 +21,43 @@ object Common extends AutoPlugin {
 
   val repoName = "play-ebean"
 
-  override def globalSettings =
+  override def globalSettings: Seq[Setting[_]] =
     Seq(
       // organization
-      organization := "com.typesafe.play",
-      organizationName := "Lightbend Inc.",
-      organizationHomepage := Some(url("https://www.lightbend.com/")),
-      // scala settings
-      scalaVersion := scala212,
+      organization         := "org.playframework",
+      organizationName     := "The Play Framework Project",
+      organizationHomepage := Some(url("https://playframework.com/")),
       scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-encoding", "utf8"),
       javacOptions ++= Seq("-encoding", "UTF-8"),
       // legal
       licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")),
       // on the web
-      homepage := Some(url(s"https://github.com/playframework/${repoName}")),
+      homepage := Some(url(s"https://github.com/playframework/$repoName")),
       scmInfo := Some(
         ScmInfo(
-          url(s"https://github.com/playframework/${repoName}"),
-          s"scm:git:git@github.com:playframework/${repoName}.git"
+          url(s"https://github.com/playframework/$repoName"),
+          s"scm:git:git@github.com:playframework/$repoName.git"
         )
       ),
       developers += Developer(
-        "contributors",
-        "Contributors",
-        "https://gitter.im/playframework/contributors",
+        "playframework",
+        "The Play Framework Contributors",
+        "contact@playframework.com",
         url("https://github.com/playframework")
       )
     )
 
-  override def projectSettings =
+  override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
-      headerEmptyLine := false,
-      headerLicense := Some(HeaderLicense.Custom("Copyright (C) Lightbend Inc. <https://www.lightbend.com>"))
+      headerLicense := Some(
+        HeaderLicense.Custom(
+          "Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>"
+        )
+      ),
+      headerMappings ++= Map(
+        FileType("sbt")        -> HeaderCommentStyle.cppStyleLineComment,
+        FileType("properties") -> HeaderCommentStyle.hashLineComment,
+        FileType("md") -> CommentStyle(new LineCommentCreator("<!---", "-->"), commentBetween("<!---", "*", "-->"))
+      )
     )
 }

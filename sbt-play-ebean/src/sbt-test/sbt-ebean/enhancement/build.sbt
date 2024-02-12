@@ -1,18 +1,17 @@
+// Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
+
 lazy val root = project
   .in(file("."))
   .enablePlugins(PlayJava, PlayEbean)
 
-scalaVersion := "2.12.10"
+scalaVersion := sys.props("scala.version")
 
-sourceDirectory in Test := baseDirectory.value / "tests"
+Test / sourceDirectory := baseDirectory.value / "tests"
 
-scalaSource in Test := baseDirectory.value / "tests"
+Test / scalaSource := baseDirectory.value / "tests"
 
-javaSource in Test := baseDirectory.value / "tests"
+Test / javaSource := baseDirectory.value / "tests"
 
 resolvers ++= DefaultOptions.resolvers(snapshot = true)
 
-libraryDependencies += "com.h2database" % "h2" % "1.4.196"
-
-resolvers += "scalaz-releases" at "https://dl.bintray.com/scalaz/releases" // specs2 depends on scalaz-stream
-
+libraryDependencies += "com.h2database" % "h2" % "2.2.224"

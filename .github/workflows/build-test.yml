@@ -1,0 +1,72 @@
+name: Check
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - main # Check branch after merge
+
+concurrency:
+  # Only run once for latest commit per ref and cancel other (previous) runs.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-code-style:
+    name: Code Style
+    uses: playframework/.github/.github/workflows/cmd.yml@v3
+    with:
+      cmd: sbt validateCode
+
+  check-binary-compatibility:
+    name: Binary Compatibility
+    uses: playframework/.github/.github/workflows/binary-check.yml@v3
+
+  check-docs:
+    name: Docs
+    uses: playframework/.github/.github/workflows/cmd.yml@v3
+    with:
+      java: 17, 11
+      scala: 2.13.x, 3.x
+      cmd: cd docs && sbt ++$MATRIX_SCALA validateCode
+
+  tests:
+    name: Tests
+    needs:
+      - "check-code-style"
+      - "check-binary-compatibility"
+      - "check-docs"
+    uses: playframework/.github/.github/workflows/cmd.yml@v3
+    with:
+      java: 17, 11
+      scala: 2.13.x, 3.x
+      cmd: >-
+        sbt ++$MATRIX_SCALA test
+
+  scripted-tests:
+    name: Scripted tests
+    needs:
+      - "check-code-style"
+      - "check-binary-compatibility"
+      - "check-docs"
+    uses: playframework/.github/.github/workflows/cmd.yml@v3
+    with:
+      java: 17, 11
+      scala: 2.13.12, 3.3.1
+      cmd: >-
+        sbt "
+          +publishLocal;
+          set plugin/scriptedLaunchOpts += \"-Dscala.version=$MATRIX_SCALA\";
+          show scriptedSbt;
+          show scriptedLaunchOpts;
+          plugin/scripted;
+        "
+
+  finish:
+    name: Finish
+    if: github.event_name == 'pull_request'
+    needs: # Should be last
+      - "tests"
+      - "scripted-tests"
+    uses: playframework/.github/.github/workflows/rtm.yml@v3

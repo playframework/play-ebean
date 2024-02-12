@@ -1,11 +1,11 @@
-addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.6.0")
+// Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
 
-addSbtPlugin("com.github.sbt" % "sbt-jacoco" % "3.2.0")
+addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.10.0")
 
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.8.1")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.3")
 
-addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.6.1")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
+addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.12")
 
-addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
+addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.8.0")

@@ -1,11 +1,16 @@
+/*
+ * Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
+ */
+
 package play.ebean.sbt
 
 import java.net.URLClassLoader
 import io.ebean.enhance.Transformer
 import io.ebean.enhance.ant.OfflineFileTransform
 import sbt.Keys._
-import sbt.internal.inc.Hash
+import sbt.internal.inc.FarmHash
 import sbt.internal.inc.LastModified
+import sbt.internal.inc.PlainVirtualFileConverter
 import sbt.internal.inc.Stamper
 import sbt.AutoPlugin
 import sbt.Compile
@@ -17,7 +22,7 @@ import sbt.taskKey
 import xsbti.compile.CompileResult
 import xsbti.compile.analysis.Stamp
 import sbt._
-
+import xsbti.VirtualFileRef
 import scala.util.control.NonFatal
 
 object PlayEbean extends AutoPlugin {
@@ -36,23 +41,23 @@ object PlayEbean extends AutoPlugin {
 
   override def trigger = noTrigger
 
-  override def projectSettings = inConfig(Compile)(scopedSettings) ++ unscopedSettings
+  override def projectSettings: Seq[Def.Setting[_]] = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
-  def scopedSettings =
+  def scopedSettings: Seq[Def.Setting[_]] =
     Seq(
-      playEbeanModels := configuredEbeanModels.value,
+      playEbeanModels    := configuredEbeanModels.value,
       manipulateBytecode := ebeanEnhance.value
     )
 
-  def unscopedSettings =
+  def unscopedSettings: Seq[Def.Setting[_]] =
     Seq(
       playEbeanDebugLevel := -1,
-      playEbeanAgentArgs := Map("debug" -> playEbeanDebugLevel.value.toString),
-      playEbeanVersion := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
+      playEbeanAgentArgs  := Map("debug" -> playEbeanDebugLevel.value.toString),
+      playEbeanVersion    := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
       libraryDependencies ++=
         Seq(
-          "com.typesafe.play" %% "play-ebean"   % playEbeanVersion.value,
-          "org.glassfish.jaxb" % "jaxb-runtime" % "2.3.2"
+          "org.playframework" %% "play-ebean"   % playEbeanVersion.value,
+          "org.glassfish.jaxb" % "jaxb-runtime" % "4.0.4"
         )
     )
 
@@ -62,26 +67,22 @@ object PlayEbean extends AutoPlugin {
   def ebeanEnhance: Def.Initialize[Task[CompileResult]] =
     Def.task {
 
-      val deps      = dependencyClasspath.value
-      val classes   = classDirectory.value
-      val result    = manipulateBytecode.value
-      val agentArgs = playEbeanAgentArgs.value
-      val analysis  = result.analysis.asInstanceOf[sbt.internal.inc.Analysis]
-
+      val deps            = dependencyClasspath.value
+      val classes         = classDirectory.value
+      val result          = manipulateBytecode.value
+      val agentArgs       = playEbeanAgentArgs.value
+      val analysis        = result.analysis.asInstanceOf[sbt.internal.inc.Analysis]
       val agentArgsString = agentArgs.map { case (key, value) => s"$key=$value" }.mkString(";")
 
       val originalContextClassLoader = Thread.currentThread.getContextClassLoader
 
       try {
-
-        val classpath = deps.map(_.data.toURI.toURL).toArray :+ classes.toURI.toURL
-
-        val classLoader = new java.net.URLClassLoader(classpath, null)
+        val classpath   = deps.map(_.data.toURI.toURL).toArray :+ classes.toURI.toURL
+        val classLoader = new URLClassLoader(classpath, null)
 
         Thread.currentThread.setContextClassLoader(classLoader)
 
-        val transformer = new Transformer(classLoader, agentArgsString)
-
+        val transformer   = new Transformer(classLoader, agentArgsString)
         val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
 
         try {
@@ -95,16 +96,16 @@ object PlayEbean extends AutoPlugin {
       }
 
       val allProducts = analysis.relations.allProducts
+      val converter   = new PlainVirtualFileConverter()
 
       /**
-       * Updates stamp of product (class file) by preserving the type of a passed stamp.
-       * This way any stamp incremental compiler chooses to use to mark class files will
-       * be supported.
+       * Updates stamp of product (class file) by preserving the type of a passed stamp. This way any stamp incremental
+       * compiler chooses to use to mark class files will be supported.
        */
-      def updateStampForClassFile(file: File, stamp: Stamp): Stamp =
+      def updateStampForClassFile(fileRef: VirtualFileRef, stamp: Stamp): Stamp =
         stamp match {
-          case _: LastModified => Stamper.forLastModified(file)
-          case _: Hash         => Stamper.forHash(file)
+          case _: LastModified => Stamper.forLastModifiedP(converter.toPath(fileRef))
+          case _: FarmHash     => Stamper.forFarmHashP(converter.toPath(fileRef))
         }
 
       // Since we may have modified some of the products of the incremental compiler, that is, the compiled template
@@ -118,6 +119,7 @@ object PlayEbean extends AutoPlugin {
               + s"product of incremental compiler: $classFile"
           )
         }
+
         stamps.markProduct(classFile, updateStampForClassFile(classFile, existingStamp))
       })
 
@@ -142,7 +144,7 @@ object PlayEbean extends AutoPlugin {
         } catch {
           case e: Exception =>
             // Since we're about to close the classloader, we can't risk any classloading that the thrown exception may
-            // do when we later interogate it, so instead we create a new exception here, with the old exceptions message
+            // do when we later interrogate it, so instead we create a new exception here, with the old exceptions message
             // and stack trace
             def clone(t: Throwable): RuntimeException = {
               val cloned = new RuntimeException(s"${t.getClass.getName}: ${t.getMessage}")
@@ -179,7 +181,7 @@ object PlayEbean extends AutoPlugin {
     try {
       props.load(stream)
     } catch {
-      case e: Exception =>
+      case _: Exception =>
     } finally {
       if (stream ne null) stream.close()
     }

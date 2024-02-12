@@ -1,7 +1,11 @@
+/*
+ * Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
+ */
+
 package models;
 
 import java.util.*;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import io.ebean.*;
 import play.data.format.*;

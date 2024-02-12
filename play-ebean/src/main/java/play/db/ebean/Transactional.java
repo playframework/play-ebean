@@ -1,20 +1,17 @@
 /*
- * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
  */
-package play.db.ebean;
 
-import play.mvc.With;
+package play.db.ebean;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import play.mvc.With;
 
-/**
- * Wraps the annotated action in an Ebean transaction.
- */
+/** Wraps the annotated action in an Ebean transaction. */
 @With(TransactionalAction.class)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Transactional {
-}
+public @interface Transactional {}

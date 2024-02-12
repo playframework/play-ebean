@@ -1,27 +1,30 @@
-import Dependencies.ScalaVersions.{scala212, scala213}
+// Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
+
+import Dependencies.ScalaVersions.scala212
+import Dependencies.ScalaVersions.scala213
+import Dependencies.ScalaVersions.scala3
 import Dependencies.Versions
+import com.typesafe.tools.mima.core._
 import sbt.Append.appendSeq
 import xsbti.compile.CompileAnalysis
 
 // Customise sbt-dynver's behaviour to make it work with tags which aren't v-prefixed
-dynverVTagPrefix in ThisBuild := false
+ThisBuild / dynverVTagPrefix := false
 
 // Sanity-check: assert that version comes from a tag (e.g. not a too-shallow clone)
 // https://github.com/dwijnand/sbt-dynver/#sanity-checking-the-version
 Global / onLoad := (Global / onLoad).value.andThen { s =>
-  val v = version.value
-  if (dynverGitDescribeOutput.value.hasNoTags)
-    throw new MessageOnlyException(
-      s"Failed to derive version from git tags. Maybe run `git fetch --unshallow`? Version: $v"
-    )
+  dynverAssertTagVersion.value
   s
 }
 
+val previousVersion: Option[String] = Some("8.0.0")
+
 lazy val mimaSettings = Seq(
-  mimaPreviousArtifacts := Set(
-    organization.value %% name.value % "6.0.0" //previousStableVersion.value
-      //.getOrElse(throw new Error("Unable to determine previous version"))
-  ),
+  mimaPreviousArtifacts := previousVersion.map(organization.value %% moduleName.value % _).toSet,
+  mimaBinaryIssueFilters ++= Seq(
+    ProblemFilters.exclude[ReversedMissingMethodProblem]("play.db.ebean.EbeanConfig.generateEvolutionsScripts"),
+  )
 )
 
 lazy val root = project
@@ -29,70 +32,102 @@ lazy val root = project
   .aggregate(core, plugin)
   .disablePlugins(MimaPlugin)
   .settings(
-    name := "play-ebean-root",
+    scalaVersion       := scala3,
+    name               := "play-ebean-root",
     crossScalaVersions := Nil,
-    publish / skip := true
+    publish / skip     := true,
+  )
+  .settings(
+    (Compile / headerSources) ++=
+      ((baseDirectory.value ** ("*.properties" || "*.md" || "*.sbt"))
+        --- (baseDirectory.value ** "target" ** "*")
+        --- (baseDirectory.value / ".github" ** "*")
+        --- (baseDirectory.value / "docs" ** "*")
+        --- (baseDirectory.value / "sbt-play-ebean" ** "*")).get ++
+        (baseDirectory.value / "project" ** "*.scala" --- (baseDirectory.value ** "target" ** "*")).get
   )
 
 lazy val core = project
   .in(file("play-ebean"))
-  .enablePlugins(PublishLibrary)
   .settings(
-    name := "play-ebean",
-    crossScalaVersions := Seq(scala212, scala213),
+    name               := "play-ebean",
+    scalaVersion       := scala213,
+    crossScalaVersions := Seq(scala213, scala3),
     Dependencies.ebean,
     mimaSettings,
-    compile in Compile := enhanceEbeanClasses(
-      (dependencyClasspath in Compile).value,
-      (compile in Compile).value,
-      (classDirectory in Compile).value,
+    Compile / compile := enhanceEbeanClasses(
+      (Compile / dependencyClasspath).value,
+      (Compile / compile).value,
+      (Compile / classDirectory).value,
       "play/db/ebean/**"
     ),
-    jacocoReportSettings := JacocoReportSettings("Jacoco Coverage Report", None, JacocoThresholds(), Seq(JacocoReportFormats.XML), "utf-8")
   )
 
 lazy val plugin = project
   .in(file("sbt-play-ebean"))
-  .enablePlugins(SbtPlugin, PublishSbtPlugin)
-  .disablePlugins(MimaPlugin)
+  .enablePlugins(SbtPlugin)
   .settings(
-    name := "sbt-play-ebean",
-    organization := "com.typesafe.sbt",
+    name         := "sbt-play-ebean",
+    organization := "org.playframework",
     Dependencies.plugin,
-    addSbtPlugin("com.typesafe.play" % "sbt-plugin" % Versions.play),
-    crossScalaVersions := Seq(scala212),
-    resourceGenerators in Compile += generateVersionFile.taskValue,
+    addSbtPlugin("org.playframework" % "sbt-plugin" % Versions.play),
+    scalaVersion          := scala212,
+    crossScalaVersions    := Seq(scala212),
+    mimaPreviousArtifacts := Set.empty,
+    Compile / resourceGenerators += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq(
-      s"-Dscala.version=${scalaVersion.value}",
-      s"-Dscala.crossVersions=${(crossScalaVersions in core).value.mkString(",")}",
       s"-Dproject.version=${version.value}",
     ),
-    scriptedBufferLog := false,
-    scriptedDependencies := (())
+    scriptedBufferLog    := false,
+    scriptedDependencies := ((): Unit),
+  )
+  .settings(
+    (Compile / headerSources) ++=
+      (sourceDirectory.value / "sbt-test" ** ("*.java" || "*.sbt")).get
   )
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
-  Defaults.sbtPluginExtra(moduleId, CrossVersion.binarySbtVersion(sbtVersion), CrossVersion.binaryScalaVersion(scalaVersion))
+  Defaults.sbtPluginExtra(
+    moduleId,
+    CrossVersion.binarySbtVersion(sbtVersion),
+    CrossVersion.binaryScalaVersion(scalaVersion)
+  )
 }
 
 // Ebean enhancement
-def enhanceEbeanClasses(classpath: Classpath, analysis: CompileAnalysis, classDirectory: File, pkg: String): CompileAnalysis = {
+def enhanceEbeanClasses(
+    classpath: Classpath,
+    analysis: CompileAnalysis,
+    classDirectory: File,
+    pkg: String
+): CompileAnalysis = {
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
-  val t = cl.loadClass("io.ebean.enhance.Transformer").getConstructor(classOf[ClassLoader], classOf[String]).newInstance(cl, "debug=0").asInstanceOf[AnyRef]
-  val ft = cl.loadClass("io.ebean.enhance.ant.OfflineFileTransform").getConstructor(
-    t.getClass, classOf[ClassLoader], classOf[String]
-  ).newInstance(t, ClassLoader.getSystemClassLoader, classDirectory.getAbsolutePath).asInstanceOf[AnyRef]
+  val t = cl
+    .loadClass("io.ebean.enhance.Transformer")
+    .getConstructor(classOf[ClassLoader], classOf[String])
+    .newInstance(cl, "debug=0")
+    .asInstanceOf[AnyRef]
+  val ft = cl
+    .loadClass("io.ebean.enhance.ant.OfflineFileTransform")
+    .getConstructor(
+      t.getClass,
+      classOf[ClassLoader],
+      classOf[String]
+    )
+    .newInstance(t, ClassLoader.getSystemClassLoader, classDirectory.getAbsolutePath)
+    .asInstanceOf[AnyRef]
   ft.getClass.getDeclaredMethod("process", classOf[String]).invoke(ft, pkg)
   analysis
 }
 
 // Version file
-def generateVersionFile = Def.task {
-  val version = (Keys.version in core).value
-  val file = (resourceManaged in Compile).value / "play-ebean.version.properties"
-  val content = s"play-ebean.version=$version"
-  IO.write(file, content)
-  Seq(file)
-}
+def generateVersionFile =
+  Def.task {
+    val version = (core / Keys.version).value
+    val file    = (Compile / resourceManaged).value / "play-ebean.version.properties"
+    val content = s"play-ebean.version=$version"
+    IO.write(file, content)
+    Seq(file)
+  }

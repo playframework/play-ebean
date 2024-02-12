@@ -1,66 +1,85 @@
 /*
- * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
  */
+
 package play.db.ebean;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValueType;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * The raw parsed config from Ebean, as opposed to the EbeanConfig which actually requires starting database connection
- * pools to create.
+ * The raw parsed config from Ebean, as opposed to the EbeanConfig which actually requires starting
+ * database connection pools to create.
  */
 public class EbeanParsedConfig {
 
-    private final String defaultDatasource;
-    private final Map<String, List<String>> datasourceModels;
+  private final String defaultDatasource;
 
-    public EbeanParsedConfig(String defaultDatasource, Map<String, List<String>> datasourceModels) {
-        this.defaultDatasource = defaultDatasource;
-        this.datasourceModels = datasourceModels;
-    }
+  private final Map<String, List<String>> datasourceModels;
 
-    public String getDefaultDatasource() {
-        return defaultDatasource;
-    }
+  private final boolean generateEvolutionsScripts;
 
-    public Map<String, List<String>> getDatasourceModels() {
-        return datasourceModels;
-    }
+  public EbeanParsedConfig(
+      String defaultDatasource,
+      Map<String, List<String>> datasourceModels,
+      boolean generateEvolutionsScripts) {
+    this.defaultDatasource = defaultDatasource;
+    this.datasourceModels = datasourceModels;
+    this.generateEvolutionsScripts = generateEvolutionsScripts;
+  }
 
-    /**
-     * Parse a play configuration.
-     *
-     * @param config play configuration
-     * @return ebean parsed configuration
-     * @see com.typesafe.config.Config
-     */
-    public static EbeanParsedConfig parseFromConfig(Config config) {
-        Config playEbeanConfig = config.getConfig("play.ebean");
-        String defaultDatasource = playEbeanConfig.getString("defaultDatasource");
-        String ebeanConfigKey = playEbeanConfig.getString("config");
+  public EbeanParsedConfig(String defaultDatasource, Map<String, List<String>> datasourceModels) {
+    this(defaultDatasource, datasourceModels, true);
+  }
 
-        Map<String, List<String>> datasourceModels = new HashMap<>();
+  public String getDefaultDatasource() {
+    return defaultDatasource;
+  }
 
-        if (config.hasPath(ebeanConfigKey)) {
-            Config ebeanConfig = config.getConfig(ebeanConfigKey);
-            ebeanConfig.root().forEach((key, raw) -> {
+  public Map<String, List<String>> getDatasourceModels() {
+    return datasourceModels;
+  }
+
+  public boolean generateEvolutionsScripts() {
+    return generateEvolutionsScripts;
+  }
+
+  /**
+   * Parse a play configuration.
+   *
+   * @param config play configuration
+   * @return ebean parsed configuration
+   * @see com.typesafe.config.Config
+   */
+  public static EbeanParsedConfig parseFromConfig(Config config) {
+    Config playEbeanConfig = config.getConfig("play.ebean");
+    String defaultDatasource = playEbeanConfig.getString("defaultDatasource");
+    String ebeanConfigKey = playEbeanConfig.getString("config");
+    boolean generateEvolutionsScripts = playEbeanConfig.getBoolean("generateEvolutionsScripts");
+
+    Map<String, List<String>> datasourceModels = new HashMap<>();
+
+    if (config.hasPath(ebeanConfigKey)) {
+      Config ebeanConfig = config.getConfig(ebeanConfigKey);
+      ebeanConfig
+          .root()
+          .forEach(
+              (key, raw) -> {
                 List<String> models;
                 if (raw.valueType() == ConfigValueType.STRING) {
-                    // Support legacy comma separated string
-                    models = Arrays.asList(((String) raw.unwrapped()).split(","));
+                  // Support legacy comma separated string
+                  models = Arrays.asList(((String) raw.unwrapped()).split(","));
                 } else {
-                    models = ebeanConfig.getStringList(key);
+                  models = ebeanConfig.getStringList(key);
                 }
 
                 datasourceModels.put(key, models);
-            });
-        }
-        return new EbeanParsedConfig(defaultDatasource, datasourceModels);
+              });
     }
+    return new EbeanParsedConfig(defaultDatasource, datasourceModels, generateEvolutionsScripts);
+  }
 }
