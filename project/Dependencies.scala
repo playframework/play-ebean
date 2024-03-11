@@ -21,9 +21,9 @@ object Dependencies {
   }
 
   val ebean = libraryDependencies ++= Seq(
-    "io.ebean"           % "ebean"                % Versions.ebean,
-    "io.ebean"           % "ebean-ddl-generator"  % Versions.ebean,
-    "io.ebean"           % "ebean-agent"          % Versions.ebean,
+    ("io.ebean" % "ebean"               % Versions.ebean).excludeAll(ExclusionRule("com.fasterxml.jackson.core")),
+    "io.ebean"  % "ebean-ddl-generator" % Versions.ebean,
+    "io.ebean"  % "ebean-agent"         % Versions.ebean,
     "com.typesafe.play" %% "play-java-jdbc"       % Versions.play,
     "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
     "com.typesafe.play" %% "play-guice"           % Versions.play % Test,
