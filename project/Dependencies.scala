@@ -16,14 +16,13 @@ object Dependencies {
 
   object Versions {
     val play: String   = "3.0.1"
-    val ebean          = "13.23.0"
-    val ebeanJakarta   = s"$ebean-jakarta"
+    val ebean          = "15.0.1"
     val typesafeConfig = "1.4.3"
   }
 
   val ebean = libraryDependencies ++= Seq(
-    "io.ebean"           % "ebean"                % Versions.ebeanJakarta,
-    "io.ebean"           % "ebean-ddl-generator"  % Versions.ebeanJakarta,
+    "io.ebean"           % "ebean"                % Versions.ebean,
+    "io.ebean"           % "ebean-ddl-generator"  % Versions.ebean,
     "io.ebean"           % "ebean-agent"          % Versions.ebean,
     "org.playframework" %% "play-java-jdbc"       % Versions.play,
     "org.playframework" %% "play-jdbc-evolutions" % Versions.play,
@@ -36,7 +35,7 @@ object Dependencies {
   )
 
   val plugin = libraryDependencies ++= Seq(
-    "io.ebean"     % "ebean"       % Versions.ebeanJakarta,
+    "io.ebean"     % "ebean"       % Versions.ebean,
     "io.ebean"     % "ebean-agent" % Versions.ebean,
     "com.typesafe" % "config"      % Versions.typesafeConfig,
   )
