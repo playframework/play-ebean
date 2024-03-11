@@ -27,6 +27,7 @@ object Dependencies {
   }
 
   val ebean = libraryDependencies ++= Seq(
+<<<<<<< HEAD
     "io.ebean"           % "ebean"                % Versions.ebean,
     "io.ebean"           % "ebean-ddl-generator"  % Versions.ebean,
     "io.ebean"           % "ebean-agent"          % Versions.ebean,
@@ -35,6 +36,16 @@ object Dependencies {
     "com.typesafe.play" %% "play-guice"           % Versions.play % Test,
     "com.typesafe.play" %% "play-filters-helpers" % Versions.play % Test,
     "com.typesafe.play" %% "play-test"            % Versions.play % Test,
+=======
+    ("io.ebean" % "ebean"               % Versions.ebean).excludeAll(ExclusionRule("com.fasterxml.jackson.core")),
+    "io.ebean"  % "ebean-ddl-generator" % Versions.ebean,
+    "io.ebean"  % "ebean-agent"         % Versions.ebean,
+    "org.playframework" %% "play-java-jdbc"       % Versions.play,
+    "org.playframework" %% "play-jdbc-evolutions" % Versions.play,
+    "org.playframework" %% "play-guice"           % Versions.play % Test,
+    "org.playframework" %% "play-filters-helpers" % Versions.play % Test,
+    "org.playframework" %% "play-test"            % Versions.play % Test,
+>>>>>>> 5a7fbec (Exclude jackson core dependencies from ebean and use Play's)
     ("org.reflections"   % "reflections"          % "0.10.2")
       .exclude("com.google.code.findbugs", "annotations")
       .classifier("")
