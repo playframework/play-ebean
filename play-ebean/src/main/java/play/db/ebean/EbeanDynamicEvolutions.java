@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import play.Environment;
@@ -34,21 +33,27 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
 
   private final Map<String, Database> databases = new HashMap<>();
 
-  @Inject
+  /**
+   * @deprecated No need to pass lifecycle anymore as shutdown is now managed by {@link
+   *     play.db.ebean.EbeanLifecycle}. Use {@link #EbeanDynamicEvolutions(EbeanConfig, Environment,
+   *     EvolutionsConfig)} instead.
+   */
+  @Deprecated
   public EbeanDynamicEvolutions(
       EbeanConfig config,
       Environment environment,
       ApplicationLifecycle lifecycle,
       EvolutionsConfig evolutionsConfig) {
+    this(config, environment, evolutionsConfig);
+  }
+
+  @Inject
+  public EbeanDynamicEvolutions(
+      EbeanConfig config, Environment environment, EvolutionsConfig evolutionsConfig) {
     this.config = config;
     this.environment = environment;
     this.evolutionsConfig = evolutionsConfig;
     start();
-    lifecycle.addStopHook(
-        () -> {
-          databases.forEach((key, database) -> database.shutdown(false, false));
-          return CompletableFuture.completedFuture(null);
-        });
   }
 
   /** Initialise the Ebean servers/databases. */
