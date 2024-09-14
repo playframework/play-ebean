@@ -24,11 +24,11 @@ object Dependencies {
     ("io.ebean" % "ebean"               % Versions.ebean).excludeAll(ExclusionRule("com.fasterxml.jackson.core")),
     "io.ebean"  % "ebean-ddl-generator" % Versions.ebean,
     "io.ebean"  % "ebean-agent"         % Versions.ebean,
-    "com.typesafe.play" %% "play-java-jdbc"       % Versions.play,
-    "com.typesafe.play" %% "play-jdbc-evolutions" % Versions.play,
-    "com.typesafe.play" %% "play-guice"           % Versions.play % Test,
-    "com.typesafe.play" %% "play-filters-helpers" % Versions.play % Test,
-    "com.typesafe.play" %% "play-test"            % Versions.play % Test,
+    "org.playframework" %% "play-java-jdbc"       % Versions.play,
+    "org.playframework" %% "play-jdbc-evolutions" % Versions.play,
+    "org.playframework" %% "play-guice"           % Versions.play % Test,
+    "org.playframework" %% "play-filters-helpers" % Versions.play % Test,
+    "org.playframework" %% "play-test"            % Versions.play % Test,
     ("org.reflections"   % "reflections"          % "0.10.2")
       .exclude("com.google.code.findbugs", "annotations")
       .classifier("")
