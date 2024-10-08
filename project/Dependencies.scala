@@ -9,14 +9,14 @@ import sbt._
 object Dependencies {
 
   object ScalaVersions {
-    val scala212 = "2.12.19"
+    val scala212 = "2.12.20"
     val scala213 = "2.13.14"
     val scala3   = "3.3.3"
   }
 
   object Versions {
     val play: String   = "2.9.5"
-    val ebean          = "15.5.0"
+    val ebean          = "15.5.2"
     val typesafeConfig = "1.4.3"
   }
 
