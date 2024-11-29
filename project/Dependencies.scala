@@ -15,7 +15,7 @@ object Dependencies {
   }
 
   object Versions {
-    val play: String   = "2.9.5"
+    val play: String   = "2.9.6"
     val ebean          = "15.8.0"
     val typesafeConfig = "1.4.3"
   }
