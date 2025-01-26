@@ -18,6 +18,7 @@ public class EbeanModule extends Module {
   public Seq<Binding<?>> bindings(Environment environment, Configuration configuration) {
     return seq(
         bind(DynamicEvolutions.class).to(EbeanDynamicEvolutions.class).eagerly(),
-        bind(EbeanConfig.class).toProvider(DefaultEbeanConfig.EbeanConfigParser.class).eagerly());
+        bind(EbeanConfig.class).toProvider(DefaultEbeanConfig.EbeanConfigParser.class).eagerly(),
+        bind(EbeanLifecycle.class).toSelf().eagerly());
   }
 }
