@@ -21,8 +21,8 @@ lazy val docs = project
     // No resource directories shuts the ebean agent up about java sources in the classes directory
     Test / unmanagedResourceDirectories := Nil,
     Test / parallelExecution            := false,
-    scalaVersion                        := "2.13.15",
-    crossScalaVersions                  := Seq("2.13.15", "3.3.3"),
+    scalaVersion                        := "2.13.16",
+    crossScalaVersions                  := Seq("2.13.16", "3.3.4"),
   )
   .settings(
     Test / javafmt / sourceDirectories ++= (Test / unmanagedSourceDirectories).value,
