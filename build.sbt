@@ -18,12 +18,12 @@ Global / onLoad := (Global / onLoad).value.andThen { s =>
   s
 }
 
-val previousVersion: Option[String] = Some("8.0.0")
+val previousVersion: Option[String] = Some("8.3.0")
 
 lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := previousVersion.map(organization.value %% moduleName.value % _).toSet,
   mimaBinaryIssueFilters ++= Seq(
-    ProblemFilters.exclude[ReversedMissingMethodProblem]("play.db.ebean.EbeanConfig.generateEvolutionsScripts"),
+    ProblemFilters.exclude[MissingTypesProblem]("play.db.ebean.DefaultEbeanConfig$EbeanConfigParser"),
   )
 )
 
