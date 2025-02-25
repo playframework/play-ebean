@@ -8,6 +8,13 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    target-branch: "8.x"
+    commit-message:
+      prefix: "[8.x] "
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
     target-branch: "7.x"
     commit-message:
       prefix: "[7.x] "
