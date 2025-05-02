@@ -125,7 +125,8 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
     }
 
     return "-- Created by Ebean DDL\r\n"
-        + "-- To stop Ebean DDL generation, remove this comment (both lines) and start using Evolutions\r\n"
+        + "-- To stop Ebean DDL generation, remove this comment (both lines) and start using"
+        + " Evolutions\r\n"
         + "\r\n"
         + "-- !Ups\r\n"
         + "\r\n"
