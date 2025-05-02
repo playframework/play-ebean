@@ -2,3 +2,6 @@
 7fe92e05b8508927343db11bd4c6bbbd723253c1
 # Enable Java formatter
 367b1e5662a20cda35df21d715bd76d1bf4d2324
+
+# Scala Steward: Reformat with sbt-java-formatter 0.10.0
+681949020e989ee6bdc5a84bceb27ac20b47b817
