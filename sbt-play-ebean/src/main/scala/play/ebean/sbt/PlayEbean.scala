@@ -28,7 +28,7 @@ import scala.util.control.NonFatal
 object PlayEbean extends AutoPlugin {
 
   object autoImport {
-    val playEbeanModels = taskKey[Seq[String]]("The packages that should be searched for ebean models to enhance.")
+    val playEbeanModels  = taskKey[Seq[String]]("The packages that should be searched for ebean models to enhance.")
     val playEbeanVersion =
       settingKey[String]("The version of Play ebean that should be added to the library dependencies.")
     val playEbeanDebugLevel = settingKey[Int](

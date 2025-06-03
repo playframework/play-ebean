@@ -104,7 +104,7 @@ def enhanceEbeanClasses(
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
-  val t = cl
+  val t  = cl
     .loadClass("io.ebean.enhance.Transformer")
     .getConstructor(classOf[ClassLoader], classOf[String])
     .newInstance(cl, "debug=0")
