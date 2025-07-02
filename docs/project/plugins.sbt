@@ -6,10 +6,10 @@ lazy val sbtPlayEbean = ProjectRef(Path.fileProperty("user.dir").getParentFile, 
 
 resolvers ++= DefaultOptions.resolvers(snapshot = true)
 
-addSbtPlugin("org.playframework" % "play-docs-sbt-plugin" % sys.props.getOrElse("play.version", "3.0.7"))
+addSbtPlugin("org.playframework" % "play-docs-sbt-plugin" % sys.props.getOrElse("play.version", "3.0.8"))
 
 addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.8.0")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.4")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.5")
 
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.10.0")
