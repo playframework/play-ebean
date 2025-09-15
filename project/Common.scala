@@ -2,14 +2,14 @@
  * Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
  */
 
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.HeaderPattern.commentBetween
+import sbtheader.HeaderPlugin.autoImport.HeaderPattern.commentBetween
 import sbt.Keys.*
 import sbt.*
 import sbt.plugins.JvmPlugin
-import de.heikoseeberger.sbtheader.CommentStyle
-import de.heikoseeberger.sbtheader.FileType
-import de.heikoseeberger.sbtheader.HeaderPlugin
-import de.heikoseeberger.sbtheader.LineCommentCreator
+import sbtheader.CommentStyle
+import sbtheader.FileType
+import sbtheader.HeaderPlugin
+import sbtheader.LineCommentCreator
 
 object Common extends AutoPlugin {
 
