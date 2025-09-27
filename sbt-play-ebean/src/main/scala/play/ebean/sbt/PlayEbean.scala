@@ -57,7 +57,7 @@ object PlayEbean extends AutoPlugin {
       libraryDependencies ++=
         Seq(
           "org.playframework" %% "play-ebean"   % playEbeanVersion.value,
-          "org.glassfish.jaxb" % "jaxb-runtime" % "4.0.5"
+          "org.glassfish.jaxb" % "jaxb-runtime" % "4.0.6"
         )
     )
 
