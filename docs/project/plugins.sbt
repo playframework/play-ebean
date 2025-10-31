@@ -10,6 +10,6 @@ addSbtPlugin("org.playframework" % "play-docs-sbt-plugin" % sys.props.getOrElse(
 
 addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.8.0")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.5")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.6")
 
 addSbtPlugin("com.github.sbt" % "sbt-header" % "5.11.0")
