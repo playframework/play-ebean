@@ -69,4 +69,4 @@ jobs:
     needs: # Should be last
       - "tests"
       - "scripted-tests"
-    uses: playframework/.github/.github/workflows/rtm.yml@v3
+    uses: playframework/.github/.github/workflows/rtm.yml@v4
