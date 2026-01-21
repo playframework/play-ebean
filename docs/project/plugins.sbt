@@ -8,7 +8,7 @@ resolvers ++= DefaultOptions.resolvers(snapshot = true)
 
 addSbtPlugin("com.typesafe.play" % "play-docs-sbt-plugin" % sys.props.getOrElse("play.version", "2.9.10"))
 
-addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.8.0")
+addSbtPlugin("com.github.sbt" % "sbt-java-formatter" % "0.10.0")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.6")
 
