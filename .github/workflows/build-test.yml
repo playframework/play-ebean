@@ -52,16 +52,29 @@ jobs:
       - "check-docs"
     uses: playframework/.github/.github/workflows/cmd.yml@v4
     with:
-      java: 21, 17
-      scala: 2.13.18, 3.3.6
+      matrix: |
+        java:
+          - '21'
+          - '17'
+        include:
+          - plugin_scala: 2.12.x
+            app_scala: 2.13.x
+          - plugin_scala: 2.12.x
+            app_scala: 3.x
+          - plugin_scala: 3.x
+            app_scala: 2.13.x
+          - plugin_scala: 3.x
+            app_scala: 3.x
       cmd: >-
         sbt "
-          +publishLocal;
-          set plugin/scriptedLaunchOpts += \"-Dscala.version=$MATRIX_SCALA\";
+          ++ $MATRIX_PLUGIN_SCALA;
+          set plugin/scriptedLaunchOpts += \"-Dscripted.scala.version=$MATRIX_APP_SCALA\";
           show scriptedSbt;
           show scriptedLaunchOpts;
           plugin/scripted;
         "
+      # Alternative:
+      # sbt -Dscripted.scala.version=$MATRIX_APP_SCALA "++ $MATRIX_PLUGIN_SCALA" plugin/scripted
 
   finish:
     name: Finish
