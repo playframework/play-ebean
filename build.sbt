@@ -72,8 +72,8 @@ lazy val plugin = project
     organization := "org.playframework",
     Dependencies.plugin,
     addSbtPlugin("org.playframework" % "sbt-plugin" % Versions.play),
-    scalaVersion          := scala212,
-    crossScalaVersions    := Seq(scala212, scala3Plugin),
+    scalaVersion                  := scala212,
+    crossScalaVersions            := Seq(scala212, scala3Plugin),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.12.9"
@@ -99,10 +99,12 @@ lazy val plugin = project
         )}",
     ),
     scriptedBufferLog    := false,
-    scriptedDependencies := Def.sequential(
-      core / publishLocal,
-      publishLocal
-    ).value,
+    scriptedDependencies := Def
+      .sequential(
+        core / publishLocal,
+        publishLocal
+      )
+      .value,
   )
   .settings(
     (Compile / headerSources) ++=

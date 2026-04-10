@@ -110,7 +110,7 @@ object PlayEbean extends AutoPlugin {
 
       try {
         implicit val fileConverterCompat: FileConverter = converter
-        val classpath =
+        val classpath                                   =
           (deps.map(dep => PluginCompat.toNioPath(dep.data).toUri.toURL).toVector :+ classes.toURI.toURL)
             .toArray[java.net.URL]
         val classLoader = new URLClassLoader(classpath, null)
@@ -166,9 +166,9 @@ object PlayEbean extends AutoPlugin {
       // Creates a classloader with all the dependencies and all the resources, from there we can use the play ebean
       // code to load the config as it would be loaded in production
       def withClassLoader[T](block: ClassLoader => T): T = {
-        val converter = fileConverter.value
+        val converter                                   = fileConverter.value
         implicit val fileConverterCompat: FileConverter = converter
-        val classpath =
+        val classpath                                   =
           unmanagedResourceDirectories.value.map(_.toURI.toURL) ++
             dependencyClasspath.value.map(dep => PluginCompat.toNioPath(dep.data).toUri.toURL)
         val classLoader = new URLClassLoader(classpath.toArray[java.net.URL], null)
