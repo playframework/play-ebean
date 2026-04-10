@@ -72,14 +72,30 @@ lazy val plugin = project
     Dependencies.plugin,
     addSbtPlugin("org.playframework" % "sbt-plugin" % Versions.play),
     scalaVersion          := scala212,
-    crossScalaVersions    := Seq(scala212),
+    crossScalaVersions    := Seq(scala212, scala3),
+    pluginCrossBuild / sbtVersion := {
+      scalaBinaryVersion.value match {
+        case "2.12" => "1.12.9"
+        case _      => "2.0.0-RC11"
+      }
+    },
+    scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, _)) => Seq("-Xsource:3")
+        case _            => Seq.empty
+      }
+    },
     mimaPreviousArtifacts := Set.empty,
     Compile / resourceGenerators += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq(
       s"-Dproject.version=${version.value}",
+      s"-Dscala.version=${if (scalaBinaryVersion.value == "2.12") scala213 else scala3}",
     ),
     scriptedBufferLog    := false,
-    scriptedDependencies := ((): Unit),
+    scriptedDependencies := Def.sequential(
+      core / publishLocal,
+      publishLocal
+    ).value,
   )
   .settings(
     (Compile / headerSources) ++=

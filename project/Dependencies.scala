@@ -11,11 +11,11 @@ object Dependencies {
   object ScalaVersions {
     val scala212 = "2.12.21"
     val scala213 = "2.13.18"
-    val scala3   = "3.3.7"
+    val scala3   = "3.8.3"
   }
 
   object Versions {
-    val play: String   = "3.1.0-M4"
+    val play: String   = "3.1.0-M8"
     val ebean          = "17.3.0"
     val typesafeConfig = "1.4.6"
   }

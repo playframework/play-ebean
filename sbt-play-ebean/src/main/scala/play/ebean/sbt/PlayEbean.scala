@@ -7,10 +7,10 @@ package play.ebean.sbt
 import java.net.URLClassLoader
 import io.ebean.enhance.Transformer
 import io.ebean.enhance.ant.OfflineFileTransform
+import play.sbt.PluginCompat
 import sbt.Keys._
 import sbt.internal.inc.FarmHash
 import sbt.internal.inc.LastModified
-import sbt.internal.inc.PlainVirtualFileConverter
 import sbt.internal.inc.Stamper
 import sbt.AutoPlugin
 import sbt.Compile
@@ -19,21 +19,23 @@ import sbt.Task
 import sbt.inConfig
 import sbt.settingKey
 import sbt.taskKey
+import xsbti.FileConverter
+import xsbti.VirtualFileRef
 import xsbti.compile.CompileResult
 import xsbti.compile.analysis.Stamp
 import sbt._
-import xsbti.VirtualFileRef
-import scala.util.control.NonFatal
 
 object PlayEbean extends AutoPlugin {
 
   object autoImport {
+    @transient
     val playEbeanModels  = taskKey[Seq[String]]("The packages that should be searched for ebean models to enhance.")
     val playEbeanVersion =
       settingKey[String]("The version of Play ebean that should be added to the library dependencies.")
     val playEbeanDebugLevel = settingKey[Int](
       "The debug level to use for the ebean agent. The higher, the more debug is output, with 9 being the most. -1 turns debugging off."
     )
+    @transient
     val playEbeanAgentArgs = taskKey[Map[String, String]]("The arguments to pass to the agent.")
   }
 
@@ -41,19 +43,47 @@ object PlayEbean extends AutoPlugin {
 
   override def trigger = noTrigger
 
-  override def projectSettings: Seq[Def.Setting[_]] = inConfig(Compile)(scopedSettings) ++ unscopedSettings
+  override def projectSettings: Seq[Def.Setting[?]] = inConfig(Compile)(scopedSettings) ++ unscopedSettings
 
-  def scopedSettings: Seq[Def.Setting[_]] =
+  def scopedSettings: Seq[Def.Setting[?]] =
     Seq(
-      playEbeanModels    := configuredEbeanModels.value,
-      manipulateBytecode := ebeanEnhance.value
+      playEbeanModels    := PluginCompat.uncached { configuredEbeanModels.value },
+      manipulateBytecode := PluginCompat.uncached { ebeanEnhance.value },
+      // sbt 2 / Play can reach compiled classes through these tasks without running compile first,
+      // so make them trigger enhancement too.
+      products := {
+        manipulateBytecode.value
+        products.value
+      },
+      productDirectories := {
+        manipulateBytecode.value
+        productDirectories.value
+      },
+      exportedProducts := PluginCompat.uncached {
+        manipulateBytecode.value
+        exportedProducts.value
+      },
+      fullClasspath := PluginCompat.uncached {
+        manipulateBytecode.value
+        fullClasspath.value
+      }
     )
 
-  def unscopedSettings: Seq[Def.Setting[_]] =
+  def unscopedSettings: Seq[Def.Setting[?]] =
     Seq(
       playEbeanDebugLevel := -1,
       playEbeanAgentArgs  := Map("debug" -> playEbeanDebugLevel.value.toString),
       playEbeanVersion    := readResourceProperty("play-ebean.version.properties", "play-ebean.version"),
+      // Test tasks need the already-enhanced main classes on their classpath, otherwise sbt 2
+      // can run tests against non-enhanced entities even though Compile / manipulateBytecode exists.
+      Test / dependencyClasspath := PluginCompat.uncached {
+        (Compile / manipulateBytecode).value
+        (Test / dependencyClasspath).value
+      },
+      Test / fullClasspath := PluginCompat.uncached {
+        (Compile / manipulateBytecode).value
+        (Test / fullClasspath).value
+      },
       libraryDependencies ++=
         Seq(
           "org.playframework" %% "play-ebean"   % playEbeanVersion.value,
@@ -73,11 +103,16 @@ object PlayEbean extends AutoPlugin {
       val agentArgs       = playEbeanAgentArgs.value
       val analysis        = result.analysis.asInstanceOf[sbt.internal.inc.Analysis]
       val agentArgsString = agentArgs.map { case (key, value) => s"$key=$value" }.mkString(";")
+      val converter       = fileConverter.value
+      val models          = playEbeanModels.value
 
       val originalContextClassLoader = Thread.currentThread.getContextClassLoader
 
       try {
-        val classpath   = deps.map(_.data.toURI.toURL).toArray :+ classes.toURI.toURL
+        implicit val fileConverterCompat: FileConverter = converter
+        val classpath =
+          (deps.map(dep => PluginCompat.toNioPath(dep.data).toUri.toURL).toVector :+ classes.toURI.toURL)
+            .toArray[java.net.URL]
         val classLoader = new URLClassLoader(classpath, null)
 
         Thread.currentThread.setContextClassLoader(classLoader)
@@ -85,18 +120,13 @@ object PlayEbean extends AutoPlugin {
         val transformer   = new Transformer(classLoader, agentArgsString)
         val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
 
-        try {
-          fileTransform.process(playEbeanModels.value.mkString(","))
-        } catch {
-          case NonFatal(_) =>
-        }
+        fileTransform.process(models.mkString(","))
 
       } finally {
         Thread.currentThread.setContextClassLoader(originalContextClassLoader)
       }
 
       val allProducts = analysis.relations.allProducts
-      val converter   = new PlainVirtualFileConverter()
 
       /**
        * Updates stamp of product (class file) by preserving the type of a passed stamp. This way any stamp incremental
@@ -136,9 +166,12 @@ object PlayEbean extends AutoPlugin {
       // Creates a classloader with all the dependencies and all the resources, from there we can use the play ebean
       // code to load the config as it would be loaded in production
       def withClassLoader[T](block: ClassLoader => T): T = {
+        val converter = fileConverter.value
+        implicit val fileConverterCompat: FileConverter = converter
         val classpath =
-          unmanagedResourceDirectories.value.map(_.toURI.toURL) ++ dependencyClasspath.value.map(_.data.toURI.toURL)
-        val classLoader = new URLClassLoader(classpath.toArray, null)
+          unmanagedResourceDirectories.value.map(_.toURI.toURL) ++
+            dependencyClasspath.value.map(dep => PluginCompat.toNioPath(dep.data).toUri.toURL)
+        val classLoader = new URLClassLoader(classpath.toArray[java.net.URL], null)
         try {
           block(classLoader)
         } catch {
