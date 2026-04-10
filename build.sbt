@@ -2,7 +2,8 @@
 
 import Dependencies.ScalaVersions.scala212
 import Dependencies.ScalaVersions.scala213
-import Dependencies.ScalaVersions.scala3
+import Dependencies.ScalaVersions.scala3App
+import Dependencies.ScalaVersions.scala3Plugin
 import Dependencies.Versions
 import com.typesafe.tools.mima.core._
 import sbt.Append.appendSeq
@@ -32,7 +33,7 @@ lazy val root = project
   .aggregate(core, plugin)
   .disablePlugins(MimaPlugin)
   .settings(
-    scalaVersion       := scala3,
+    scalaVersion       := scala3App,
     name               := "play-ebean-root",
     crossScalaVersions := Nil,
     publish / skip     := true,
@@ -52,7 +53,7 @@ lazy val core = project
   .settings(
     name               := "play-ebean",
     scalaVersion       := scala213,
-    crossScalaVersions := Seq(scala213, scala3),
+    crossScalaVersions := Seq(scala213, scala3App),
     Dependencies.ebean,
     mimaSettings,
     Compile / compile := enhanceEbeanClasses(
@@ -72,7 +73,7 @@ lazy val plugin = project
     Dependencies.plugin,
     addSbtPlugin("org.playframework" % "sbt-plugin" % Versions.play),
     scalaVersion          := scala212,
-    crossScalaVersions    := Seq(scala212, scala3),
+    crossScalaVersions    := Seq(scala212, scala3Plugin),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.12.9"
@@ -87,12 +88,13 @@ lazy val plugin = project
     },
     mimaPreviousArtifacts := Set.empty,
     Compile / resourceGenerators += generateVersionFile.taskValue,
+    // Use the current lane-based app Scala as a fallback for local runs without scripted.scala.version.
     scriptedLaunchOpts ++= Seq(
       s"-Dproject.version=${version.value}",
       s"-Dscala.version=${resolveScriptedScala(
           sys.props.getOrElse(
             "scripted.scala.version",
-            if (scalaBinaryVersion.value == "2.12") scala213 else scala3
+            if (scalaBinaryVersion.value == "2.12") scala213 else scala3App
           )
         )}",
     ),
@@ -111,7 +113,7 @@ def resolveScriptedScala(version: String): String =
   version match {
     case "scala212" | "2.12.x" => scala212
     case "scala213" | "2.13.x" => scala213
-    case "scala3" | "3.x"      => scala3
+    case "scala3" | "3.x"      => scala3App
     case exact                 => exact
   }
 
