@@ -89,7 +89,12 @@ lazy val plugin = project
     Compile / resourceGenerators += generateVersionFile.taskValue,
     scriptedLaunchOpts ++= Seq(
       s"-Dproject.version=${version.value}",
-      s"-Dscala.version=${if (scalaBinaryVersion.value == "2.12") scala213 else scala3}",
+      s"-Dscala.version=${resolveScriptedScala(
+          sys.props.getOrElse(
+            "scripted.scala.version",
+            if (scalaBinaryVersion.value == "2.12") scala213 else scala3
+          )
+        )}",
     ),
     scriptedBufferLog    := false,
     scriptedDependencies := Def.sequential(
@@ -101,6 +106,14 @@ lazy val plugin = project
     (Compile / headerSources) ++=
       (sourceDirectory.value / "sbt-test" ** ("*.java" || "*.sbt")).get
   )
+
+def resolveScriptedScala(version: String): String =
+  version match {
+    case "scala212" | "2.12.x" => scala212
+    case "scala213" | "2.13.x" => scala213
+    case "scala3" | "3.x"      => scala3
+    case exact                 => exact
+  }
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
   Defaults.sbtPluginExtra(
