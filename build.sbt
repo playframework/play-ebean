@@ -99,12 +99,7 @@ lazy val plugin = project
         )}",
     ),
     scriptedBufferLog    := false,
-    scriptedDependencies := Def
-      .sequential(
-        core / publishLocal,
-        publishLocal
-      )
-      .value,
+    scriptedDependencies := publishLocal.value,
   )
   .settings(
     (Compile / headerSources) ++=

@@ -66,6 +66,7 @@ jobs:
       java: ${{ matrix.java }}
       cmd: >-
         sbt -Dscripted.scala.version=${{ matrix.app_scala }} "
+          +core/publishLocal;
           ++ ${{ matrix.plugin_scala }};
           show scriptedSbt;
           show scriptedLaunchOpts;
