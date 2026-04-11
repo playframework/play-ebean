@@ -65,15 +65,12 @@ jobs:
     with:
       java: ${{ matrix.java }}
       cmd: >-
-        sbt "
+        sbt -Dscripted.scala.version=${{ matrix.app_scala }} "
           ++ ${{ matrix.plugin_scala }};
-          set plugin/scriptedLaunchOpts += \"-Dscripted.scala.version=${{ matrix.app_scala }}\";
           show scriptedSbt;
           show scriptedLaunchOpts;
           plugin/scripted;
         "
-      # Alternative:
-      # sbt -Dscripted.scala.version=${{ matrix.app_scala }} "++ ${{ matrix.plugin_scala }}" plugin/scripted
 
   finish:
     name: Finish
