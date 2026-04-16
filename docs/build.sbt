@@ -8,6 +8,8 @@ import sbtheader.LineCommentCreator
 
 SettingKey[Seq[File]]("migrationManualSources") := Nil
 
+ThisBuild / javafmtFormatterCompatibleJavaVersion := 17
+
 lazy val docs = project
   .in(file("."))
   .enablePlugins(PlayDocsPlugin, PlayEbean)
