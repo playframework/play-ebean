@@ -27,6 +27,8 @@ lazy val mimaSettings = Seq(
   )
 )
 
+ThisBuild / javafmtFormatterCompatibleJavaVersion := 11
+
 lazy val root = project
   .in(file("."))
   .aggregate(core, plugin)
