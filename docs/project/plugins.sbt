@@ -6,7 +6,7 @@ lazy val sbtPlayEbean = ProjectRef(Path.fileProperty("user.dir").getParentFile, 
 
 resolvers ++= DefaultOptions.resolvers(snapshot = true)
 
-addSbtPlugin("com.typesafe.play" % "play-docs-sbt-plugin" % sys.props.getOrElse("play.version", "2.9.10"))
+addSbtPlugin("com.typesafe.play" % "play-docs-sbt-plugin" % sys.props.getOrElse("play.version", "2.9.11"))
 
 addSbtPlugin("com.github.sbt" % "sbt-java-formatter" % "0.12.0")
 
