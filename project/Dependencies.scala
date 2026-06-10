@@ -11,7 +11,7 @@ object Dependencies {
   object ScalaVersions {
     val scala212     = "2.12.21"
     val scala213     = "2.13.18"
-    val scala3App    = "3.8.3"
+    val scala3App    = "3.8.4"
     val scala3Plugin = scala3App
   }
 
