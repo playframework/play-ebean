@@ -24,7 +24,7 @@ lazy val docs = project
     Test / unmanagedResourceDirectories := Nil,
     Test / parallelExecution            := false,
     scalaVersion                        := "2.13.18",
-    crossScalaVersions                  := Seq("2.13.18", "3.3.6"),
+    crossScalaVersions                  := Seq("2.13.18", "3.3.7"),
   )
   .settings(
     Test / javafmt / sourceDirectories ++= (Test / unmanagedSourceDirectories).value,
