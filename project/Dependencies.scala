@@ -11,14 +11,14 @@ object Dependencies {
   object ScalaVersions {
     val scala212     = "2.12.21"
     val scala213     = "2.13.18"
-    val scala3App    = "3.8.3"
+    val scala3App    = "3.8.4"
     val scala3Plugin = scala3App
   }
 
   object Versions {
     val play: String   = "3.1.0-M8"
     val ebean          = "17.10.0"
-    val typesafeConfig = "1.4.6"
+    val typesafeConfig = "1.4.9"
   }
 
   val ebean = libraryDependencies ++= Seq(
