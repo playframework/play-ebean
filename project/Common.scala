@@ -21,21 +21,21 @@ object Common extends AutoPlugin {
 
   val repoName = "play-ebean"
 
-  override def globalSettings: Seq[Setting[_]] =
+  override def globalSettings: Seq[Setting[?]] =
     Seq(
       // organization
       organization         := "org.playframework",
       organizationName     := "The Play Framework Project",
-      organizationHomepage := Some(url("https://playframework.com/")),
+      organizationHomepage := Some(uri("https://playframework.com/")),
       scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-encoding", "utf8"),
       javacOptions ++= Seq("-encoding", "UTF-8"),
       // legal
-      licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")),
+      licenses := Seq(License("Apache-2.0", uri("https://www.apache.org/licenses/LICENSE-2.0.html"))),
       // on the web
-      homepage := Some(url(s"https://github.com/playframework/$repoName")),
+      homepage := Some(uri(s"https://github.com/playframework/$repoName")),
       scmInfo  := Some(
         ScmInfo(
-          url(s"https://github.com/playframework/$repoName"),
+          uri(s"https://github.com/playframework/$repoName"),
           s"scm:git:git@github.com:playframework/$repoName.git"
         )
       ),
@@ -43,11 +43,11 @@ object Common extends AutoPlugin {
         "playframework",
         "The Play Framework Contributors",
         "contact@playframework.com",
-        url("https://github.com/playframework")
+        uri("https://github.com/playframework")
       )
     )
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def projectSettings: Seq[Def.Setting[?]] =
     Seq(
       headerLicense := Some(
         HeaderLicense.Custom(

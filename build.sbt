@@ -41,13 +41,14 @@ lazy val root = project
     publish / skip     := true,
   )
   .settings(
-    (Compile / headerSources) ++=
+    (Compile / headerSources) ++= Def.uncached(
       ((baseDirectory.value ** ("*.properties" || "*.md" || "*.sbt"))
         --- (baseDirectory.value ** "target" ** "*")
         --- (baseDirectory.value / ".github" ** "*")
         --- (baseDirectory.value / "docs" ** "*")
-        --- (baseDirectory.value / "sbt-play-ebean" ** "*")).get ++
-        (baseDirectory.value / "project" ** "*.scala" --- (baseDirectory.value ** "target" ** "*")).get
+        --- (baseDirectory.value / "sbt-play-ebean" ** "*")).get() ++
+        (baseDirectory.value / "project" ** "*.scala" --- (baseDirectory.value ** "target" ** "*")).get()
+    ),
   )
 
 lazy val core = project
@@ -58,11 +59,14 @@ lazy val core = project
     crossScalaVersions := Seq(scala213, scala3App),
     Dependencies.ebean,
     mimaSettings,
-    Compile / compile := enhanceEbeanClasses(
-      (Compile / dependencyClasspath).value,
-      (Compile / compile).value,
-      (Compile / classDirectory).value,
-      "play/db/ebean/**"
+    Compile / compile := Def.uncached(
+      enhanceEbeanClasses(
+        (Compile / dependencyClasspath).value,
+        (Compile / compile).value,
+        (Compile / classDirectory).value,
+        "play/db/ebean/**",
+        fileConverter.value,
+      )
     ),
   )
 
@@ -74,12 +78,12 @@ lazy val plugin = project
     organization := "org.playframework",
     Dependencies.plugin,
     addSbtPlugin("org.playframework" % "sbt-plugin" % Versions.play),
-    scalaVersion                  := scala212,
+    scalaVersion                  := scala3Plugin,
     crossScalaVersions            := Seq(scala212, scala3Plugin),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.12.9"
-        case _      => "2.0.0-RC11"
+        case _      => "2.0.8"
       }
     },
     scalacOptions ++= {
@@ -104,8 +108,9 @@ lazy val plugin = project
     scriptedDependencies := publishLocal.value,
   )
   .settings(
-    (Compile / headerSources) ++=
-      (sourceDirectory.value / "sbt-test" ** ("*.java" || "*.sbt")).get
+    (Compile / headerSources) ++= Def.uncached(
+      (sourceDirectory.value / "sbt-test" ** ("*.java" || "*.sbt")).get()
+    ),
   )
 
 def resolveScriptedScala(version: String): String =
@@ -129,10 +134,11 @@ def enhanceEbeanClasses(
     classpath: Classpath,
     analysis: CompileAnalysis,
     classDirectory: File,
-    pkg: String
+    pkg: String,
+    converter: FileConverter,
 ): CompileAnalysis = {
   // Ebean (really hacky sorry)
-  val cp = classpath.map(_.data.toURI.toURL).toArray :+ classDirectory.toURI.toURL
+  val cp = classpath.map(_.data).map(converter.toPath).map(_.toFile.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)
   val t  = cl
     .loadClass("io.ebean.enhance.Transformer")
