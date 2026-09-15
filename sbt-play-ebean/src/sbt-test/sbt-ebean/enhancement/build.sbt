@@ -6,6 +6,8 @@ lazy val root = project
 
 scalaVersion := sys.props("scala.version")
 
+resolvers ++= Seq(Resolver.sonatypeCentralSnapshots, Resolver.ApacheMavenSnapshotsRepo)
+
 Test / sourceDirectory := baseDirectory.value / "tests"
 
 Test / scalaSource := baseDirectory.value / "tests"

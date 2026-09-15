@@ -27,8 +27,8 @@ object Common extends AutoPlugin {
       organization         := "org.playframework",
       organizationName     := "The Play Framework Project",
       organizationHomepage := Some(uri("https://playframework.com/")),
-      scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-encoding", "utf8"),
-      javacOptions ++= Seq("-encoding", "UTF-8"),
+      scalacOptions ++= Seq("-release", "17", "-deprecation", "-feature", "-unchecked", "-encoding", "utf8"),
+      javacOptions ++= Seq("--release", "17", "-encoding", "UTF-8"),
       // legal
       licenses := Seq(License("Apache-2.0", uri("https://www.apache.org/licenses/LICENSE-2.0.html"))),
       // on the web
@@ -49,6 +49,9 @@ object Common extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[?]] =
     Seq(
+      scalacOptions ++= {
+        if (scalaVersion.value.startsWith("3.3.")) Seq("-Yfuture-lazy-vals") else Seq.empty
+      },
       headerLicense := Some(
         HeaderLicense.Custom(
           "Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>"

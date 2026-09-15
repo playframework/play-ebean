@@ -9,6 +9,14 @@ import sbtheader.LineCommentCreator
 SettingKey[Seq[File]]("migrationManualSources") := Nil
 
 ThisBuild / javafmtFormatterCompatibleJavaVersion := 17
+ThisBuild / resolvers += Resolver.sonatypeCentralSnapshots
+
+val scalaVersionAliases = Map(
+  "2.13.x" -> "2.13.18",
+  "3.3.x"  -> "3.3.8",
+  "3.9.x"  -> "3.9.0",
+  "3.next" -> "3.10.0-RC2",
+)
 
 lazy val docs = project
   .in(file("."))
@@ -23,8 +31,14 @@ lazy val docs = project
     // No resource directories shuts the ebean agent up about java sources in the classes directory
     Test / unmanagedResourceDirectories := Nil,
     Test / parallelExecution            := false,
-    scalaVersion                        := "2.13.18",
-    crossScalaVersions                  := Seq("2.13.18", "3.3.8"),
+    scalaVersion                        := {
+      val selected = sys.props.getOrElse("scala.version", "2.13.18")
+      scalaVersionAliases.getOrElse(selected, selected)
+    },
+    crossScalaVersions := Seq("2.13.18", "3.3.8"),
+    scalacOptions ++= {
+      if (scalaVersion.value.startsWith("3.3.")) Seq("-release:17", "-Yfuture-lazy-vals") else Seq.empty
+    },
   )
   .settings(
     Test / javafmt / sourceDirectories ++= (Test / unmanagedSourceDirectories).value,

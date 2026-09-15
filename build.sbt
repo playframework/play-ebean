@@ -1,9 +1,11 @@
 // Copyright (C) from 2022 The Play Framework Contributors <https://github.com/playframework>, 2011-2021 Lightbend Inc. <https://www.lightbend.com>
 
-import Dependencies.ScalaVersions.scala212
-import Dependencies.ScalaVersions.scala213
-import Dependencies.ScalaVersions.scala3App
-import Dependencies.ScalaVersions.scala3Plugin
+import Dependencies.ScalaVersions.publishedScalaVersions
+import Dependencies.ScalaVersions.resolveScalaVersion
+import Dependencies.ScalaVersions.scala212Version
+import Dependencies.ScalaVersions.scala213Version
+import Dependencies.ScalaVersions.scala3PluginVersion
+import Dependencies.ScalaVersions.scala3Version
 import Dependencies.Versions
 import com.typesafe.tools.mima.core._
 import sbt.Append.appendSeq
@@ -11,6 +13,7 @@ import xsbti.compile.CompileAnalysis
 
 // Customise sbt-dynver's behaviour to make it work with tags which aren't v-prefixed
 ThisBuild / dynverVTagPrefix := false
+ThisBuild / resolvers += Resolver.sonatypeCentralSnapshots
 
 // Sanity-check: assert that version comes from a tag (e.g. not a too-shallow clone)
 // https://github.com/dwijnand/sbt-dynver/#sanity-checking-the-version
@@ -35,7 +38,7 @@ lazy val root = project
   .aggregate(core, plugin)
   .disablePlugins(MimaPlugin)
   .settings(
-    scalaVersion       := scala3App,
+    scalaVersion       := resolveScalaVersion(sys.props.getOrElse("scala.version", scala213Version)),
     name               := "play-ebean-root",
     crossScalaVersions := Nil,
     publish / skip     := true,
@@ -55,8 +58,8 @@ lazy val core = project
   .in(file("play-ebean"))
   .settings(
     name               := "play-ebean",
-    scalaVersion       := scala213,
-    crossScalaVersions := Seq(scala213, scala3App),
+    scalaVersion       := resolveScalaVersion(sys.props.getOrElse("scala.version", scala213Version)),
+    crossScalaVersions := publishedScalaVersions,
     Dependencies.ebean,
     mimaSettings,
     Compile / compile := Def.uncached(
@@ -78,12 +81,12 @@ lazy val plugin = project
     organization := "org.playframework",
     Dependencies.plugin,
     addSbtPlugin("org.playframework" % "sbt-plugin" % Versions.play),
-    scalaVersion                  := scala3Plugin,
-    crossScalaVersions            := Seq(scala212, scala3Plugin),
+    scalaVersion                  := scala3PluginVersion,
+    crossScalaVersions            := Seq(scala212Version, scala3PluginVersion),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.12.9"
-        case _      => "2.1.0-M1"
+        case _      => "2.1.0-M2"
       }
     },
     scalacOptions ++= {
@@ -100,7 +103,7 @@ lazy val plugin = project
       s"-Dscala.version=${resolveScriptedScala(
           sys.props.getOrElse(
             "scripted.scala.version",
-            if (scalaBinaryVersion.value == "2.12") scala213 else scala3App
+            if (scalaBinaryVersion.value == "2.12") scala213Version else scala3Version
           )
         )}",
     ),
@@ -115,10 +118,10 @@ lazy val plugin = project
 
 def resolveScriptedScala(version: String): String =
   version match {
-    case "scala212" | "2.12.x" => scala212
-    case "scala213" | "2.13.x" => scala213
-    case "scala3" | "3.x"      => scala3App
-    case exact                 => exact
+    case "scala212" | "2.12.x" => scala212Version
+    case "scala213" | "2.13.x" => scala213Version
+    case "scala3" | "3.x"      => scala3Version
+    case selector              => resolveScalaVersion(selector)
   }
 
 def sbtPluginDep(moduleId: ModuleID, sbtVersion: String, scalaVersion: String) = {
