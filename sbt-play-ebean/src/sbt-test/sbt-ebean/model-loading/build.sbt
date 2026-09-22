@@ -6,6 +6,4 @@ lazy val root = project
 
 scalaVersion := sys.props("scala.version")
 
-resolvers ++= DefaultOptions.resolvers(snapshot = true)
-
 libraryDependencies += "com.h2database" % "h2" % "2.5.250"

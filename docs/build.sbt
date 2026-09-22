@@ -15,7 +15,6 @@ lazy val docs = project
   .enablePlugins(PlayDocsPlugin, PlayEbean)
   .settings(
     // use special snapshot play version for now
-    resolvers ++= DefaultOptions.resolvers(snapshot = true),
     libraryDependencies += component("play-java-forms"),
     libraryDependencies += component("play-test") % Test,
     libraryDependencies += "com.h2database"       % "h2" % "2.5.250" % Test,
