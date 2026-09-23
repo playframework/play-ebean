@@ -9,5 +9,5 @@ on:
 jobs:
   publish-artifacts:
     name: Publish / Artifacts
-    uses: playframework/.github/.github/workflows/publish.yml@v4
+    uses: playframework/.github/.github/workflows/publish.yml@unblock-repo_scala_sbt_org
     secrets: inherit
