@@ -15,17 +15,17 @@ concurrency:
 jobs:
   check-code-style:
     name: Code Style
-    uses: playframework/.github/.github/workflows/cmd.yml@v4
+    uses: playframework/.github/.github/workflows/cmd.yml@unblock-repo_scala_sbt_org
     with:
       cmd: sbt validateCode
 
   check-binary-compatibility:
     name: Binary Compatibility
-    uses: playframework/.github/.github/workflows/binary-check.yml@v4
+    uses: playframework/.github/.github/workflows/binary-check.yml@unblock-repo_scala_sbt_org
 
   check-docs:
     name: Docs
-    uses: playframework/.github/.github/workflows/cmd.yml@v4
+    uses: playframework/.github/.github/workflows/cmd.yml@unblock-repo_scala_sbt_org
     with:
       java: 21, 17
       # Symbolic lanes resolve to exact versions in project/Dependencies.scala.
@@ -38,7 +38,7 @@ jobs:
       - "check-code-style"
       - "check-binary-compatibility"
       - "check-docs"
-    uses: playframework/.github/.github/workflows/cmd.yml@v4
+    uses: playframework/.github/.github/workflows/cmd.yml@unblock-repo_scala_sbt_org
     with:
       java: 21, 17
       # Symbolic lanes resolve to exact versions in project/Dependencies.scala.
@@ -65,7 +65,7 @@ jobs:
           - 3.3.x
           - 3.9.x
           - 3.next
-    uses: playframework/.github/.github/workflows/cmd.yml@v4
+    uses: playframework/.github/.github/workflows/cmd.yml@unblock-repo_scala_sbt_org
     with:
       java: ${{ matrix.java }}
       cmd: >-
@@ -83,4 +83,4 @@ jobs:
     needs: # Should be last
       - "tests"
       - "scripted-tests"
-    uses: playframework/.github/.github/workflows/rtm.yml@v4
+    uses: playframework/.github/.github/workflows/rtm.yml@unblock-repo_scala_sbt_org
