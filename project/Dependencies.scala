@@ -9,14 +9,30 @@ import sbt._
 object Dependencies {
 
   object ScalaVersions {
-    val scala212     = "2.12.21"
-    val scala213     = "2.13.18"
-    val scala3App    = "3.9.0"
-    val scala3Plugin = scala3App
+    val scala212Version   = "2.12.21"
+    val scala213Version   = "2.13.18"
+    val scala3Version     = "3.3.8"
+    val scala39LTSVersion = "3.9.0"
+    val scala3NextVersion = "3.10.0-RC2"
+
+    val publishedScalaVersions = Seq(scala213Version, scala3Version)
+
+    private val scalaVersionAliases = Map(
+      "2.12.x" -> scala212Version,
+      "2.13.x" -> scala213Version,
+      "3.3.x"  -> scala3Version,
+      "3.9.x"  -> scala39LTSVersion,
+      "3.next" -> scala3NextVersion,
+    )
+
+    def resolveScalaVersion(version: String): String = scalaVersionAliases.getOrElse(version, version)
+
+    // sbt 2.1.0-M2 itself is built with Scala 3.9.0.
+    val scala3PluginVersion = scala39LTSVersion
   }
 
   object Versions {
-    val play: String   = "3.1.0-M9"
+    val play: String   = "3.1.0-M10-e1f3c2a9-SNAPSHOT"
     val ebean          = "19.5.0"
     val typesafeConfig = "1.4.9"
   }

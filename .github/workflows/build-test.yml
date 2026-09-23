@@ -28,8 +28,9 @@ jobs:
     uses: playframework/.github/.github/workflows/cmd.yml@v4
     with:
       java: 21, 17
-      scala: 2.13.x, 3.x
-      cmd: cd docs && sbt "++$MATRIX_SCALA ; validateCode"
+      # Symbolic lanes resolve to exact versions in project/Dependencies.scala.
+      scala: 2.13.x, 3.3.x, 3.9.x, 3.next
+      cmd: cd docs && sbt -Dscala.version=$MATRIX_SCALA validateCode
 
   tests:
     name: Tests
@@ -40,9 +41,10 @@ jobs:
     uses: playframework/.github/.github/workflows/cmd.yml@v4
     with:
       java: 21, 17
-      scala: 2.13.x, 3.x
+      # Symbolic lanes resolve to exact versions in project/Dependencies.scala.
+      scala: 2.13.x, 3.3.x, 3.9.x, 3.next
       cmd: >-
-        sbt --server ++$MATRIX_SCALA test
+        sbt --server -Dscala.version=$MATRIX_SCALA testFull
 
   scripted-tests:
     name: Scripted tests
@@ -60,7 +62,9 @@ jobs:
           - 3.x
         app_scala:
           - 2.13.x
-          - 3.x
+          - 3.3.x
+          - 3.9.x
+          - 3.next
     uses: playframework/.github/.github/workflows/cmd.yml@v4
     with:
       java: ${{ matrix.java }}
