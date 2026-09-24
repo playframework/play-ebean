@@ -5,7 +5,7 @@ import Dependencies.ScalaVersions.resolveScalaVersion
 import Dependencies.ScalaVersions.scala212Version
 import Dependencies.ScalaVersions.scala213Version
 import Dependencies.ScalaVersions.scala3PluginVersion
-import Dependencies.ScalaVersions.scala3Version
+import Dependencies.ScalaVersions.scala33LTSVersion
 import Dependencies.Versions
 import com.typesafe.tools.mima.core._
 import sbt.Append.appendSeq
@@ -103,7 +103,7 @@ lazy val plugin = project
       s"-Dscala.version=${resolveScriptedScala(
           sys.props.getOrElse(
             "scripted.scala.version",
-            if (scalaBinaryVersion.value == "2.12") scala213Version else scala3Version
+            if (scalaBinaryVersion.value == "2.12") scala213Version else scala33LTSVersion
           )
         )}",
     ),
@@ -120,7 +120,7 @@ def resolveScriptedScala(version: String): String =
   version match {
     case "scala212" | "2.12.x" => scala212Version
     case "scala213" | "2.13.x" => scala213Version
-    case "scala3" | "3.x"      => scala3Version
+    case "scala3" | "3.x"      => scala33LTSVersion
     case selector              => resolveScalaVersion(selector)
   }
 
