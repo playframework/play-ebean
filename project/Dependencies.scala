@@ -47,7 +47,7 @@ object Dependencies {
     "org.playframework" %% "play-filters-helpers" % Versions.play % Test,
     "org.playframework" %% "play-test"            % Versions.play % Test,
     ("org.reflections"   % "reflections"          % "0.10.2")
-      .exclude("com.google.code.findbugs", "annotations")
+      .exclude("com.google.code.findbugs" % "annotations")
       .classifier("")
   )
 
