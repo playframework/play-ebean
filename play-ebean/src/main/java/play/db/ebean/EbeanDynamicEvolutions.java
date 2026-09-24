@@ -5,7 +5,6 @@
 package play.db.ebean;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import jakarta.inject.Inject;
@@ -53,9 +52,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
 
   /** Initialise the Ebean servers/databases. */
   public void start() {
-    config
-        .serverConfigs()
-        .forEach((key, serverConfig) -> databases.put(key, DatabaseFactory.create(serverConfig)));
+    config.serverConfigs().forEach((key, serverConfig) -> databases.put(key, serverConfig.build()));
   }
 
   /** Generate evolutions. */

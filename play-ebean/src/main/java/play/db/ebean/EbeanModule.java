@@ -4,20 +4,22 @@
 
 package play.db.ebean;
 
-import play.api.Configuration;
-import play.api.Environment;
+import com.typesafe.config.Config;
+import java.util.List;
+import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;
-import play.api.inject.Binding;
-import play.api.inject.Module;
-import scala.collection.Seq;
+import play.inject.Binding;
+import play.inject.Module;
 
 /** Injection module with default Ebean components. */
 public class EbeanModule extends Module {
 
   @Override
-  public Seq<Binding<?>> bindings(Environment environment, Configuration configuration) {
-    return seq(
-        bind(DynamicEvolutions.class).to(EbeanDynamicEvolutions.class).eagerly(),
-        bind(EbeanConfig.class).toProvider(DefaultEbeanConfig.EbeanConfigParser.class).eagerly());
+  public List<Binding<?>> bindings(final Environment environment, final Config config) {
+    return List.of(
+        bindClass(DynamicEvolutions.class).to(EbeanDynamicEvolutions.class).eagerly(),
+        bindClass(EbeanConfig.class)
+            .toProvider(DefaultEbeanConfig.EbeanConfigParser.class)
+            .eagerly());
   }
 }

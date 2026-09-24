@@ -28,6 +28,8 @@ lazy val mimaSettings = Seq(
   mimaPreviousArtifacts := previousVersion.map(organization.value %% moduleName.value % _).toSet,
   mimaBinaryIssueFilters ++= Seq(
     ProblemFilters.exclude[MissingTypesProblem]("play.db.ebean.DefaultEbeanConfig$EbeanConfigParser"),
+    // Play's Java Module superclass provides the inherited Scala bindings method and its Seq bridge.
+    ProblemFilters.exclude[DirectAbstractMethodProblem]("play.api.inject.Module.bindings"),
   )
 )
 

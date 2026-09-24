@@ -6,7 +6,8 @@ package play.db.ebean;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigException;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.Database;
+import io.ebean.DatabaseBuilder;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
@@ -27,20 +28,21 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
   private final String defaultServer;
 
-  private final Map<String, DatabaseConfig> serverConfigs;
+  private final Map<String, DatabaseBuilder.Settings> serverConfigs;
 
   private final boolean generateEvolutionsScripts;
 
   public DefaultEbeanConfig(
       String defaultServer,
-      Map<String, DatabaseConfig> serverConfigs,
+      Map<String, DatabaseBuilder.Settings> serverConfigs,
       boolean generateEvolutionsScripts) {
     this.defaultServer = defaultServer;
     this.serverConfigs = serverConfigs;
     this.generateEvolutionsScripts = generateEvolutionsScripts;
   }
 
-  public DefaultEbeanConfig(String defaultServer, Map<String, DatabaseConfig> serverConfigs) {
+  public DefaultEbeanConfig(
+      String defaultServer, Map<String, DatabaseBuilder.Settings> serverConfigs) {
     this(defaultServer, serverConfigs, true);
   }
 
@@ -50,7 +52,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
   }
 
   @Override
-  public Map<String, DatabaseConfig> serverConfigs() {
+  public Map<String, DatabaseBuilder.Settings> serverConfigs() {
     return serverConfigs;
   }
 
@@ -91,7 +93,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
       EbeanParsedConfig ebeanConfig = EbeanParsedConfig.parseFromConfig(config);
 
-      Map<String, DatabaseConfig> serverConfigs = new HashMap<>();
+      Map<String, DatabaseBuilder.Settings> serverConfigs = new HashMap<>();
 
       for (Map.Entry<String, List<String>> entry : ebeanConfig.getDatasourceModels().entrySet()) {
         String key = entry.getKey();
@@ -102,14 +104,14 @@ public class DefaultEbeanConfig implements EbeanConfig {
           continue;
         }
 
-        DatabaseConfig serverConfig = new DatabaseConfig();
-        serverConfig.setName(key);
+        DatabaseBuilder.Settings serverConfig = Database.builder().settings();
+        serverConfig.name(key);
         serverConfig.loadFromProperties();
 
         setServerConfigDataSource(key, serverConfig);
 
         if (!ebeanConfig.getDefaultDatasource().equals(key)) {
-          serverConfig.setDefaultServer(false);
+          serverConfig.defaultDatabase(false);
         }
 
         Set<String> classes = getModelClasses(entry);
@@ -124,16 +126,16 @@ public class DefaultEbeanConfig implements EbeanConfig {
           ebeanConfig.generateEvolutionsScripts());
     }
 
-    private void setServerConfigDataSource(String key, DatabaseConfig serverConfig) {
+    private void setServerConfigDataSource(String key, DatabaseBuilder serverConfig) {
       try {
-        serverConfig.setDataSource(new WrappingDatasource(dbApi.getDatabase(key).getDataSource()));
+        serverConfig.dataSource(new WrappingDatasource(dbApi.getDatabase(key).getDataSource()));
       } catch (Exception e) {
         throw new ConfigException.BadValue("ebean." + key, e.getMessage(), e);
       }
     }
 
     private void addModelClassesToServerConfig(
-        String key, DatabaseConfig serverConfig, Set<String> classes) {
+        String key, DatabaseBuilder serverConfig, Set<String> classes) {
       for (String clazz : classes) {
         try {
           serverConfig.addClass(Class.forName(clazz, true, environment.classLoader()));
