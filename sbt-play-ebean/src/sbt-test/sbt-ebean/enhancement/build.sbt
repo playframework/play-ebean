@@ -14,4 +14,4 @@ Test / scalaSource := baseDirectory.value / "tests"
 
 Test / javaSource := baseDirectory.value / "tests"
 
-libraryDependencies += "com.h2database" % "h2" % "2.5.250"
+libraryDependencies += "com.h2database" % "h2" % "2.5.252"
