@@ -26,9 +26,17 @@ public class EbeanShutdownTest {
         new GuiceApplicationBuilder()
             .configure(
                 Map.of(
-                    "db.default.driver", "org.h2.Driver",
-                    "db.default.url", "jdbc:h2:mem:play-ebean-shutdown",
-                    "ebean.default", List.of()))
+                    "db.default.driver",
+                    "org.h2.Driver",
+                    "db.default.url",
+                    "jdbc:h2:mem:play-ebean-shutdown",
+                    "ebean.default",
+                    List.of(),
+                    // Without models, Ebean searches the classpath and finds the test models, so
+                    // don't
+                    // write their evolutions script into the working directory
+                    "play.ebean.generateEvolutionsScripts",
+                    false))
             .build();
     Helpers.start(app);
     Database database = DB.getDefault();
