@@ -101,11 +101,17 @@ public class EbeanParsedConfig {
               });
     }
     Map<String, String> readOnlyDatasources = new HashMap<>();
-    Config readOnlyDatasourcesConfig = playEbeanConfig.getConfig("readOnlyDatasources");
-    readOnlyDatasourcesConfig
+    Config serversConfig = playEbeanConfig.getConfig("db");
+    serversConfig
         .root()
         .keySet()
-        .forEach(key -> readOnlyDatasources.put(key, readOnlyDatasourcesConfig.getString(key)));
+        .forEach(
+            server -> {
+              Config serverConfig = serversConfig.getConfig(server);
+              if (serverConfig.hasPath("readOnlyDatasource")) {
+                readOnlyDatasources.put(server, serverConfig.getString("readOnlyDatasource"));
+              }
+            });
 
     return new EbeanParsedConfig(
         defaultDatasource, datasourceModels, generateEvolutionsScripts, readOnlyDatasources);

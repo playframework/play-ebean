@@ -94,7 +94,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
       for (String key : ebeanConfig.getReadOnlyDatasources().keySet()) {
         if (!ebeanConfig.getDatasourceModels().containsKey(key)) {
           throw new ConfigException.BadValue(
-              "play.ebean.readOnlyDatasources." + key, "There is no Ebean server '" + key + "'");
+              "play.ebean.db." + key, "There is no Ebean server '" + key + "'");
         }
       }
 
@@ -150,7 +150,7 @@ public class DefaultEbeanConfig implements EbeanConfig {
       }
       if (dbApi.getDatabase(readOnlyDatasource) == null) {
         throw new ConfigException.BadValue(
-            "play.ebean.readOnlyDatasources." + key,
+            "play.ebean.db." + key + ".readOnlyDatasource",
             "There is no Play database '" + readOnlyDatasource + "'");
       }
       // Not wrapped: Ebean's implicit read-only transactions work best with auto-commit

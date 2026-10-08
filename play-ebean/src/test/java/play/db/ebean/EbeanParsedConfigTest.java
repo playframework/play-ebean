@@ -64,7 +64,7 @@ public class EbeanParsedConfigTest {
   @Test
   public void readOnlyDatasources() {
     EbeanParsedConfig config =
-        parse(ImmutableMap.of("play.ebean.readOnlyDatasources.default", "replica"));
+        parse(ImmutableMap.of("play.ebean.db.default.readOnlyDatasource", "replica"));
     assertThat(config.getReadOnlyDatasources().size(), equalTo(1));
     assertThat(config.getReadOnlyDatasources().get("default"), equalTo("replica"));
   }
