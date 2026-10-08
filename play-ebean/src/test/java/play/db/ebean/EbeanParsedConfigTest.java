@@ -9,9 +9,12 @@ import static org.hamcrest.MatcherAssert.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigParseOptions;
+import com.typesafe.config.ConfigSyntax;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import org.junit.*;
 
 public class EbeanParsedConfigTest {
@@ -41,6 +44,43 @@ public class EbeanParsedConfigTest {
     assertThat(config.getDatasourceModels().size(), equalTo(2));
     assertThat(config.getDatasourceModels().get("default"), hasItems("a", "b"));
     assertThat(config.getDatasourceModels().get("other"), hasItems("c"));
+  }
+
+  @Test
+  public void ignoresEbeanSettingsFromProperties() {
+    // Play also loads conf/application.properties, where all values are strings
+    EbeanParsedConfig config =
+        EbeanParsedConfig.parseFromConfig(
+            ConfigFactory.parseString(
+                    "ebean.default=a\n"
+                        + "ebean.other.databasePlatformName=h2\n"
+                        + "ebean.migration.run=false\n"
+                        + "ebean.dumpMetricsOnShutdown=true\n",
+                    ConfigParseOptions.defaults().setSyntax(ConfigSyntax.PROPERTIES))
+                .withFallback(ConfigFactory.defaultReference()));
+    // Nested settings get ignored, while a setting directly below ebean. looks like a list of
+    // models (of an Ebean server without a database, so it gets skipped later on)
+    assertThat(
+        config.getDatasourceModels().keySet(), equalTo(Set.of("default", "dumpMetricsOnShutdown")));
+    assertThat(config.getDatasourceModels().get("default"), hasItems("a"));
+  }
+
+  @Test
+  public void ignoresEbeanSettings() {
+    // Ebean's own settings in a .conf file (which Ebean doesn't read, though)
+    EbeanParsedConfig config =
+        parse(
+            ImmutableMap.of(
+                "ebean.default",
+                Collections.singletonList("a"),
+                "ebean.other.databasePlatformName",
+                "h2",
+                "ebean.migration.run",
+                false,
+                "ebean.dumpMetricsOnShutdown",
+                true));
+    assertThat(config.getDatasourceModels().keySet(), equalTo(Collections.singleton("default")));
+    assertThat(config.getDatasourceModels().get("default"), hasItems("a"));
   }
 
   @Test
