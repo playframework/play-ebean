@@ -30,7 +30,10 @@ public class EbeanReadOnlyDatasourceTest {
                 "db.default.url", "jdbc:h2:mem:play-ebean-primary",
                 "db.replica.driver", "org.h2.Driver",
                 "db.replica.url", "jdbc:h2:mem:play-ebean-replica",
-                "ebean.default", List.of()))
+                "ebean.default", List.of(),
+                // Without models, Ebean searches the classpath and finds the test models, so don't
+                // write their evolutions script into the working directory
+                "play.ebean.generateEvolutionsScripts", false))
         .configure(config);
   }
 
