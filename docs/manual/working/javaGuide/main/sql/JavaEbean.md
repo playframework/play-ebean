@@ -47,7 +47,7 @@ Note that Ebean will also make use of a `conf/orm.xml` file (if present), to con
 
 #### Using a read replica
 
-Ebean can run queries that are executed outside of a transaction against a separate, read-only data source, typically a [read replica](https://ebean.io/docs/read-replicas/). Queries inside of transactions and all writes keep using the main data source.
+Ebean can run queries against a separate, read-only data source, typically a [read replica](https://ebean.io/docs/read-replicas/). This applies to queries executed outside of a transaction and to explicitly read-only transactions (e.g. `TxScope.required().setReadOnly(true)`). All writes and all queries inside of other transactions, including the ones of `@Transactional` actions, keep using the main data source.
 
 To use a read replica, configure it as an additional Play database and map it to the Ebean server via `play.ebean.readOnlyDatasources`:
 

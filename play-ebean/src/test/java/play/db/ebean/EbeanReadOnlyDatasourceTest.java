@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThrows;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Transaction;
+import io.ebean.TxScope;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
@@ -48,6 +49,9 @@ public class EbeanReadOnlyDatasourceTest {
       try (Transaction transaction = database.beginTransaction()) {
         assertEquals("PLAY-EBEAN-PRIMARY", currentDatabase(database));
       }
+      database.execute(
+          TxScope.required().setReadOnly(true),
+          () -> assertEquals("PLAY-EBEAN-REPLICA", currentDatabase(database)));
     } finally {
       Helpers.stop(app);
     }
