@@ -26,7 +26,7 @@ The runtime library can be configured by putting the list of packages and/or cla
 ebean.default = ["models.*"]
 ```
 
-This defines a `default` Ebean server, using the `default` data source, which must be properly configured. You can also override the name of the default Ebean server by configuring `ebeanconfig.datasource.default` property. This might be useful if you want to use separate databases for testing and development. You can actually create as many Ebean servers you need, and explicitly define the mapped class for each server:
+This defines a `default` Ebean server, using the `default` data source, which must be properly configured. You can also override the name of the default Ebean server by configuring the `play.ebean.defaultDatasource` property. This might be useful if you want to use separate databases for testing and development. You can actually create as many Ebean servers you need, and explicitly define the mapped class for each server:
 
 ```properties
 ebean.orders = ["models.Order", "models.OrderItem"]
@@ -138,3 +138,17 @@ If your class is an action, you can annotate your action method with `@play.db.e
 Or if you want a more traditional approach you can begin, commit and rollback transactions explicitly:
 
 @[traditional](code/javaguide/ebean/JavaEbeanTest.java)
+
+## Using Ebean during application startup
+
+Play Ebean creates the Ebean databases while the application starts, and Ebean's static API (like `DB.getDefault()`, but also the methods of `Model` and finders) only works afterwards. So if a component uses Ebean while it gets created, e.g. in the constructor of an eagerly bound component, or of one created via Guice's static injection, make it depend on `play.api.db.evolutions.DynamicEvolutions`. Play Ebean binds that one, and it creates the databases:
+
+@[startup](code/javaguide/ebean/TaskRepository.java)
+
+Otherwise Ebean tries to create the database itself from its own configuration. That usually fails, e.g. with `Configuration error creating DataSource for the default Database`, and leaves Ebean unusable until the JVM restarts. A later error like `NoClassDefFoundError: Could not initialize class io.ebean.DbContext` only means that this initialization failed before, so look for the first error to find out why.
+
+Note that this only makes sure that the databases exist, not that the evolutions have been applied. In dev mode, Play only applies pending evolutions once you confirm them in the browser, and it can't show that page if the application fails to start, e.g. because a component queries a table that doesn't exist yet. Depending on `play.api.db.evolutions.ApplicationEvolutions` doesn't help with that either, as in dev mode it doesn't wait for pending evolutions (its `upToDate()` method tells if there are any). So don't use the database schema while components get created, but later, e.g. when they get used for the first time. Or let Play apply the evolutions automatically, which you can limit to dev mode in your `build.sbt`:
+
+```scala
+PlayKeys.devSettings += "play.evolutions.db.default.autoApply" -> "true"
+```
