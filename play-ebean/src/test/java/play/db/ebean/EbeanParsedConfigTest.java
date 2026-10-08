@@ -44,6 +44,24 @@ public class EbeanParsedConfigTest {
   }
 
   @Test
+  public void ignoresEbeanSettings() {
+    // Ebean's own settings, e.g. from conf/application.properties, which Play loads too
+    EbeanParsedConfig config =
+        parse(
+            ImmutableMap.of(
+                "ebean.default",
+                Collections.singletonList("a"),
+                "ebean.other.databasePlatformName",
+                "h2",
+                "ebean.migration.run",
+                false,
+                "ebean.dumpMetricsOnShutdown",
+                true));
+    assertThat(config.getDatasourceModels().keySet(), equalTo(Collections.singleton("default")));
+    assertThat(config.getDatasourceModels().get("default"), hasItems("a"));
+  }
+
+  @Test
   public void commaSeparatedModels() {
     EbeanParsedConfig config = parse(ImmutableMap.of("ebean.default", "a,b"));
     assertThat(config.getDatasourceModels().get("default"), hasItems("a", "b"));

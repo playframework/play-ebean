@@ -11,12 +11,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import play.Logger;
 
 /**
  * The raw parsed config from Ebean, as opposed to the EbeanConfig which actually requires starting
  * database connection pools to create.
  */
 public class EbeanParsedConfig {
+
+  private static final Logger.ALogger LOGGER = Logger.of(EbeanParsedConfig.class);
 
   private final String defaultDatasource;
 
@@ -118,8 +121,21 @@ public class EbeanParsedConfig {
                 if (raw.valueType() == ConfigValueType.STRING) {
                   // Support legacy comma separated string
                   models = Arrays.asList(((String) raw.unwrapped()).split(","));
-                } else {
+                } else if (raw.valueType() == ConfigValueType.LIST) {
                   models = ebeanConfig.getStringList(key);
+                } else {
+                  // No models, but e.g. one of Ebean's own settings, which Play also loads from
+                  // conf/application.properties
+                  if (raw.origin().description().contains(".conf")) {
+                    LOGGER.warn(
+                        "Ignoring {}.{} ({}), as it's no list of models and Ebean doesn't read"
+                            + " Play's configuration. Put Ebean's own settings into"
+                            + " conf/application.yaml or conf/application.properties instead.",
+                        ebeanConfigKey,
+                        key,
+                        raw.origin().description());
+                  }
+                  return;
                 }
 
                 datasourceModels.put(key, models);
