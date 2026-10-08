@@ -8,7 +8,8 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static play.test.Helpers.*;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
+import io.ebean.Transaction;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,11 +92,11 @@ public class JavaEbeanTest extends WithApplication {
 
     // ###insert: ...
 
-    Ebean.execute(
+    DB.execute(
         () -> {
           // code running in "REQUIRED" transactional scope
           // ... as "REQUIRED" is the default TxType
-          System.out.println(Ebean.currentTransaction());
+          System.out.println(DB.currentTransaction());
 
           Task task = Task.find.byId(34L);
           task.setDone(true);
@@ -131,16 +132,17 @@ public class JavaEbeanTest extends WithApplication {
     createTask();
 
     // #traditional
-    Ebean.beginTransaction();
-    try {
+    // ###insert: import io.ebean.*;
+
+    // ###insert: ...
+
+    try (Transaction transaction = DB.beginTransaction()) {
       Task task = Task.find.byId(34L);
       task.setDone(true);
 
       task.save();
 
-      Ebean.commitTransaction();
-    } finally {
-      Ebean.endTransaction();
+      transaction.commit();
     }
     // #traditional
 
