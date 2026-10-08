@@ -7,6 +7,7 @@ package play.db.ebean;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValueType;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,13 +24,24 @@ public class EbeanParsedConfig {
 
   private final boolean generateEvolutionsScripts;
 
+  private final Map<String, String> readOnlyDatasources;
+
+  public EbeanParsedConfig(
+      String defaultDatasource,
+      Map<String, List<String>> datasourceModels,
+      boolean generateEvolutionsScripts,
+      Map<String, String> readOnlyDatasources) {
+    this.defaultDatasource = defaultDatasource;
+    this.datasourceModels = datasourceModels;
+    this.generateEvolutionsScripts = generateEvolutionsScripts;
+    this.readOnlyDatasources = readOnlyDatasources;
+  }
+
   public EbeanParsedConfig(
       String defaultDatasource,
       Map<String, List<String>> datasourceModels,
       boolean generateEvolutionsScripts) {
-    this.defaultDatasource = defaultDatasource;
-    this.datasourceModels = datasourceModels;
-    this.generateEvolutionsScripts = generateEvolutionsScripts;
+    this(defaultDatasource, datasourceModels, generateEvolutionsScripts, Collections.emptyMap());
   }
 
   public EbeanParsedConfig(String defaultDatasource, Map<String, List<String>> datasourceModels) {
@@ -46,6 +58,14 @@ public class EbeanParsedConfig {
 
   public boolean generateEvolutionsScripts() {
     return generateEvolutionsScripts;
+  }
+
+  /**
+   * @return the names of the Play databases the Ebean servers use for read-only queries, keyed by
+   *     Ebean server name.
+   */
+  public Map<String, String> getReadOnlyDatasources() {
+    return readOnlyDatasources;
   }
 
   /**
@@ -80,6 +100,14 @@ public class EbeanParsedConfig {
                 datasourceModels.put(key, models);
               });
     }
-    return new EbeanParsedConfig(defaultDatasource, datasourceModels, generateEvolutionsScripts);
+    Map<String, String> readOnlyDatasources = new HashMap<>();
+    Config readOnlyDatasourcesConfig = playEbeanConfig.getConfig("readOnlyDatasources");
+    readOnlyDatasourcesConfig
+        .root()
+        .keySet()
+        .forEach(key -> readOnlyDatasources.put(key, readOnlyDatasourcesConfig.getString(key)));
+
+    return new EbeanParsedConfig(
+        defaultDatasource, datasourceModels, generateEvolutionsScripts, readOnlyDatasources);
   }
 }

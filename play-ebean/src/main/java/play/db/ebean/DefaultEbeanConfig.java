@@ -91,6 +91,13 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
       EbeanParsedConfig ebeanConfig = EbeanParsedConfig.parseFromConfig(config);
 
+      for (String key : ebeanConfig.getReadOnlyDatasources().keySet()) {
+        if (!ebeanConfig.getDatasourceModels().containsKey(key)) {
+          throw new ConfigException.BadValue(
+              "play.ebean.readOnlyDatasources." + key, "There is no Ebean server '" + key + "'");
+        }
+      }
+
       Map<String, DatabaseConfig> serverConfigs = new HashMap<>();
 
       for (Map.Entry<String, List<String>> entry : ebeanConfig.getDatasourceModels().entrySet()) {
@@ -109,6 +116,8 @@ public class DefaultEbeanConfig implements EbeanConfig {
         serverConfig.loadFromProperties();
 
         setServerConfigDataSource(key, serverConfig);
+        setServerConfigReadOnlyDataSource(
+            key, serverConfig, ebeanConfig.getReadOnlyDatasources().get(key));
 
         if (!ebeanConfig.getDefaultDatasource().equals(key)) {
           serverConfig.setDefaultServer(false);
@@ -132,6 +141,20 @@ public class DefaultEbeanConfig implements EbeanConfig {
       } catch (Exception e) {
         throw new ConfigException.BadValue("ebean." + key, e.getMessage(), e);
       }
+    }
+
+    private void setServerConfigReadOnlyDataSource(
+        String key, DatabaseConfig serverConfig, String readOnlyDatasource) {
+      if (readOnlyDatasource == null) {
+        return;
+      }
+      if (dbApi.getDatabase(readOnlyDatasource) == null) {
+        throw new ConfigException.BadValue(
+            "play.ebean.readOnlyDatasources." + key,
+            "There is no Play database '" + readOnlyDatasource + "'");
+      }
+      // Not wrapped: Ebean's implicit read-only transactions work best with auto-commit
+      serverConfig.setReadOnlyDataSource(dbApi.getDatabase(readOnlyDatasource).getDataSource());
     }
 
     private void addModelClassesToServerConfig(

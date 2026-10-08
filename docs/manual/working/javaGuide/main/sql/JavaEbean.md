@@ -45,6 +45,25 @@ As an example, the fairly common problem of reducing the sequence batch size in 
 
 Note that Ebean will also make use of a `conf/orm.xml` file (if present), to configure `<entity-mappings>`.
 
+#### Using a read replica
+
+Ebean can run queries that are executed outside of a transaction against a separate, read-only data source, typically a [read replica](https://ebean.io/docs/read-replicas/). Queries inside of transactions and all writes keep using the main data source.
+
+To use a read replica, configure it as an additional Play database and map it to the Ebean server via `play.ebean.readOnlyDatasources`:
+
+```properties
+db.default.url = "jdbc:postgresql://primary-host/app"
+db.replica.url = "jdbc:postgresql://replica-host/app"
+db.replica.hikaricp.readOnly = true
+
+ebean.default = ["models.*"]
+play.ebean.readOnlyDatasources.default = "replica"
+```
+
+The key is the name of the Ebean server (here `default`) and the value is the name of the Play database used for its read-only queries. Play manages the connection pool of the read replica like that of any other database, so all the usual `db` settings apply.
+
+Ebean supports one read-only data source per Ebean server. To spread the read-only queries across multiple read replicas, use a JDBC URL that lists all of them (if supported by your JDBC driver, e.g. the PostgreSQL driver's `loadBalanceHosts` and `targetServerType` parameters), or point the URL to a load balancer or the reader endpoint of your database service.
+
 > For more information about Ebean, see the [Ebean documentation](https://ebean-orm.github.io/docs).
 
 #### Configuring the sbt plugin
