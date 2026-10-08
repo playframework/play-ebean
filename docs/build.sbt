@@ -46,8 +46,9 @@ lazy val docs = project
   )
   .settings(PlayEbean.unscopedSettings: _*)
   .settings(
+    // The code samples are test sources, so enhance their models there
     inConfig(Test)(
-      Seq(
+      PlayEbean.scopedSettings ++ Seq(
         playEbeanModels := Seq("javaguide.ebean.*")
       )
     ): _*

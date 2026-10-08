@@ -6,12 +6,13 @@
 // ###replace: package models;
 package javaguide.ebean;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.event.ServerConfigStartup;
 
 public class MyServerConfigStartup implements ServerConfigStartup {
-  public void onStart(ServerConfig serverConfig) {
-    serverConfig.setDatabaseSequenceBatchSize(1);
+  @Override
+  public void onStart(DatabaseBuilder config) {
+    config.databaseSequenceBatchSize(1);
   }
 }
 // #content
