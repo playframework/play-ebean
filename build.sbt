@@ -65,6 +65,13 @@ lazy val core = project
       (Compile / classDirectory).value,
       "play/db/ebean/**"
     ),
+    // The models of the tests need to be enhanced as well
+    Test / compile := enhanceEbeanClasses(
+      (Test / dependencyClasspath).value,
+      (Test / compile).value,
+      (Test / classDirectory).value,
+      "play/db/ebean/models/**"
+    ),
   )
 
 lazy val plugin = project

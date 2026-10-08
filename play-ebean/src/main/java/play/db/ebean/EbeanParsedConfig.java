@@ -24,16 +24,20 @@ public class EbeanParsedConfig {
 
   private final boolean generateEvolutionsScripts;
 
+  private final Map<String, Boolean> generateEvolutionsScriptsByServer;
+
   private final Map<String, String> readOnlyDatasources;
 
   public EbeanParsedConfig(
       String defaultDatasource,
       Map<String, List<String>> datasourceModels,
       boolean generateEvolutionsScripts,
+      Map<String, Boolean> generateEvolutionsScriptsByServer,
       Map<String, String> readOnlyDatasources) {
     this.defaultDatasource = defaultDatasource;
     this.datasourceModels = datasourceModels;
     this.generateEvolutionsScripts = generateEvolutionsScripts;
+    this.generateEvolutionsScriptsByServer = generateEvolutionsScriptsByServer;
     this.readOnlyDatasources = readOnlyDatasources;
   }
 
@@ -41,7 +45,12 @@ public class EbeanParsedConfig {
       String defaultDatasource,
       Map<String, List<String>> datasourceModels,
       boolean generateEvolutionsScripts) {
-    this(defaultDatasource, datasourceModels, generateEvolutionsScripts, Collections.emptyMap());
+    this(
+        defaultDatasource,
+        datasourceModels,
+        generateEvolutionsScripts,
+        Collections.emptyMap(),
+        Collections.emptyMap());
   }
 
   public EbeanParsedConfig(String defaultDatasource, Map<String, List<String>> datasourceModels) {
@@ -58,6 +67,22 @@ public class EbeanParsedConfig {
 
   public boolean generateEvolutionsScripts() {
     return generateEvolutionsScripts;
+  }
+
+  /**
+   * @param server the name of the Ebean server
+   * @return whether to generate the evolutions script of the given Ebean server
+   */
+  public boolean generateEvolutionsScripts(String server) {
+    return generateEvolutionsScriptsByServer.getOrDefault(server, generateEvolutionsScripts);
+  }
+
+  /**
+   * @return the explicit settings whether to generate the evolutions scripts, keyed by Ebean server
+   *     name.
+   */
+  public Map<String, Boolean> getGenerateEvolutionsScriptsByServer() {
+    return generateEvolutionsScriptsByServer;
   }
 
   /**
@@ -100,6 +125,7 @@ public class EbeanParsedConfig {
                 datasourceModels.put(key, models);
               });
     }
+    Map<String, Boolean> generateEvolutionsScriptsByServer = new HashMap<>();
     Map<String, String> readOnlyDatasources = new HashMap<>();
     Config serversConfig = playEbeanConfig.getConfig("db");
     serversConfig
@@ -108,12 +134,20 @@ public class EbeanParsedConfig {
         .forEach(
             server -> {
               Config serverConfig = serversConfig.getConfig(server);
+              if (serverConfig.hasPath("generateEvolutionsScripts")) {
+                generateEvolutionsScriptsByServer.put(
+                    server, serverConfig.getBoolean("generateEvolutionsScripts"));
+              }
               if (serverConfig.hasPath("readOnlyDatasource")) {
                 readOnlyDatasources.put(server, serverConfig.getString("readOnlyDatasource"));
               }
             });
 
     return new EbeanParsedConfig(
-        defaultDatasource, datasourceModels, generateEvolutionsScripts, readOnlyDatasources);
+        defaultDatasource,
+        datasourceModels,
+        generateEvolutionsScripts,
+        generateEvolutionsScriptsByServer,
+        readOnlyDatasources);
   }
 }

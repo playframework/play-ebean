@@ -64,13 +64,13 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
     if (environment.isProd()) {
       return;
     }
-    if (!config.generateEvolutionsScripts()) {
-      return;
-    }
     config
         .serverConfigs()
         .forEach(
             (key, serverConfig) -> {
+              if (!config.generateEvolutionsScripts(key)) {
+                return;
+              }
               String evolutionScript = generateEvolutionScript(databases.get(key));
               if (evolutionScript == null) {
                 return;
