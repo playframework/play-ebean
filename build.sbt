@@ -57,7 +57,9 @@ lazy val core = project
     crossScalaVersions := Seq(scala213, scala3),
     Dependencies.ebean,
     mimaSettings,
-    Compile / compile := enhanceEbeanClasses(
+    // Ebean registers databases JVM-wide by name, so tests starting applications must not run in parallel
+    Test / parallelExecution := false,
+    Compile / compile        := enhanceEbeanClasses(
       (Compile / dependencyClasspath).value,
       (Compile / compile).value,
       (Compile / classDirectory).value,
