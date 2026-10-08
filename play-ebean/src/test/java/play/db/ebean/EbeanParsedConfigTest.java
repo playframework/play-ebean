@@ -28,6 +28,7 @@ public class EbeanParsedConfigTest {
     assertThat(config.getDatasourceModels().size(), equalTo(0));
     assertThat(config.generateEvolutionsScripts(), equalTo(Boolean.TRUE));
     assertThat(config.getReadOnlyDatasources().size(), equalTo(0));
+    assertThat(config.getGenerateEvolutionsScriptsByServer().size(), equalTo(0));
   }
 
   @Test
@@ -62,9 +63,28 @@ public class EbeanParsedConfigTest {
   }
 
   @Test
+  public void disableGenerateEvolutionsScriptsForServer() {
+    EbeanParsedConfig config =
+        parse(ImmutableMap.of("play.ebean.db.other.generateEvolutionsScripts", false));
+    assertThat(config.generateEvolutionsScripts("default"), equalTo(Boolean.TRUE));
+    assertThat(config.generateEvolutionsScripts("other"), equalTo(Boolean.FALSE));
+  }
+
+  @Test
+  public void enableGenerateEvolutionsScriptsForServer() {
+    EbeanParsedConfig config =
+        parse(
+            ImmutableMap.of(
+                "play.ebean.generateEvolutionsScripts", false,
+                "play.ebean.db.other.generateEvolutionsScripts", true));
+    assertThat(config.generateEvolutionsScripts("default"), equalTo(Boolean.FALSE));
+    assertThat(config.generateEvolutionsScripts("other"), equalTo(Boolean.TRUE));
+  }
+
+  @Test
   public void readOnlyDatasources() {
     EbeanParsedConfig config =
-        parse(ImmutableMap.of("play.ebean.readOnlyDatasources.default", "replica"));
+        parse(ImmutableMap.of("play.ebean.db.default.readOnlyDatasource", "replica"));
     assertThat(config.getReadOnlyDatasources().size(), equalTo(1));
     assertThat(config.getReadOnlyDatasources().get("default"), equalTo("replica"));
   }
