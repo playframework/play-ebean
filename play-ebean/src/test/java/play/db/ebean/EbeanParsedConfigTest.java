@@ -27,6 +27,7 @@ public class EbeanParsedConfigTest {
     assertThat(config.getDefaultDatasource(), equalTo("default"));
     assertThat(config.getDatasourceModels().size(), equalTo(0));
     assertThat(config.generateEvolutionsScripts(), equalTo(Boolean.TRUE));
+    assertThat(config.getReadOnlyDatasources().size(), equalTo(0));
   }
 
   @Test
@@ -58,6 +59,14 @@ public class EbeanParsedConfigTest {
     EbeanParsedConfig config =
         parse(ImmutableMap.of("play.ebean.generateEvolutionsScripts", false));
     assertThat(config.generateEvolutionsScripts(), equalTo(Boolean.FALSE));
+  }
+
+  @Test
+  public void readOnlyDatasources() {
+    EbeanParsedConfig config =
+        parse(ImmutableMap.of("play.ebean.readOnlyDatasources.default", "replica"));
+    assertThat(config.getReadOnlyDatasources().size(), equalTo(1));
+    assertThat(config.getReadOnlyDatasources().get("default"), equalTo("replica"));
   }
 
   @Test
