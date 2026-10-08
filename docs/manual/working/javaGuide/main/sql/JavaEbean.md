@@ -45,6 +45,8 @@ As an example, the fairly common problem of reducing the sequence batch size in 
 
 Make sure that such a class is covered by an `ebean.` config line, for example by putting it into the `models` package. Play Ebean registers the configured classes with Ebean explicitly, which disables Ebean's own classpath scanning, so Ebean silently ignores any `ServerConfigStartup` that is not covered.
 
+Note that Ebean doesn't read Play's `conf/application.conf`, so put Ebean's own settings (e.g. `ebean.migration.run`) into `conf/application.yaml`, which only Ebean reads, or into `conf/application.properties`. Play loads `conf/application.properties` as well, and Play Ebean ignores nested settings from there, like `ebean.migration.run`. However, a setting directly below `ebean.`, like `ebean.dumpMetricsOnShutdown=true`, looks like a list of models to Play Ebean, which only skips it because there's no database of that name. So prefer `conf/application.yaml` for such settings.
+
 Note that Ebean will also make use of a `conf/orm.xml` file (if present), to configure `<entity-mappings>`.
 
 #### Using a read replica
