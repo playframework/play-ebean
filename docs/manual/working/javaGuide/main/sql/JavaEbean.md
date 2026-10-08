@@ -37,11 +37,13 @@ In this example, we have access to two Ebean servers - each using its own databa
 
 Each `ebean.` config line (as above) can map *any* classes that Ebean may be interested in registering (eg. `@Entity`/`Model` classes, `@Embeddable`s, custom `ScalarType`s and `CompoundType`s, `BeanPersistController`s, `BeanPersistListener`s, `BeanFinder`s, `ServerConfigStartup`s, etc). These can be individually listed separated by commas, and/or you can use the wildcard `.*`. For example, `models.*` registers with Ebean all classes within the models package that Ebean can make use of.
 
-To customise the underlying Ebean Server configuration, you can either add a [`conf/application.yaml`](https://ebean.io/docs/intro/configuration/) file, or create an instance of the `ServerConfigStartup` interface to programmatically manipulate the Ebean `ServerConfig` before the server is initialised.
+To customise the underlying Ebean Server configuration, you can either add a [`conf/application.yaml`](https://ebean.io/docs/intro/configuration/) file, or implement the `ServerConfigStartup` interface to programmatically manipulate the Ebean `DatabaseBuilder` before the server is initialised.
 
 As an example, the fairly common problem of reducing the sequence batch size in order to minimise sequence gaps, could be solved quite simply with a class like this:
 
 @[content](code/javaguide/ebean/MyServerConfigStartup.java)
+
+Make sure that such a class is covered by an `ebean.` config line, for example by putting it into the `models` package. Play Ebean registers the configured classes with Ebean explicitly, which disables Ebean's own classpath scanning, so Ebean silently ignores any `ServerConfigStartup` that is not covered.
 
 Note that Ebean will also make use of a `conf/orm.xml` file (if present), to configure `<entity-mappings>`.
 
@@ -108,7 +110,7 @@ By default Ebean will use transactions. However these transactions will be creat
 
 @[transaction](code/javaguide/ebean/JavaEbeanTest.java)
 
-So, if you want to do more than one action in the same transaction you can use TxRunnable and TxCallable:
+So, if you want to do more than one action in the same transaction you can use `DB.execute` (or `DB.executeCall` to return a value):
 
 @[txrunnable](code/javaguide/ebean/JavaEbeanTest.java)
 
