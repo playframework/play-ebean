@@ -29,6 +29,7 @@ object Dependencies {
     "com.typesafe.play" %% "play-guice"           % Versions.play % Test,
     "com.typesafe.play" %% "play-filters-helpers" % Versions.play % Test,
     "com.typesafe.play" %% "play-test"            % Versions.play % Test,
+    "com.h2database"     % "h2"                   % "2.5.252"     % Test,
     ("org.reflections"   % "reflections"          % "0.10.2")
       .exclude("com.google.code.findbugs", "annotations")
       .classifier("")
