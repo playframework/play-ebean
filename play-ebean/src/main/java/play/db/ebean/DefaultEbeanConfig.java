@@ -106,6 +106,8 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
         DatabaseBuilder.Settings serverConfig = Database.builder().settings();
         serverConfig.name(key);
+        // Play shuts down the database in a stop hook, after in-flight requests completed
+        serverConfig.shutdownHook(false);
         serverConfig.loadFromProperties();
 
         setServerConfigDataSource(key, serverConfig);

@@ -46,6 +46,7 @@ object Dependencies {
     "org.playframework" %% "play-guice"           % Versions.play % Test,
     "org.playframework" %% "play-filters-helpers" % Versions.play % Test,
     "org.playframework" %% "play-test"            % Versions.play % Test,
+    "com.h2database"     % "h2"                   % "2.5.252"     % Test,
     ("org.reflections"   % "reflections"          % "0.10.2")
       .exclude("com.google.code.findbugs" % "annotations")
       .classifier("")
