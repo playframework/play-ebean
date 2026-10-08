@@ -32,13 +32,24 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
   private final boolean generateEvolutionsScripts;
 
+  private final Map<String, Boolean> generateEvolutionsScriptsByServer;
+
+  public DefaultEbeanConfig(
+      String defaultServer,
+      Map<String, DatabaseBuilder.Settings> serverConfigs,
+      boolean generateEvolutionsScripts,
+      Map<String, Boolean> generateEvolutionsScriptsByServer) {
+    this.defaultServer = defaultServer;
+    this.serverConfigs = serverConfigs;
+    this.generateEvolutionsScripts = generateEvolutionsScripts;
+    this.generateEvolutionsScriptsByServer = generateEvolutionsScriptsByServer;
+  }
+
   public DefaultEbeanConfig(
       String defaultServer,
       Map<String, DatabaseBuilder.Settings> serverConfigs,
       boolean generateEvolutionsScripts) {
-    this.defaultServer = defaultServer;
-    this.serverConfigs = serverConfigs;
-    this.generateEvolutionsScripts = generateEvolutionsScripts;
+    this(defaultServer, serverConfigs, generateEvolutionsScripts, Collections.emptyMap());
   }
 
   public DefaultEbeanConfig(
@@ -59,6 +70,11 @@ public class DefaultEbeanConfig implements EbeanConfig {
   @Override
   public boolean generateEvolutionsScripts() {
     return generateEvolutionsScripts;
+  }
+
+  @Override
+  public boolean generateEvolutionsScripts(String server) {
+    return generateEvolutionsScriptsByServer.getOrDefault(server, generateEvolutionsScripts);
   }
 
   @Singleton
@@ -93,7 +109,9 @@ public class DefaultEbeanConfig implements EbeanConfig {
 
       EbeanParsedConfig ebeanConfig = EbeanParsedConfig.parseFromConfig(config);
 
-      for (String key : ebeanConfig.getReadOnlyDatasources().keySet()) {
+      Set<String> configuredServers = new HashSet<>(ebeanConfig.getReadOnlyDatasources().keySet());
+      configuredServers.addAll(ebeanConfig.getGenerateEvolutionsScriptsByServer().keySet());
+      for (String key : configuredServers) {
         if (!ebeanConfig.getDatasourceModels().containsKey(key)) {
           throw new ConfigException.BadValue(
               "play.ebean.db." + key, "There is no Ebean server '" + key + "'");
@@ -134,7 +152,8 @@ public class DefaultEbeanConfig implements EbeanConfig {
       return new DefaultEbeanConfig(
           ebeanConfig.getDefaultDatasource(),
           serverConfigs,
-          ebeanConfig.generateEvolutionsScripts());
+          ebeanConfig.generateEvolutionsScripts(),
+          ebeanConfig.getGenerateEvolutionsScriptsByServer());
     }
 
     private void setServerConfigDataSource(String key, DatabaseBuilder serverConfig) {

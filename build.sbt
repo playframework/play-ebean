@@ -75,6 +75,16 @@ lazy val core = project
         fileConverter.value,
       )
     ),
+    // The models of the tests need to be enhanced as well
+    Test / compile := Def.uncached(
+      enhanceEbeanClasses(
+        (Test / dependencyClasspath).value,
+        (Test / compile).value,
+        (Test / classDirectory).value,
+        "play/db/ebean/models/**",
+        fileConverter.value,
+      )
+    ),
   )
 
 lazy val plugin = project
