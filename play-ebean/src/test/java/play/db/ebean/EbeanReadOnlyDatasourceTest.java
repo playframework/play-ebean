@@ -41,7 +41,7 @@ public class EbeanReadOnlyDatasourceTest {
   @Test
   public void queriesOutsideOfTransactionsUseReadOnlyDatasource() {
     Application app =
-        appBuilder(Map.of("play.ebean.readOnlyDatasources.default", "replica")).build();
+        appBuilder(Map.of("play.ebean.db.default.readOnlyDatasource", "replica")).build();
     Helpers.start(app);
     try {
       Database database = DB.getDefault();
@@ -71,18 +71,18 @@ public class EbeanReadOnlyDatasourceTest {
   @Test
   public void failsForUnknownPlayDatabase() {
     GuiceApplicationBuilder builder =
-        appBuilder(Map.of("play.ebean.readOnlyDatasources.default", "unknown"));
+        appBuilder(Map.of("play.ebean.db.default.readOnlyDatasource", "unknown"));
     Exception e = assertThrows(Exception.class, builder::build);
-    assertThat(e.getMessage(), containsString("play.ebean.readOnlyDatasources.default"));
+    assertThat(e.getMessage(), containsString("play.ebean.db.default.readOnlyDatasource"));
     assertThat(e.getMessage(), containsString("There is no Play database 'unknown'"));
   }
 
   @Test
   public void failsForUnknownEbeanServer() {
     GuiceApplicationBuilder builder =
-        appBuilder(Map.of("play.ebean.readOnlyDatasources.unknown", "replica"));
+        appBuilder(Map.of("play.ebean.db.unknown.readOnlyDatasource", "replica"));
     Exception e = assertThrows(Exception.class, builder::build);
-    assertThat(e.getMessage(), containsString("play.ebean.readOnlyDatasources.unknown"));
+    assertThat(e.getMessage(), containsString("play.ebean.db.unknown"));
     assertThat(e.getMessage(), containsString("There is no Ebean server 'unknown'"));
   }
 }
