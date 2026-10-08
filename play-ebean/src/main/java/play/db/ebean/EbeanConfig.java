@@ -14,4 +14,12 @@ public interface EbeanConfig {
   Map<String, DatabaseConfig> serverConfigs();
 
   boolean generateEvolutionsScripts();
+
+  /**
+   * @param server the name of the Ebean server
+   * @return whether to generate the evolutions script of the given Ebean server
+   */
+  default boolean generateEvolutionsScripts(String server) {
+    return generateEvolutionsScripts();
+  }
 }

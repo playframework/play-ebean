@@ -66,6 +66,21 @@ Here `default` is the name of the Ebean server and `replica` the name of the Pla
 
 Ebean supports one read-only data source per Ebean server. To spread the read-only queries across multiple read replicas, use a JDBC URL that lists all of them (if supported by your JDBC driver, e.g. the PostgreSQL driver's `loadBalanceHosts` and `targetServerType` parameters), or point the URL to a load balancer or the reader endpoint of your database service.
 
+#### Generating evolution scripts
+
+In dev and test mode, Play Ebean generates the evolution script `conf/evolutions/<server>/1.sql` of each Ebean server from its models, so that Play's [evolutions](https://www.playframework.com/documentation/latest/Evolutions) can create the database schema. Whenever the models change, Play Ebean updates the script, as long as it starts with the `-- Created by Ebean DDL` comment. To write the evolutions yourself, remove this comment (both lines), then Play Ebean doesn't touch the file anymore.
+
+You can turn off generating the scripts for all Ebean servers, and override that for single Ebean servers:
+
+```properties
+# Don't generate the scripts of the Ebean servers...
+play.ebean.generateEvolutionsScripts = false
+# ...except the one of the "default" Ebean server
+play.ebean.db.default.generateEvolutionsScripts = true
+```
+
+This is independent of whether Play applies the evolutions to a database (`play.evolutions.db.<name>.enabled`). For example, turn off generating the script for a read-only database, or for a database whose evolution scripts come from the classpath (e.g. from a dependency), because a `conf/evolutions/<name>/1.sql` file takes precedence over these.
+
 > For more information about Ebean, see the [Ebean documentation](https://ebean-orm.github.io/docs).
 
 #### Configuring the sbt plugin
