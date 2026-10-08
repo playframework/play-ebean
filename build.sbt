@@ -64,7 +64,9 @@ lazy val core = project
     crossScalaVersions := publishedScalaVersions,
     Dependencies.ebean,
     mimaSettings,
-    Compile / compile := Def.uncached(
+    // Ebean registers databases JVM-wide by name, so tests starting applications must not run in parallel
+    Test / parallelExecution := false,
+    Compile / compile        := Def.uncached(
       enhanceEbeanClasses(
         (Compile / dependencyClasspath).value,
         (Compile / compile).value,
