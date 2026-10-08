@@ -94,6 +94,18 @@ object PlayEbean extends AutoPlugin {
   // This is replacement of old Stamp `Exists` representation
   private final val notPresent = "absent"
 
+  /**
+   * Turns the configured models, which can be packages (`models.*`) or single classes (`models.Task`), into the
+   * packages the enhancer processes. Packages without compiled classes (e.g. not existing yet, or provided by a
+   * dependency) are skipped, because the enhancer fails for them.
+   */
+  private def packagesToEnhance(models: Seq[String], classes: File): Seq[String] =
+    models
+      .map(_.trim)
+      .map(model => if (model.endsWith(".*")) model.dropRight(2) else model.take(math.max(model.lastIndexOf('.'), 0)))
+      .distinct
+      .filter(pkg => new File(classes, pkg.replace('.', '/')).isDirectory)
+
   def ebeanEnhance: Def.Initialize[Task[CompileResult]] =
     Def.task {
 
@@ -120,7 +132,11 @@ object PlayEbean extends AutoPlugin {
         val transformer   = new Transformer(classLoader, agentArgsString)
         val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
 
-        fileTransform.process(models.mkString(","))
+        val packages = packagesToEnhance(models, classes)
+        // An empty list would make the enhancer process all classes
+        if (packages.nonEmpty) {
+          fileTransform.process(packages.mkString(","))
+        }
 
       } finally {
         Thread.currentThread.setContextClassLoader(originalContextClassLoader)
