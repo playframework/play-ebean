@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import play.Environment;
@@ -22,6 +23,7 @@ import play.api.db.evolutions.DynamicEvolutions;
 import play.api.db.evolutions.Evolutions$;
 import play.api.db.evolutions.EvolutionsConfig;
 import play.inject.ApplicationLifecycle;
+import play.inject.Injector;
 
 /** A Play module that automatically manages Ebean configuration. */
 @Singleton
@@ -30,16 +32,34 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
   private final EbeanConfig config;
   private final Environment environment;
 
-  private final EvolutionsConfig evolutionsConfig;
+  private final Supplier<EvolutionsConfig> evolutionsConfig;
 
   private final Map<String, Database> databases = new HashMap<>();
+
+  public EbeanDynamicEvolutions(
+      EbeanConfig config,
+      Environment environment,
+      ApplicationLifecycle lifecycle,
+      EvolutionsConfig evolutionsConfig) {
+    this(config, environment, lifecycle, () -> evolutionsConfig);
+  }
 
   @Inject
   public EbeanDynamicEvolutions(
       EbeanConfig config,
       Environment environment,
       ApplicationLifecycle lifecycle,
-      EvolutionsConfig evolutionsConfig) {
+      Injector injector) {
+    // Only needed (and bound) when Play's EvolutionsModule, which is optional, generates the
+    // scripts
+    this(config, environment, lifecycle, () -> injector.instanceOf(EvolutionsConfig.class));
+  }
+
+  private EbeanDynamicEvolutions(
+      EbeanConfig config,
+      Environment environment,
+      ApplicationLifecycle lifecycle,
+      Supplier<EvolutionsConfig> evolutionsConfig) {
     this.config = config;
     this.environment = environment;
     this.evolutionsConfig = evolutionsConfig;
@@ -64,6 +84,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
     if (environment.isProd()) {
       return;
     }
+    EvolutionsConfig evolutionsConfig = this.evolutionsConfig.get();
     config
         .serverConfigs()
         .forEach(
