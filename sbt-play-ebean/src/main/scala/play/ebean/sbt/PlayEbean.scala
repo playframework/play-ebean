@@ -23,7 +23,6 @@ import xsbti.compile.CompileResult
 import xsbti.compile.analysis.Stamp
 import sbt._
 import xsbti.VirtualFileRef
-import scala.util.control.NonFatal
 
 object PlayEbean extends AutoPlugin {
 
@@ -64,6 +63,25 @@ object PlayEbean extends AutoPlugin {
   // This is replacement of old Stamp `Exists` representation
   private final val notPresent = "absent"
 
+  /**
+   * Turns the configured models into the packages the enhancer processes: packages (`models.*` or `models`) as they
+   * are, and single classes (`models.Task`) via their package. Entries without compiled classes (e.g. packages not
+   * existing yet, or provided by a dependency) are skipped, because the enhancer fails for them.
+   */
+  private def packagesToEnhance(models: Seq[String], classes: File): Seq[String] = {
+    def isPackage(name: String) = new File(classes, name.replace('.', '/')).isDirectory
+    models
+      .map(_.trim)
+      .flatMap { model =>
+        // Like the enhancer, ignore a trailing ".*" or ".**"
+        val pkg = model.stripSuffix("*").stripSuffix("*").stripSuffix(".")
+        if (isPackage(pkg)) Some(pkg)
+        else if (pkg == model && model.contains('.')) Some(model.substring(0, model.lastIndexOf('.'))).filter(isPackage)
+        else None
+      }
+      .distinct
+  }
+
   def ebeanEnhance: Def.Initialize[Task[CompileResult]] =
     Def.task {
 
@@ -85,10 +103,10 @@ object PlayEbean extends AutoPlugin {
         val transformer   = new Transformer(classLoader, agentArgsString)
         val fileTransform = new OfflineFileTransform(transformer, classLoader, classes.getAbsolutePath)
 
-        try {
-          fileTransform.process(playEbeanModels.value.mkString(","))
-        } catch {
-          case NonFatal(_) =>
+        val packages = packagesToEnhance(playEbeanModels.value, classes)
+        // An empty list would make the enhancer process all classes
+        if (packages.nonEmpty) {
+          fileTransform.process(packages.mkString(","))
         }
 
       } finally {
