@@ -13,6 +13,7 @@ import io.ebean.Transaction;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.junit.*;
 import play.Application;
 import play.db.ebean.Transactional;
@@ -27,6 +28,7 @@ public class JavaEbeanTest extends WithApplication {
     Map<String, String> config = new HashMap<>();
     config.putAll(inMemoryDatabase());
     config.put("ebean.default", "javaguide.ebean.Task");
+    config.put("database.dispatcher.executor", "thread-pool-executor");
     return fakeApplication(config);
   }
 
@@ -146,6 +148,21 @@ public class JavaEbeanTest extends WithApplication {
     }
     // #traditional
 
+    assertThat(Task.find.byId(34L).isDone(), is(true));
+  }
+
+  @Test
+  public void asyncTransaction() throws Exception {
+    createTask();
+
+    Task task =
+        app.injector()
+            .instanceOf(TaskService.class)
+            .markDone(34L)
+            .toCompletableFuture()
+            .get(10, TimeUnit.SECONDS);
+
+    assertThat(task.isDone(), is(true));
     assertThat(Task.find.byId(34L).isDone(), is(true));
   }
 
