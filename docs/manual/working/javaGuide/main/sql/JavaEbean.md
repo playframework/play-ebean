@@ -121,6 +121,8 @@ As you can see, we've added a `find` static field, defining a `Finder` for an en
 
 @[operations](code/javaguide/ebean/JavaEbeanTest.java)
 
+> **Note:** Ebean also provides [query beans](https://ebean.io/docs/query/query-beans) for type-safe queries. Play Ebean doesn't set up their generation, and only enhances the code that uses them if it's in the packages of your models. You can set that up yourself, but it has limitations with incremental compilation, e.g. with sbt 1, queries using outdated query beans can compile and then fail at runtime. See [this comment on issue #61](https://github.com/playframework/play-ebean/issues/61#issuecomment-6089771595) for the configuration it needs, the versions it was tested with, and when to do a clean build.
+
 ## Transactional actions
 
 By default Ebean will use transactions. However these transactions will be created before and committed or rollbacked after every single query, update, create or delete, as you can see here:
