@@ -147,7 +147,13 @@ Play Ebean creates the Ebean databases while the application starts, and Ebean's
 
 Otherwise Ebean tries to create the database itself from its own configuration. That usually fails, e.g. with `Configuration error creating DataSource for the default Database`, and leaves Ebean unusable until the JVM restarts. A later error like `NoClassDefFoundError: Could not initialize class io.ebean.DbContext` only means that this initialization failed before, so look for the first error to find out why.
 
-Note that this only makes sure that the databases exist, not that the evolutions have been applied. By default, in dev mode, Play only applies pending evolutions once you confirm them in the browser, and it can't show that page if the application fails to start, e.g. because a component queries a table that doesn't exist yet. Depending on `play.api.db.evolutions.ApplicationEvolutions` doesn't help with that either, as in dev mode it doesn't wait for pending evolutions (its `upToDate()` method tells if there are any). So don't use the database schema while components get created, but later, e.g. when they get used for the first time. Or let Play apply the evolutions automatically, which you can limit to dev mode in your `build.sbt`:
+Note that this only makes sure that the databases exist, not that the evolutions have been applied. By default, in dev mode, Play only applies pending evolutions once you confirm them in the browser, and it can't show that page if the application fails to start, e.g. because a component queries a table that doesn't exist yet. So if a component uses the database schema while it gets created, e.g. to insert some initial data, make it depend on `play.api.db.evolutions.ApplicationEvolutions` instead. Play then checks the evolutions (and, if `autoApply` is enabled, applies them) before it creates the component, and as `ApplicationEvolutions` depends on `DynamicEvolutions`, the databases exist as well. In dev mode, Play starts the application even if evolutions still need to be applied, so only use the schema if `upToDate()` returns `true`:
+
+@[startup-evolutions](code/javaguide/ebean/StartupDataLoader.java)
+
+Once you apply the evolutions in the browser, Play reloads the application, which creates the component again, this time with `upToDate()` returning `true`. In test mode, Play applies the evolutions automatically, and in prod mode, it doesn't start the application while evolutions still need to be applied, unless they get applied automatically.
+
+You can also let Play apply the evolutions automatically, limited to dev mode in your `build.sbt`:
 
 ```scala
 PlayKeys.devSettings += "play.evolutions.db.default.autoApply" -> "true"
