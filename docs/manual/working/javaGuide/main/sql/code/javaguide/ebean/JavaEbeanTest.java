@@ -149,6 +149,16 @@ public class JavaEbeanTest extends WithApplication {
     assertThat(Task.find.byId(34L).isDone(), is(true));
   }
 
+  @Test
+  public void startupDataLoader() {
+    // Evolutions get applied automatically in test mode
+    app.injector().instanceOf(StartupDataLoader.class);
+
+    List<Task> tasks = Task.find.all();
+    assertThat(tasks.size(), equalTo(1));
+    assertThat(tasks.get(0).getName(), equalTo("Initial task"));
+  }
+
   private void createTask() {
     Task task = new Task();
     task.setId(34L);
