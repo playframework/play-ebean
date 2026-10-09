@@ -135,6 +135,41 @@ If your class is an action, you can annotate your action method with `@play.db.e
 
 @[annotation](code/javaguide/ebean/JavaEbeanTest.java)
 
+The transaction gets committed as soon as the action returns its result, or rolled back if the action throws an exception. As Ebean binds the transaction to the current thread, it only covers the database operations that the action runs on its own thread, before it returns:
+
+- Database operations that run on another thread, e.g. in a `CompletableFuture.supplyAsync`, don't run in the transaction, even if they start before the action returns. Ebean then runs each of them in a transaction of its own, so they aren't atomic together anymore.
+- The same applies to the action method itself, if another action that runs between `@Transactional` and the action method calls it asynchronously, e.g. only once an asynchronous check completed.
+- If the action throws an exception, the transaction gets rolled back. If it returns a `CompletionStage` that fails instead, even one that failed already, the transaction gets committed.
+
+To run asynchronous database operations in a transaction, begin it on the thread that runs them, and run all database operations of the transaction synchronously in there, e.g. with `DB.executeCall` on an execution context meant for blocking database calls:
+
+@[async](code/javaguide/ebean/TaskService.java)
+
+Don't return a `CompletionStage` from the callable that runs in the transaction, as the transaction would get committed before that completes as well. The `DatabaseExecutionContext` is a [`CustomExecutionContext`](https://www.playframework.com/documentation/latest/JavaAsync#Using-CustomExecutionContext-and-ClassLoaderExecution) for a dispatcher that keeps the blocking database calls off Play's default thread pool:
+
+@[execution-context](code/javaguide/ebean/DatabaseExecutionContext.java)
+
+Configure the dispatcher in `application.conf`. As each of its threads blocks on a database connection, give it as many threads as the connection pool has connections:
+
+```
+# Number of database connections
+fixedConnectionPool = 9
+
+play.db.prototype.hikaricp {
+  minimumIdle = ${fixedConnectionPool}
+  maximumPoolSize = ${fixedConnectionPool}
+}
+
+# Worker threads matched to the connection pool
+database.dispatcher {
+  executor = "thread-pool-executor"
+  throughput = 1
+  thread-pool-executor {
+    fixed-pool-size = ${fixedConnectionPool}
+  }
+}
+```
+
 Or if you want a more traditional approach you can begin, commit and rollback transactions explicitly:
 
 @[traditional](code/javaguide/ebean/JavaEbeanTest.java)
