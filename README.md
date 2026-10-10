@@ -57,6 +57,47 @@ The Play Ebean plugin supports several different versions of Play and Ebean.
 
 We also recommend using the payintech fork: https://github.com/payintech/play-ebean
 
+## Testing the evolution scripts on real databases
+
+`EbeanEvolutionScriptDatabasesTest` applies the evolution script that Play Ebean generates with Play's evolutions, uses the models, and reverts the script again. It always runs on H2 and SQLite. On Postgres, MySQL, MariaDB, SQL Server and Oracle, it only runs when these environment variables are set, and is skipped otherwise, like on CI:
+
+- `PLAY_EBEAN_TEST_<DB>_URL`: the JDBC URL
+- `PLAY_EBEAN_TEST_<DB>_USER`
+- `PLAY_EBEAN_TEST_<DB>_PASSWORD`, or `PLAY_EBEAN_TEST_<DB>_PASSWORD_FILE` to read the password from a file
+
+`<DB>` is one of `POSTGRES`, `MYSQL`, `MARIADB`, `SQLSERVER` and `ORACLE`. Use an empty database that you can throw away, because the test creates and drops its tables, and Ebean's stored procedures and history tables.
+
+For example, start the databases with Docker:
+
+```bash
+docker run -d --name play-ebean-test-postgres -e POSTGRES_PASSWORD=test -e POSTGRES_DB=play_ebean_test -p 127.0.0.1:15432:5432 postgres:17
+docker run -d --name play-ebean-test-mysql -e MYSQL_ROOT_PASSWORD=test -e MYSQL_DATABASE=play_ebean_test -p 127.0.0.1:13306:3306 mysql:8.4
+docker run -d --name play-ebean-test-mariadb -e MARIADB_ROOT_PASSWORD=test -e MARIADB_DATABASE=play_ebean_test -p 127.0.0.1:13307:3306 mariadb:11.4
+docker run -d --name play-ebean-test-oracle -e ORACLE_PASSWORD=test -e APP_USER=play_ebean_test -e APP_USER_PASSWORD=test -p 127.0.0.1:11521:1521 gvenzl/oracle-free:23-slim
+# The SQL Server images are only available for x86-64
+docker run -d --name play-ebean-test-sqlserver -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD=Test-1234 -p 127.0.0.1:11433:1433 mcr.microsoft.com/mssql/server:2022-latest
+```
+
+When SQL Server has started, create its database:
+
+```bash
+docker exec play-ebean-test-sqlserver /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P Test-1234 -Q 'CREATE DATABASE play_ebean_test'
+```
+
+Then set the variables for the databases to test, and run the test once the databases are ready (Oracle takes a while on its first start):
+
+```bash
+export PLAY_EBEAN_TEST_POSTGRES_URL='jdbc:postgresql://127.0.0.1:15432/play_ebean_test' PLAY_EBEAN_TEST_POSTGRES_USER=postgres PLAY_EBEAN_TEST_POSTGRES_PASSWORD=test
+export PLAY_EBEAN_TEST_MYSQL_URL='jdbc:mysql://127.0.0.1:13306/play_ebean_test' PLAY_EBEAN_TEST_MYSQL_USER=root PLAY_EBEAN_TEST_MYSQL_PASSWORD=test
+export PLAY_EBEAN_TEST_MARIADB_URL='jdbc:mariadb://127.0.0.1:13307/play_ebean_test' PLAY_EBEAN_TEST_MARIADB_USER=root PLAY_EBEAN_TEST_MARIADB_PASSWORD=test
+export PLAY_EBEAN_TEST_ORACLE_URL='jdbc:oracle:thin:@//127.0.0.1:11521/FREEPDB1' PLAY_EBEAN_TEST_ORACLE_USER=play_ebean_test PLAY_EBEAN_TEST_ORACLE_PASSWORD=test
+export PLAY_EBEAN_TEST_SQLSERVER_URL='jdbc:sqlserver://127.0.0.1:11433;databaseName=play_ebean_test;encrypt=true;trustServerCertificate=true' PLAY_EBEAN_TEST_SQLSERVER_USER=sa PLAY_EBEAN_TEST_SQLSERVER_PASSWORD=Test-1234
+
+sbt --server 'core/testOnly play.db.ebean.EbeanEvolutionScriptDatabasesTest'
+```
+
+With `--server`, sbt starts on its own and sees the variables. Without it, sbt can connect to an sbt server that's already running, which doesn't see them.
+
 ## Releasing a new version
 
 See https://github.com/playframework/.github/blob/main/RELEASING.md
