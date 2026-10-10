@@ -5,28 +5,41 @@
 package play.db.ebean;
 
 import io.ebean.Database;
+import io.ebean.ddlrunner.DdlDetect;
+import io.ebean.ddlrunner.DdlParser;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import play.Environment;
 import play.api.db.evolutions.DynamicEvolutions;
+import play.api.db.evolutions.Evolution;
 import play.api.db.evolutions.Evolutions$;
 import play.api.db.evolutions.EvolutionsConfig;
+import play.api.db.evolutions.UpScript;
 import play.inject.ApplicationLifecycle;
 import play.inject.Injector;
+import scala.jdk.javaapi.CollectionConverters;
 
 /** A Play module that automatically manages Ebean configuration. */
 @Singleton
 public class EbeanDynamicEvolutions extends DynamicEvolutions {
+
+  /** How Ebean resolves {@code ${timestamp}} in the DDL header. */
+  private static final Pattern TIMESTAMP =
+      Pattern.compile("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z");
 
   private final EbeanConfig config;
   private final Environment environment;
@@ -142,16 +155,115 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
       return null;
     }
 
+    String header = spiServer.config().getDdlHeader();
+
     return "-- Created by Ebean DDL\r\n"
         + "-- To stop Ebean DDL generation, remove this comment (both lines) and start using"
         + " Evolutions\r\n"
         + "\r\n"
         + "-- !Ups\r\n"
         + "\r\n"
-        + ups
+        + evolutionScript(ups, header)
         + "\r\n"
         + "-- !Downs\r\n"
         + "\r\n"
-        + downs;
+        + evolutionScript(downs, header);
+  }
+
+  /**
+   * Like {@link #evolutionScript(String)}, but keeps the DDL header that Ebean puts first as it is,
+   * which, unlike the DDL that Ebean generates, can contain anything. If the DDL doesn't start with
+   * the header, all of it stays as it is.
+   *
+   * @param header the configured header, which Ebean returns with another {@code ${timestamp}} each
+   *     time
+   */
+  static String evolutionScript(String ddl, String header) {
+    if (header == null || header.isEmpty()) {
+      return evolutionScript(ddl);
+    }
+    // Ebean puts the header and a line break first, and resolving its placeholders adds no lines
+    int end = -1;
+    for (int line = 0; line < header.split("\n", -1).length; line++) {
+      end = ddl.indexOf('\n', end + 1);
+      if (end == -1) {
+        return ddl;
+      }
+    }
+    String prefix = ddl.substring(0, end + 1);
+    if (!withoutTimestamps(prefix).equals(withoutTimestamps(header + "\n"))) {
+      return ddl;
+    }
+    return prefix + evolutionScript(ddl.substring(end + 1));
+  }
+
+  private static String withoutTimestamps(String header) {
+    return TIMESTAMP.matcher(header).replaceAll("");
+  }
+
+  /**
+   * Returns Ebean's DDL in a form, from which Play's evolutions run the statements that Ebean
+   * itself would run.
+   *
+   * <p>Ebean's DDL can contain statements with semicolons, like stored procedures or triggers, and
+   * separates those with its own conventions, like {@code delimiter $$} or {@code GO}. Play however
+   * splits on every semicolon. So if Play wouldn't run Ebean's statements, the DDL is split into
+   * Ebean's statements, and those with semicolons are written between {@code !split-semicolon}
+   * comments. Otherwise, the DDL stays as it is.
+   */
+  static String evolutionScript(String ddl) {
+    List<String> statements = ebeanStatements(ddl);
+    if (comparable(playStatements(ddl)).equals(comparable(statements))) {
+      return ddl;
+    }
+    StringBuilder script = new StringBuilder();
+    for (String statement : statements) {
+      if (statement.contains(";")) {
+        script
+            .append("-- !split-semicolon: never\n")
+            .append(statement)
+            .append("\n-- !split-semicolon: always\n;\n\n");
+      } else {
+        script.append(statement).append(";\n\n");
+      }
+    }
+    return script.toString();
+  }
+
+  /** Returns the statements of the DDL that Ebean's DdlRunner would run. */
+  static List<String> ebeanStatements(String ddl) {
+    return new DdlParser(DdlDetect.NONE)
+        .parse(new StringReader(ddl)).stream()
+            // Like DdlRunner, which removes a trailing ; or / from each statement
+            .map(String::trim)
+            .map(
+                sql ->
+                    sql.endsWith(";") || sql.endsWith("/")
+                        ? sql.substring(0, sql.length() - 1)
+                        : sql)
+            .map(String::trim)
+            .filter(sql -> !sql.isEmpty())
+            .collect(Collectors.toList());
+  }
+
+  /** Returns the statements that Play's evolutions would run from the DDL. */
+  static List<String> playStatements(String ddl) {
+    // Play trims the lines of the evolution scripts it reads
+    String sql = ddl.lines().map(String::trim).collect(Collectors.joining("\n"));
+    return CollectionConverters.asJava(new UpScript(new Evolution(1, sql, "")).statements());
+  }
+
+  /** Ignores indentation, empty lines and comment lines, which don't change the statements. */
+  static List<String> comparable(List<String> statements) {
+    return statements.stream()
+        .map(
+            statement ->
+                statement
+                    .lines()
+                    .map(String::trim)
+                    .filter(line -> !line.isEmpty() && !line.startsWith("--"))
+                    .collect(Collectors.joining("\n")))
+        .filter(statement -> !statement.isEmpty())
+        .collect(Collectors.toList());
   }
 }
