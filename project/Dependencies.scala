@@ -32,7 +32,7 @@ object Dependencies {
   }
 
   object Versions {
-    val play: String   = "3.1.0-M10-e1f3c2a9-SNAPSHOT"
+    val play: String   = "3.1.0-M10-3968a052-SNAPSHOT"
     val ebean          = "19.6.0"
     val typesafeConfig = "1.4.9"
   }
@@ -47,7 +47,14 @@ object Dependencies {
     "org.playframework" %% "play-filters-helpers" % Versions.play % Test,
     "org.playframework" %% "play-test"            % Versions.play % Test,
     "com.h2database"     % "h2"                   % "2.5.252"     % Test,
-    ("org.reflections"   % "reflections"          % "0.10.2")
+    // For the tests on real databases, which apart from SQLite only run when configured
+    "org.xerial"               % "sqlite-jdbc"         % "3.53.4.0"     % Test,
+    "org.postgresql"           % "postgresql"          % "42.7.14"      % Test,
+    "com.mysql"                % "mysql-connector-j"   % "26.7.0"       % Test,
+    "org.mariadb.jdbc"         % "mariadb-java-client" % "3.5.10"       % Test,
+    "com.microsoft.sqlserver"  % "mssql-jdbc"          % "13.6.0.jre11" % Test,
+    "com.oracle.database.jdbc" % "ojdbc11"             % "23.26.3.0.0"  % Test,
+    ("org.reflections"         % "reflections"         % "0.10.2")
       .exclude("com.google.code.findbugs" % "annotations")
       .classifier("")
   )
