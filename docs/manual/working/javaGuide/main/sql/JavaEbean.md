@@ -72,6 +72,10 @@ Ebean supports one read-only data source per Ebean server. To spread the read-on
 
 In dev and test mode, Play Ebean generates the evolution script `conf/evolutions/<server>/1.sql` of each Ebean server from its models, so that Play's [evolutions](https://www.playframework.com/documentation/latest/Evolutions) can create the database schema. Whenever the models change, Play Ebean updates the script, as long as it starts with the `-- Created by Ebean DDL` comment. To write the evolutions yourself, remove this comment (both lines), then Play Ebean doesn't touch the file anymore.
 
+Some of Ebean's statements contain semicolons, like the stored procedures that Ebean creates on MySQL, MariaDB and SQL Server, or the triggers for [`@History`](https://ebean.io/docs/features/history). Play Ebean splits the DDL like Ebean itself does, and writes such statements between `-- !split-semicolon: never` and `-- !split-semicolon: always` comments, so that Play runs each of them as a whole (see the [evolutions scripts](https://www.playframework.com/documentation/latest/Evolutions#Evolutions-scripts)).
+
+As soon as a production database uses the generated script, remove the comment or turn off generating the script, before you upgrade Ebean or Play Ebean, or run the application in dev mode or its tests again. Write further changes as new evolution scripts (`2.sql` and so on). Otherwise, a dev mode start or a test run can change `1.sql`, e.g. after upgrading Ebean or Play Ebean, and Play can then only apply the changed evolution by reverting the applied one with the down script stored in the database. Removing the comment doesn't change the evolution itself. This especially applies when upgrading to Play Ebean 9, which writes the scripts differently where Ebean's DDL contains statements with semicolons, e.g. on MySQL, MariaDB and SQL Server, on Oracle with sequences, or with `@History`.
+
 You can turn off generating the scripts for all Ebean servers, and override that for single Ebean servers:
 
 ```properties
