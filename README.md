@@ -65,7 +65,7 @@ We also recommend using the payintech fork: https://github.com/payintech/play-eb
 - `PLAY_EBEAN_TEST_<DB>_USER`
 - `PLAY_EBEAN_TEST_<DB>_PASSWORD`, or `PLAY_EBEAN_TEST_<DB>_PASSWORD_FILE` to read the password from a file
 
-`<DB>` is one of `POSTGRES`, `MYSQL`, `MARIADB`, `SQLSERVER` and `ORACLE`. Use an empty database that you can throw away, because the test creates and drops its tables, and Ebean's stored procedures and history tables.
+`<DB>` is one of `POSTGRES`, `MYSQL`, `MARIADB`, `SQLSERVER` and `ORACLE`. Use an empty, disposable database. The test creates and drops model and history tables. It also creates Ebean helper procedures, which may remain afterward.
 
 For example, start the databases with Docker:
 
