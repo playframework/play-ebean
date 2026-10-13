@@ -97,7 +97,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                 return;
               }
               File evolutions =
-                  environment.getFile(
+                  evolutionsFile(
                       Evolutions$.MODULE$.fileName(
                           key, 1, evolutionsConfig.forDatasource(key).path()));
               try {
@@ -109,8 +109,7 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                 if (content.isEmpty()
                     || content.startsWith("# --- Created by Ebean DDL")
                     || content.startsWith("-- Created by Ebean DDL")) {
-                  environment
-                      .getFile(
+                  evolutionsFile(
                           Evolutions$.MODULE$.directoryName(
                               key, evolutionsConfig.forDatasource(key).path()))
                       .mkdirs();
@@ -123,6 +122,15 @@ public class EbeanDynamicEvolutions extends DynamicEvolutions {
                 throw new RuntimeException(e);
               }
             });
+  }
+
+  /**
+   * Resolves the location of an evolution script like Play's evolutions do: an absolute path as it
+   * is, any other path relative to the application's root folder.
+   */
+  private File evolutionsFile(String path) {
+    File file = new File(path);
+    return file.isAbsolute() ? file : environment.getFile(path);
   }
 
   /**
