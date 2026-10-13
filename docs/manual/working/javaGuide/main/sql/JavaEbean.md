@@ -85,14 +85,15 @@ This is independent of whether Play applies the evolutions to a database (`play.
 
 Play Ebean writes the script where Play's evolutions look for it, so it follows the [location of the evolution scripts](https://www.playframework.com/documentation/latest/Evolutions#Location-of-the-evolution-scripts) (`play.evolutions.path` or `play.evolutions.db.<name>.path`), including absolute paths and paths relative to the project's root folder.
 
-If your project doesn't use Play's layout (`disablePlugins(PlayLayoutPlugin)`), so that its resources are in `src/main/resources` instead of `conf`, be aware that Play still looks for the scripts in `conf/evolutions/<name>/` first, but doesn't package that folder. So the script that Play Ebean generates there would be missing in production, and in dev and test mode it would take precedence over a script of yours in `src/main/resources/evolutions/<name>/`. You can let Play Ebean write the script into the resources in dev and test mode:
+If your project doesn't use Play's layout (it disables the `PlayLayoutPlugin`, or only enables `PlayService`), so that its resources are in `src/main/resources` instead of `conf`, be aware that Play still looks for the scripts in `conf/evolutions/<name>/` first, but doesn't package that folder. So the script that Play Ebean generates there would be missing in production, and in dev and test mode it would take precedence over a script of yours in `src/main/resources/evolutions/<name>/`. You can let Play Ebean write the scripts into the resources instead. For dev mode, set the location in your `build.sbt`:
 
-```properties
-# Generates the script in src/main/resources/evolutions/default/1.sql
-play.evolutions.db.default.path = "./src/main/resources/evolutions"
+```scala
+PlayKeys.devSettings += "play.evolutions.path" -> "./src/main/resources/evolutions"
 ```
 
-Then start the application in production with `-Dplay.evolutions.db.default.path=evolutions`, so that Play reads the packaged script from the classpath. Or turn off generating the script, as shown above. That doesn't remove a script that Play Ebean generated before, so if there is a generated `conf/evolutions/<name>/1.sql` that you don't want, delete that file.
+The tests don't use these settings, so set the location in the configuration of their applications as well, e.g. with `new GuiceApplicationBuilder().configure("play.evolutions.path", "./src/main/resources/evolutions")`. In production, Play then uses the default location, and reads the packaged scripts. Note that Play Ebean only generates the scripts in dev and test mode, not with `sbt stage` or `sbt dist`, so run the application in dev mode or its tests before you package it.
+
+Or turn off generating the script, as shown above. That doesn't remove a script that Play Ebean generated before, so if there is a generated `conf/evolutions/<name>/1.sql` that you don't want, delete that file.
 
 > For more information about Ebean, see the [Ebean documentation](https://ebean-orm.github.io/docs).
 
