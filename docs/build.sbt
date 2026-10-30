@@ -13,7 +13,7 @@ ThisBuild / resolvers += Resolver.sonatypeCentralSnapshots
 
 val scalaVersionAliases = Map(
   "2.13.x" -> "2.13.18",
-  "3.3.x"  -> "3.3.8",
+  "3.3.x"  -> "3.3.9",
   "3.9.x"  -> "3.9.0",
   "3.next" -> "3.10.0-RC3",
 )
@@ -35,7 +35,7 @@ lazy val docs = project
       val selected = sys.props.getOrElse("scala.version", "2.13.18")
       scalaVersionAliases.getOrElse(selected, selected)
     },
-    crossScalaVersions := Seq("2.13.18", "3.3.8"),
+    crossScalaVersions := Seq("2.13.18", "3.3.9"),
     scalacOptions ++= {
       if (scalaVersion.value.startsWith("3.3.")) Seq("-release:17", "-Yfuture-lazy-vals") else Seq.empty
     },
