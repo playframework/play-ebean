@@ -13,7 +13,7 @@ object Dependencies {
     val scala213Version   = "2.13.18"
     val scala33LTSVersion = "3.3.9"
     val scala39LTSVersion = "3.9.0"
-    val scala3NextVersion = "3.10.0-RC3"
+    val scala3NextVersion = "3.10.0"
 
     val publishedScalaVersions = Seq(scala213Version, scala33LTSVersion)
 
@@ -51,7 +51,7 @@ object Dependencies {
     "org.xerial"               % "sqlite-jdbc"         % "3.53.4.0"     % Test,
     "org.postgresql"           % "postgresql"          % "42.7.14"      % Test,
     "com.mysql"                % "mysql-connector-j"   % "26.10.0"      % Test,
-    "org.mariadb.jdbc"         % "mariadb-java-client" % "3.5.11"       % Test,
+    "org.mariadb.jdbc"         % "mariadb-java-client" % "4.0.0"        % Test,
     "com.microsoft.sqlserver"  % "mssql-jdbc"          % "13.6.1.jre11" % Test,
     "com.oracle.database.jdbc" % "ojdbc11"             % "23.26.3.0.0"  % Test,
     ("org.reflections"         % "reflections"         % "0.10.2")
