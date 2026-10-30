@@ -48,7 +48,7 @@ object Dependencies {
     "org.playframework" %% "play-test"            % Versions.play % Test,
     "com.h2database"     % "h2"                   % "2.5.252"     % Test,
     // For the tests on real databases, which apart from SQLite only run when configured
-    "org.xerial"               % "sqlite-jdbc"         % "3.53.4.0"     % Test,
+    "org.xerial"               % "sqlite-jdbc"         % "3.54.1.0"     % Test,
     "org.postgresql"           % "postgresql"          % "42.7.14"      % Test,
     "com.mysql"                % "mysql-connector-j"   % "26.10.0"      % Test,
     "org.mariadb.jdbc"         % "mariadb-java-client" % "3.5.11"       % Test,
