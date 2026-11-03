@@ -52,7 +52,7 @@ object Dependencies {
     "org.postgresql"           % "postgresql"          % "42.7.14"      % Test,
     "com.mysql"                % "mysql-connector-j"   % "26.10.0"      % Test,
     "org.mariadb.jdbc"         % "mariadb-java-client" % "4.0.0"        % Test,
-    "com.microsoft.sqlserver"  % "mssql-jdbc"          % "13.6.1.jre11" % Test,
+    "com.microsoft.sqlserver"  % "mssql-jdbc"          % "13.6.2.jre11" % Test,
     "com.oracle.database.jdbc" % "ojdbc11"             % "23.26.4.0.0"  % Test,
     ("org.reflections"         % "reflections"         % "0.10.2")
       .exclude("com.google.code.findbugs" % "annotations")
