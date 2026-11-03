@@ -8,6 +8,7 @@ import Dependencies.ScalaVersions.scala3PluginVersion
 import Dependencies.ScalaVersions.scala33LTSVersion
 import Dependencies.Versions
 import com.typesafe.tools.mima.core._
+import java.nio.file.Files
 import sbt.Append.appendSeq
 import xsbti.compile.CompileAnalysis
 
@@ -100,7 +101,7 @@ lazy val plugin = project
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.12.9"
-        case _      => "2.1.0-M2"
+        case _      => "2.1.0-RC2"
       }
     },
     scalacOptions ++= {
@@ -120,6 +121,9 @@ lazy val plugin = project
             if (scalaBinaryVersion.value == "2.12") scala213Version else scala33LTSVersion
           )
         )}",
+      // sbt 2 reuses the results of tests whose classes didn't change, also across the scripted tests, as it leaves out
+      // the main resources like application.conf. But the scripted tests check what running their tests does.
+      "-Dsbt.cache_test_result=false",
     ),
     scriptedBufferLog    := false,
     scriptedDependencies := publishLocal.value,
@@ -154,6 +158,14 @@ def enhanceEbeanClasses(
     pkg: String,
     converter: FileConverter,
 ): CompileAnalysis = {
+  // The enhancer rewrites class files in place, but sbt 2 restores the class files of a cached compile as links into
+  // its read-only cache, so turn them into regular files first (see https://github.com/sbt/sbt/issues/10036)
+  (classDirectory / pkg.stripSuffix("**") ** "*.class").get().map(_.toPath).filter(Files.isSymbolicLink).foreach {
+    link =>
+      val bytes = Files.readAllBytes(link)
+      Files.delete(link)
+      Files.write(link, bytes)
+  }
   // Ebean (really hacky sorry)
   val cp = classpath.map(_.data).map(converter.toPath).map(_.toFile.toURI.toURL).toArray :+ classDirectory.toURI.toURL
   val cl = new java.net.URLClassLoader(cp)

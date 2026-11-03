@@ -27,7 +27,7 @@ object Dependencies {
 
     def resolveScalaVersion(version: String): String = scalaVersionAliases.getOrElse(version, version)
 
-    // sbt 2.1.0-M2 itself is built with Scala 3.9.0.
+    // sbt 2.1.0 itself is built with Scala 3.9.0.
     val scala3PluginVersion = scala39LTSVersion
   }
 
