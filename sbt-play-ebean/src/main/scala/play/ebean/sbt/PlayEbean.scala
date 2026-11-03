@@ -5,6 +5,7 @@
 package play.ebean.sbt
 
 import java.net.URLClassLoader
+import java.nio.file.Files
 import io.ebean.enhance.Transformer
 import io.ebean.enhance.ant.OfflineFileTransform
 import play.sbt.PluginCompat
@@ -113,6 +114,21 @@ object PlayEbean extends AutoPlugin {
       .distinct
   }
 
+  /**
+   * Turns the class files below the packages that are links into regular files, because the enhancer rewrites class
+   * files in place: sbt 2 restores the class files of a cached compile as links into its cache, which must not be
+   * written to (read-only since sbt 2.0.10 and 2.1.0-RC1, see https://github.com/sbt/sbt/issues/10036).
+   */
+  private def copyLinkedClassFiles(packages: Seq[String], classes: File): Unit =
+    packages.foreach { pkg =>
+      (new File(classes, pkg.replace('.', '/')) ** "*.class").get().map(_.toPath).filter(Files.isSymbolicLink).foreach {
+        link =>
+          val bytes = Files.readAllBytes(link)
+          Files.delete(link)
+          Files.write(link, bytes)
+      }
+    }
+
   def ebeanEnhance: Def.Initialize[Task[CompileResult]] =
     Def.task {
 
@@ -142,6 +158,7 @@ object PlayEbean extends AutoPlugin {
         val packages = packagesToEnhance(models, classes)
         // An empty list would make the enhancer process all classes
         if (packages.nonEmpty) {
+          copyLinkedClassFiles(packages, classes)
           fileTransform.process(packages.mkString(","))
         }
 

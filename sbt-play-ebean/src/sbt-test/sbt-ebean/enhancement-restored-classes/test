@@ -1,0 +1,17 @@
+> test
+
+# sbt 2 restores the class files of an unchanged compile from its cache, as links into the cache
+# (https://github.com/sbt/sbt/issues/10036). The enhancement must not write to them: the cache is read-only, and it
+# must keep the compiler's output.
+$ delete target/out
+> compileIncremental
+> recordCachedTask
+> test
+> checkCachedTask
+
+# the same when going back to an earlier version of a model
+$ copy-file app/models/Task.java saved/Task.java
+$ copy-file changes/Task.java app/models/Task.java
+> test
+$ copy-file saved/Task.java app/models/Task.java
+> test
