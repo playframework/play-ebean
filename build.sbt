@@ -121,6 +121,9 @@ lazy val plugin = project
             if (scalaBinaryVersion.value == "2.12") scala213Version else scala33LTSVersion
           )
         )}",
+      // sbt 2 reuses the results of tests whose classes didn't change, also across the scripted tests, as it leaves out
+      // the main resources like application.conf. But the scripted tests check what running their tests does.
+      "-Dsbt.cache_test_result=false",
     ),
     scriptedBufferLog    := false,
     scriptedDependencies := publishLocal.value,
