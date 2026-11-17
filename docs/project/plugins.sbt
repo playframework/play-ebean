@@ -9,7 +9,7 @@ resolvers += Resolver.sonatypeCentralSnapshots
 addSbtPlugin(
   "org.playframework" % "play-docs-sbt-plugin" % sys.props.getOrElse(
     "play.version",
-    "3.1.0-M10-3968a052-SNAPSHOT"
+    "3.1.0-M10-de32fcb4-SNAPSHOT"
   )
 )
 
