@@ -49,7 +49,7 @@ object Dependencies {
     "com.h2database"     % "h2"                   % "2.5.252"     % Test,
     // For the tests on real databases, which apart from SQLite only run when configured
     "org.xerial"               % "sqlite-jdbc"         % "3.54.1.0"     % Test,
-    "org.postgresql"           % "postgresql"          % "42.7.14"      % Test,
+    "org.postgresql"           % "postgresql"          % "42.7.15"      % Test,
     "com.mysql"                % "mysql-connector-j"   % "26.10.0"      % Test,
     "org.mariadb.jdbc"         % "mariadb-java-client" % "4.0.0"        % Test,
     "com.microsoft.sqlserver"  % "mssql-jdbc"          % "13.6.2.jre11" % Test,
